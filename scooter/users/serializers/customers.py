@@ -89,4 +89,4 @@ class CustomerSignUpSerializer(serializers.Serializer):
                                             data=data)
         if not send_email:
             raise serializers.ValidationError({'detail': 'Ha ocurrido un error al enviar el correo'})
-        return user
+        return customer
