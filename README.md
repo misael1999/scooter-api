@@ -1,6 +1,6 @@
-Ecommerce Tehuacan
+Scooter
 =============
 
-Plataforma de compra y venta de comercios locales
+Plataforma de servicios a domicilio
 
 
