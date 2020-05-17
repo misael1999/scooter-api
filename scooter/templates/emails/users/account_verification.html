@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+            font-size: 100%;
+            font-family: 'Avenir Next', "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
+            line-height: 1.65;
+        }
+
+        img {
+            max-width: 60%;
+            max-height: 80px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        body,
+        .body-wrap {
+            width: 100% !important;
+            height: 100%;
+            background: #f8f8f8;
+        }
+
+        a {
+            color: #506fba;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-left {
+            text-align: left;
+        }
+
+        .button {
+            display: inline-block;
+            color: white;
+            background: #506fba;
+            border: solid #506fba;
+            border-width: 10px 20px 8px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer !important;
+        }
+
+        .button:hover {
+            text-decoration: none;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            margin-bottom: 20px;
+            line-height: 1.25;
+        }
+
+        h1 {
+            font-size: 32px;
+        }
+
+        h2 {
+            font-size: 28px;
+        }
+
+        h3 {
+            font-size: 24px;
+        }
+
+        h4 {
+            font-size: 20px;
+        }
+
+        h5 {
+            font-size: 16px;
+        }
+
+        p,
+        ul,
+        ol {
+            font-size: 16px;
+            font-weight: normal;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            display: block !important;
+            clear: both !important;
+            margin: 0 auto !important;
+            max-width: 580px !important;
+        }
+
+        .container table {
+            width: 100% !important;
+            border-collapse: collapse;
+        }
+
+        .container .masthead {
+            padding: 40px 0;
+            background: #ffff !important;
+            color: white;
+        }
+
+        .container .masthead h1 {
+            margin: 0 auto !important;
+            max-width: 90%;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        .container .content {
+            background: white;
+            padding: 30px 35px;
+        }
+
+        .container .content.footer {
+            background: none;
+        }
+
+        .container .content.footer p {
+            margin-bottom: 0;
+            color: #888;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .container .content.footer a {
+            color: #888;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .container .content.footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <table class="body-wrap">
+        <tr>
+            <td class="container">
+
+                <!-- Message start -->
+                <table>
+                    <tr>
+                        <td align="center" class="masthead">
+
+                            <!--                             <h1 style="color: #fff !important">Garage coders</h1>
+             -->
+                            <img src="https://i.ibb.co/2YcywZz/logo.png"/>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="content">
+                        {% if user.client.name %}
+                            <h2>Hola {{ user.client.name }} !</h2>
+                        {% endif %}
+
+                        {% if user.merchant.business_name %}
+                            <h2>Hola {{ user.merchant.business_name }} !</h2>
+                        {% endif %}
+
+                            <p>
+                                    Antes de usar <strong>Comercio Teh</strong> necesitamos que realices una ultima cosa.
+                                    Por favor da click al siguiente boton para verificar tu cuenta.
+                            </p>
+
+                            <table>
+                                <tr>
+                                    <td align="center">
+                                        <p>
+                                            <a href="{{ url }}/auth/verify-account?token={{ token }}" class="button">
+                                                Verificar cuenta</a>
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- <p>By the way, if you're wondering where you can find more of this fine meaty filler, visit
+                                            <a href="http://baconipsum.com">Bacon Ipsum</a>.</p>
+
+                                        <p><em>– Mr. Pen</em></p> -->
+
+                        </td>
+                    </tr>
+                </table>
+
+            </td>
+        </tr>
+        <tr>
+            <td class="container">
+
+                <!-- Message start -->
+                <table>
+                    <tr>
+                        <td class="content footer" align="center">
+                            <p>Enviado por <a href="#">Comercio Teh</a>, Insurgentes sur #1722 Col. Florida</p>
+                            <!--                             <p><a href="mailto:">hello@company.com</a> | <a href="#">Unsubscribe</a></p>
+             -->
+                        </td>
+                    </tr>
+                </table>
+
+            </td>
+        </tr>
+    </table>
+
+</body>
+
+</html>
+
+
+
+<p>
+
+</p>
+

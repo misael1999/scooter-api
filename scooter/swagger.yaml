@@ -1,0 +1,38 @@
+swagger: '2.0'
+info:
+  title: SCOOTER API REST
+  description: It is API to scooter app
+  termsOfService: https://www.google.com/policies/terms/
+  contact:
+    email: misael.gonzalez.e.229@gmail.com
+  license:
+    name: BSD License
+  version: v1
+basePath: /
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  Basic:
+    type: basic
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+security:
+  - Basic: []
+  - bearerAuth: []
+paths:
+  /commons/status/:
+    get:
+      operationId: general_status_get
+      description: Return all status.
+      parameters: []
+      responses:
+        '200':
+          description: 'Regresa todos los estatus que se ocupan de manera general'
+      tags:
+        - Common
+    parameters: []
+

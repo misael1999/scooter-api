@@ -1,0 +1,4 @@
+
+LIMIT_UPLOAD_IMAGES = 6
+URL_SERVER_BACKEND = 'http://localhost:8000'
+URL_SERVER_FRONTEND = 'http://localhost:4200'

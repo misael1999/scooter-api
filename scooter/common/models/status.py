@@ -1,0 +1,9 @@
+""" Status models """
+from django.db import models
+
+
+class Status(models.Model):
+    name = models.CharField(max_length=30)
+    slug_name = models.CharField(max_length=30)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
