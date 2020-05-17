@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ad7ecdc6-1d1d-4762-8c46-4c8321586ddb" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/settings/local.py" beforeDir="false" afterPath="$PROJECT_DIR$/config/settings/local.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -55,7 +53,7 @@
       <updated>1589668168434</updated>
       <workItem from="1589668177615" duration="2823000" />
       <workItem from="1589674557640" duration="475000" />
-      <workItem from="1589675141910" duration="3044000" />
+      <workItem from="1589675141910" duration="3171000" />
     </task>
     <servers />
   </component>
