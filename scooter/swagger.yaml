@@ -97,7 +97,7 @@ paths:
       parameters:
         - name: body
           in: body
-          description: Login
+          description: Registro de clientes
           schema:
             $ref: '#/definitions/RegisterCustomer'
       responses:

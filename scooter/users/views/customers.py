@@ -46,8 +46,8 @@ class CustomerViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         serializer = serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        message = 'Gracias por registrarte, tienes hasta el {time} para vericar tu cuenta'\
-            .format(user.verification_deadline)
+        message = 'Gracias por registrarte, tienes hasta el {time} para verificar tu cuenta'\
+            .format(time=str(user.verification_deadline))
         data = self.set_response(status='ok',
                                  data=UserModelSimpleSerializer(user).data,
                                  message=message)
