@@ -112,6 +112,11 @@ ENV/
 env.bak/
 venv.bak/
 config/settings/.env
+config/__pycache__/urls.cpython-36.pyc
+config/settings/__pycache__/base.cpython-36.pyc
+config/settings/__pycache__/local.cpython-36.pyc
+.idea/workspace.xml
+.idea/*
 
 # Spyder project settings
 .spyderproject
@@ -131,3 +136,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+scooter/templates/emails/merchants/
