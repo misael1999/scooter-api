@@ -4,7 +4,7 @@ from rest_framework.decorators import action
 from rest_framework import status
 from rest_framework.response import Response
 # Custom viewset
-from scooter.utils.viewsets import EcommerceViewSet
+from scooter.utils.viewsets import ScooterViewSet
 # Permissions
 from rest_framework.permissions import AllowAny, IsAuthenticated
 # Models
@@ -13,7 +13,7 @@ from scooter.common.models.status import Status
 from scooter.common.serializers.status import (StatusModelSerializer,)
 
 
-class StatusViewSet(EcommerceViewSet):
+class StatusViewSet(ScooterViewSet):
     """ Return status"""
     lookup_field = 'id'
     permission_classes = (IsAuthenticated,)

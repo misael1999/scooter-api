@@ -1,1 +1,1 @@
-from .ecommerce import *
+from .scooter import *

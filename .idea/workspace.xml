@@ -2,7 +2,17 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ad7ecdc6-1d1d-4762-8c46-4c8321586ddb" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/config/settings/local.py" beforeDir="false" afterPath="$PROJECT_DIR$/config/settings/local.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scooter/users/managers/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/settings/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/config/settings/base.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/config/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scooter/common/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/scooter/common/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scooter/common/serializers/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/scooter/common/serializers/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scooter/common/views/status.py" beforeDir="false" afterPath="$PROJECT_DIR$/scooter/common/views/status.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scooter/swagger.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/scooter/swagger.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scooter/templates/emails/users/account_verification.html" beforeDir="false" afterPath="$PROJECT_DIR$/scooter/templates/emails/users/account_verification.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scooter/templates/emails/users/recover_password.html" beforeDir="false" afterPath="$PROJECT_DIR$/scooter/templates/emails/users/recover_password.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scooter/utils/models/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/scooter/utils/models/__init__.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,7 +63,7 @@
       <updated>1589668168434</updated>
       <workItem from="1589668177615" duration="2823000" />
       <workItem from="1589674557640" duration="475000" />
-      <workItem from="1589675141910" duration="3171000" />
+      <workItem from="1589675141910" duration="13133000" />
     </task>
     <servers />
   </component>
@@ -61,10 +71,10 @@
     <option name="version" value="1" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="458" y="204" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1589676794640">
+    <state x="458" y="204" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1589727140685">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state x="458" y="204" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1440.900@0.0.1440.900" timestamp="1589676794640" />
+    <state x="458" y="204" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1440.900@0.0.1440.900" timestamp="1589727140685" />
     <state x="508" y="211" key="FileChooserDialogImpl" timestamp="1589674764726">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
@@ -77,5 +87,9 @@
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="399" y="282" key="com.intellij.ide.util.TipDialog/0.0.1440.900@0.0.1440.900" timestamp="1589668178165" />
+    <state x="386" y="207" width="667" height="486" key="find.popup" timestamp="1589727407028">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="386" y="207" width="667" height="486" key="find.popup/0.0.1440.900@0.0.1440.900" timestamp="1589727407028" />
   </component>
 </project>

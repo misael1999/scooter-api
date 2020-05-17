@@ -23,8 +23,11 @@ securityDefinitions:
 security:
   - Basic: []
   - bearerAuth: []
+
+# ====== PATHS =======
 paths:
-  /commons/status/:
+  # STATUS
+  /api/v1/commons/status/:
     get:
       operationId: general_status_get
       description: Return all status.
@@ -33,6 +36,193 @@ paths:
         '200':
           description: 'Regresa todos los estatus que se ocupan de manera general'
       tags:
-        - Common
+        - Común
     parameters: []
+  # LOGIN CUSTOMER
+  /api/v1/users/login/customer/:
+    post:
+      operationId: api_login_token
+      description: Login de clientes
+      parameters:
+        - name: body
+          in: body
+          description: Login
+          schema:
+            $ref: '#/definitions/LoginToken'
+      responses:
+        '200':
+          description: 'Regresa información del cliente y su access_token'
+      tags:
+        - Clientes
+    parameters: []
+  # FORGOT PASSWORD
+  /api/v1/users/forgot-password/:
+    post:
+      operationId: forgot_password_customer
+      description: Correo para obtener token de recuperación
+      parameters:
+        - name: body
+          in: body
+          description: Recuperar contraseña
+          schema:
+            $ref: '#/definitions/ForgotPassword'
+      responses:
+        '200':
+          description: 'Envío de correo para obtener un token de recuperación'
+      tags:
+        - Clientes
+    parameters: []
+  # RECOVER PASSWORD
+  /api/v1/users/recover-password/:
+    post:
+      operationId: recover_password_customer
+      description: Recuperar contraseña del cliente
+      parameters:
+        - name: body
+          in: body
+          description: Recuperar contraseña
+          schema:
+            $ref: '#/definitions/RecoverPassword'
+      responses:
+        '200':
+          description: 'Contraseña cambiada'
+      tags:
+        - Clientes
+    parameters: []
+  # REGISTER CUSTOMER
+  /api/v1/customers/:
+    post:
+      operationId: register_client
+      description: Registro de clientes
+      parameters:
+        - name: body
+          in: body
+          description: Login
+          schema:
+            $ref: '#/definitions/RegisterCustomer'
+      responses:
+        '201':
+          description: 'Información del cliente y mensaje'
+      tags:
+        - Clientes
+    parameters: []
+  # UPDATE CUSTOMER
+  /api/v1/customers/{id}/:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+    patch:
+      operationId: update_client
+      description: Actualizar datos del cliente
+      parameters:
+        - name: body
+          in: body
+          description: Login
+          schema:
+            $ref: '#/definitions/UpdateCustomer'
+      responses:
+        '201':
+          description: 'Información del cliente y mensaje'
+      tags:
+        - Clientes
+    get:
+      operationId: get_client
+      description: Obtener datos del cliente
+      responses:
+        '201':
+          description: 'Información del cliente y mensaje'
+      tags:
+        - Clientes
+# ======== DEFINITIONS ==============
+definitions:
+  # LOGIN CUSTOMER
+  LoginToken:
+    type: object
+    properties:
+      email:
+        type: string
+        description: Correo
+      password:
+        type: string
+        description: Contraseña
+    required:
+      - email
+      - password
+  # FORGOT PASSWORD
+  ForgotPassword:
+    type: object
+    properties:
+      email:
+        type: string
+        description: Correo
+    required:
+      - email
+  # RECOVER PASSWORD
+  RecoverPassword:
+    type: object
+    properties:
+      token:
+        type: string
+        description: Token de recuperación
+      password:
+        type: string
+        description: Nueva contraseña
+    required:
+      - token
+      - password
+  # REGISTER CUSTOMER
+  RegisterCustomer:
+    type: object
+    properties:
+      email:
+        type: string
+        description: Correo
+      password:
+        type: string
+        description: Contraseña
+      name:
+        type: string
+        description: Nombre(s) del cliente
+      last_name:
+        type: string
+        description: Apellidos del cliente
+      birthdate:
+        type: string
+        description: Fecha de nacimiento
+        format: date
+        example: '2019-05-19'
+      phone_number:
+        type: string
+        description: Numero de teléfono
+    required:
+      - email
+      - password
+      - name
+      - last_name
+      - birthdate
+      - phone_number
+  # UPDATE CUSTOMER
+  UpdateCustomer:
+    type: object
+    properties:
+      name:
+        type: string
+        description: Nombre(s) del cliente
+      last_name:
+        type: string
+        description: Apellidos del cliente
+      birthdate:
+        type: string
+        description: Fecha de nacimiento
+        format: date
+        example: '2019-05-19'
+      phone_number:
+        type: string
+        description: Numero de teléfono
+      picture:
+        type: string
+        description: Imagen de perfil
+
 

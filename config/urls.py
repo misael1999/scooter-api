@@ -10,8 +10,10 @@ urlpatterns = [
     # Django Admin
     path('', include('swagger_ui.urls')),
     path(settings.ADMIN_URL, admin.site.urls),
-
     #  Apps Urls
-
+    # Users
+    path('', include('scooter.users.urls')),
+    # Common
+    path('', include('scooter.common.urls'))
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

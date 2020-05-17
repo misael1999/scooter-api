@@ -38,7 +38,7 @@ ROOT_URLCONF = 'config.urls'
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # USERS AND AUTHENTICATION
-# AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = 'users.User'
 
 # Apps
 DJANGO_APPS = [
@@ -56,6 +56,8 @@ THIRD_PARTY_APPS = [
     'corsheaders'
 ]
 LOCAL_APPS = [
+    'scooter.users.apps.UsersAppConfig',
+    'scooter.common.apps.CommonsAppConfig',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
