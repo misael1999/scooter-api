@@ -38,22 +38,22 @@ paths:
       tags:
         - Común
     parameters: []
-  # LOGIN CUSTOMER
-  /api/v1/users/login/customer/:
+  # VERIFY ACCOUNT
+  /api/v1/users/verify/:
     post:
-      operationId: api_login_token
-      description: Login de clientes
+      operationId: verify_account_customer
+      description: Verificar cuenta del cliente
       parameters:
         - name: body
           in: body
-          description: Login
+          description: Verificar cuenta ingresando el token recibido por correo electronico
           schema:
-            $ref: '#/definitions/LoginToken'
+            $ref: '#/definitions/VerifyAccount'
       responses:
         '200':
-          description: 'Regresa información del cliente y su access_token'
+          description: 'Información del usuario verificado'
       tags:
-        - Clientes
+        - Usuarios general
     parameters: []
   # FORGOT PASSWORD
   /api/v1/users/forgot-password/:
@@ -70,7 +70,7 @@ paths:
         '200':
           description: 'Envío de correo para obtener un token de recuperación'
       tags:
-        - Clientes
+        - Usuarios general
     parameters: []
   # RECOVER PASSWORD
   /api/v1/users/recover-password/:
@@ -86,6 +86,23 @@ paths:
       responses:
         '200':
           description: 'Contraseña cambiada'
+      tags:
+        - Usuarios general
+    parameters: []
+  # LOGIN CUSTOMER
+  /api/v1/customers/login/:
+    post:
+      operationId: customer_login
+      description: Login de clientes
+      parameters:
+        - name: body
+          in: body
+          description: Login
+          schema:
+            $ref: '#/definitions/LoginToken'
+      responses:
+        '200':
+          description: 'Regresa información del cliente y su access_token'
       tags:
         - Clientes
     parameters: []
@@ -119,7 +136,7 @@ paths:
       parameters:
         - name: body
           in: body
-          description: Login
+          description: Actualizar datos del cliente
           schema:
             $ref: '#/definitions/UpdateCustomer'
       responses:
@@ -135,6 +152,69 @@ paths:
           description: 'Información del cliente y mensaje'
       tags:
         - Clientes
+  # STATION LOGIN
+  /api/v1/stations/login/:
+    post:
+      operationId: station_login
+      description: Login de centrales
+      parameters:
+        - name: body
+          in: body
+          description: Login
+          schema:
+            $ref: '#/definitions/LoginToken'
+      responses:
+        '200':
+          description: 'Regresa información del cliente y su access_token'
+      tags:
+        - Centrales
+    parameters: []
+  # REGISTER STATIONS
+  /api/v1/stations/:
+    post:
+      operationId: register_station
+      description: Registro de centrales
+      parameters:
+        - name: body
+          in: body
+          description: Registro de centrales
+          schema:
+            $ref: '#/definitions/RegisterStation'
+      responses:
+        '201':
+          description: 'Información de la central'
+      tags:
+        - Centrales
+    parameters: []
+  # UPDATE STATIONS
+  /api/v1/stations/{id}/:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+    patch:
+      operationId: update_client
+      description: Actualizar datos de la central
+      parameters:
+        - name: body
+          in: body
+          description: Actualizar datos de la central
+          schema:
+            $ref: '#/definitions/UpdateStation'
+      responses:
+        '201':
+          description: 'Información de la central'
+      tags:
+        - Centrales
+    get:
+      operationId: get_station
+      description: Obtener datos de la central
+      responses:
+        '201':
+          description: 'Información de la central'
+      tags:
+        - Centrales
 # ======== DEFINITIONS ==============
 definitions:
   # LOGIN CUSTOMER
@@ -157,8 +237,16 @@ definitions:
       email:
         type: string
         description: Correo
-    required:
-      - email
+      required:
+        - email
+  VerifyAccount:
+    type: object
+    properties:
+      token:
+        type: string
+        description: Token
+      required:
+        - token
   # RECOVER PASSWORD
   RecoverPassword:
     type: object
@@ -169,9 +257,9 @@ definitions:
       password:
         type: string
         description: Nueva contraseña
-    required:
-      - token
-      - password
+      required:
+        - token
+        - password
   # REGISTER CUSTOMER
   RegisterCustomer:
     type: object
@@ -221,6 +309,37 @@ definitions:
       phone_number:
         type: string
         description: Numero de teléfono
+      picture:
+        type: string
+        description: Imagen de perfil
+  # REGISTER STATION
+  RegisterStation:
+    type: object
+    properties:
+      email:
+        type: string
+        description: Correo
+      password:
+        type: string
+        description: Contraseña
+      station_name:
+        type: string
+        description: Nombre de la central
+      contact_person:
+        type: string
+        description: Persona de contacto
+    required:
+      - email
+      - password
+      - station_name
+      - contact_person
+  # UPDATE STATION
+  UpdateStation:
+    type: object
+    properties:
+      contact_person:
+        type: string
+        description: Persona de contacto
       picture:
         type: string
         description: Imagen de perfil
