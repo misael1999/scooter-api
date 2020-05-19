@@ -63,7 +63,8 @@ class StationUserModelSerializer(serializers.ModelSerializer):
 
 
 class StationSignUpSerializer(serializers.Serializer):
-    email = serializers.EmailField(
+    username = serializers.CharField(
+        max_length=150,
         validators=[UniqueValidator(
             queryset=User.objects.all(),
             message='El email ya esta en uso')])
@@ -76,7 +77,7 @@ class StationSignUpSerializer(serializers.Serializer):
 
     def create(self, data):
         try:
-            user = User(email=data['email'],
+            user = User(username=data['username'],
                         is_verified=False,
                         is_client=False,
                         verification_deadline=timezone.now() + timedelta(minutes=20))
@@ -98,7 +99,7 @@ class StationSignUpSerializer(serializers.Serializer):
                 'url': settings.URL_SERVER_FRONTEND
             }
             send_email = send_mail_verification(subject=subject,
-                                                to_user=user.email,
+                                                to_user=user.username,
                                                 path_template="emails/users/account_verification.html",
                                                 data=data)
             if not send_email:

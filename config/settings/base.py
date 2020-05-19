@@ -58,6 +58,7 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     'scooter.users.apps.UsersAppConfig',
     'scooter.common.apps.CommonsAppConfig',
+    'scooter.delivery_men.apps.DeliverMenAppConfig',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

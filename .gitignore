@@ -120,6 +120,7 @@ config/settings/__pycache__/local.cpython-36.pyc
 !**/__pycache__/
 !**/migrations/
 !**/migrations/**/__pycache__/
+scooter/media/*
 
 
 # Spyder project settings

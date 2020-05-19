@@ -17,7 +17,7 @@ from scooter.utils.functions import send_mail_verification, generate_verificatio
 class UserModelSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('email', 'is_verified')
+        fields = ('username', 'is_verified')
 
 
 class AccountVerificationSerializer(serializers.Serializer):
@@ -38,7 +38,7 @@ class AccountVerificationSerializer(serializers.Serializer):
 
     def create(self, data):
         payload = self.context['payload']
-        user = User.objects.get(email=payload['email'])
+        user = User.objects.get(username=payload['email'])
         # Validate if the user has already been verified
         if user.is_verified:
             raise serializers.ValidationError({'detail': 'El usuario ya se encuentra verificado'},
@@ -51,11 +51,11 @@ class AccountVerificationSerializer(serializers.Serializer):
 
 class ResendCodeAccountVerificationSerializer(serializers.Serializer):
 
-    email = serializers.EmailField()
+    username = serializers.EmailField()
 
     def create(self, data):
         try:
-            user = User.objects.get(email=data['email'])
+            user = User.objects.get(username=data['username'])
             if user.is_verified:
                 raise serializers.ValidationError({'detail': 'El usuario ya se encuentra verificado'})
             code = generate_verification_token(user=user,
@@ -69,7 +69,7 @@ class ResendCodeAccountVerificationSerializer(serializers.Serializer):
                 'url': settings.URL_SERVER_FRONTEND
             }
             send_email = send_mail_verification(subject=subject,
-                                                to_user=user.email,
+                                                to_user=user.username,
                                                 path_template="emails/users/account_verification.html",
                                                 data=data)
             if not send_email:
@@ -84,7 +84,7 @@ class RecoverPasswordSerializer(serializers.Serializer):
 
     def create(self, data):
         try:
-            user = User.objects.get(email=data['email'])
+            user = User.objects.get(username=data['email'])
             code = generate_verification_token(user=user,
                                                exp=timezone.now() + timedelta(minutes=15),
                                                token_type='recover_password')
@@ -96,7 +96,7 @@ class RecoverPasswordSerializer(serializers.Serializer):
                 'url': settings.URL_SERVER_FRONTEND
             }
             send_email = send_mail_verification(subject=subject,
-                                                to_user=user.email,
+                                                to_user=user.username,
                                                 path_template="emails/users/recover_password.html",
                                                 data=data)
             if not send_email:
@@ -125,7 +125,7 @@ class RecoverPasswordVerificationSerializer(serializers.Serializer):
 
     def create(self, data):
         payload = self.context['payload']
-        user = User.objects.get(email=payload['email'])
+        user = User.objects.get(username=payload['email'])
         user.set_password(data['password'])
         user.save()
         return user

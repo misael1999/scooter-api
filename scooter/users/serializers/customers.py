@@ -52,7 +52,8 @@ class CustomerUserModelSerializer(serializers.ModelSerializer):
 
 
 class CustomerSignUpSerializer(serializers.Serializer):
-    email = serializers.EmailField(
+    username = serializers.CharField(
+        max_length=150,
         validators=[UniqueValidator(
             queryset=User.objects.all(),
             message='El email ya esta en uso')])
@@ -62,9 +63,10 @@ class CustomerSignUpSerializer(serializers.Serializer):
     password = serializers.CharField(min_length=8, max_length=64)
     birthdate = serializers.DateField()
     picture = Base64ImageField(required=False)
+    phone_number = serializers.CharField(max_length=15)
 
     def create(self, data):
-        user = User(email=data['email'],
+        user = User(username=data['username'],
                     is_verified=False,
                     is_client=True,
                     verification_deadline=timezone.now() + timedelta(days=1))
@@ -73,7 +75,8 @@ class CustomerSignUpSerializer(serializers.Serializer):
         customer = Customer.objects.create(user=user,
                                            birthdate=data['birthdate'],
                                            name=data['name'],
-                                           last_name=data['last_name'])
+                                           last_name=data['last_name'],
+                                           phone_number=data['phone_number'])
         code = generate_verification_token(user=user,
                                            exp=user.verification_deadline,
                                            token_type='email_confirmation')
@@ -84,7 +87,7 @@ class CustomerSignUpSerializer(serializers.Serializer):
             'url': settings.URL_SERVER_FRONTEND
         }
         send_email = send_mail_verification(subject=subject,
-                                            to_user=user.email,
+                                            to_user=user.username,
                                             path_template="emails/users/account_verification.html",
                                             data=data)
         if not send_email:

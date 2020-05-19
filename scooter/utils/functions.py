@@ -26,7 +26,7 @@ def send_mail_verification(subject, to_user, path_template, data):
 
 def generate_verification_token(user, exp, token_type):
     token = jwt.encode({
-        'email': user.email,
+        'email': user.username,
         'iat': timezone.now(),
         'exp': exp,
         'token_type': token_type

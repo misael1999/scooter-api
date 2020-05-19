@@ -221,24 +221,24 @@ definitions:
   LoginToken:
     type: object
     properties:
-      email:
+      username:
         type: string
         description: Correo
       password:
         type: string
         description: Contraseña
     required:
-      - email
+      - username
       - password
   # FORGOT PASSWORD
   ForgotPassword:
     type: object
     properties:
-      email:
+      username:
         type: string
         description: Correo
       required:
-        - email
+        - username
   VerifyAccount:
     type: object
     properties:
@@ -264,7 +264,7 @@ definitions:
   RegisterCustomer:
     type: object
     properties:
-      email:
+      username:
         type: string
         description: Correo
       password:
@@ -285,7 +285,7 @@ definitions:
         type: string
         description: Numero de teléfono
     required:
-      - email
+      - username
       - password
       - name
       - last_name
@@ -316,7 +316,7 @@ definitions:
   RegisterStation:
     type: object
     properties:
-      email:
+      username:
         type: string
         description: Correo
       password:
@@ -329,7 +329,7 @@ definitions:
         type: string
         description: Persona de contacto
     required:
-      - email
+      - username
       - password
       - station_name
       - contact_person

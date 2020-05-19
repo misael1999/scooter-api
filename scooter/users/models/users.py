@@ -2,7 +2,7 @@
 
 # Django
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import AbstractBaseUser, AbstractUser
 # Utilities
 from scooter.utils.models import ScooterModel
 from django.utils import timezone
@@ -15,13 +15,14 @@ from scooter.users.managers.users import CustomUserManager
 
 class User(ScooterModel, AbstractBaseUser, PermissionsMixin):
     """ User models """
-    email = models.EmailField(
+    username = models.CharField(
         unique=True,
+        max_length=150,
         error_messages={
-            'unique': 'Ya existe un usuario con ese email'
+            'unique': 'Ya existe un usuario'
         })
 
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []
 
     is_client = models.BooleanField(default=False)
@@ -50,7 +51,7 @@ class User(ScooterModel, AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
 
     def __str__(self):
-        return self.email
+        return self.username
 
     def get_short_name(self):
-        return self.email
+        return self.username
