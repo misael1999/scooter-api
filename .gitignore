@@ -141,5 +141,3 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-
-scooter/templates/emails/merchants/
