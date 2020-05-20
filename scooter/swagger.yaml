@@ -296,6 +296,24 @@ paths:
       tags:
         - Centrales
   # ========== END STATIONS =================
+  # ========= BEGIN DELIVERY MAN ============
+  /api/v1/delivery_men/login/:
+    post:
+      operationId: delivery_man_login
+      description: Login de repartidores
+      parameters:
+        - name: body
+          in: body
+          description: Login de repartidores
+          schema:
+            $ref: '#/definitions/LoginDeliveryMan'
+      responses:
+        '200':
+          description: 'Regresa información del repartidor y su access_token'
+      tags:
+        - Repartidores
+    parameters: []
+
 # ======== DEFINITIONS ==============
 definitions:
   # LOGIN CUSTOMER
@@ -462,5 +480,18 @@ definitions:
       password:
         type: string
         description: Contraseña para inicio de sesión
+  # DELIVERY MAN
+  LoginDeliveryMan:
+    type: object
+    properties:
+      username:
+        type: string
+        description: Correo
+      password:
+        type: string
+        description: Contraseña
+    required:
+      - username
+      - password
 
 

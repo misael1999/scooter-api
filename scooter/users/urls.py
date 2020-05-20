@@ -4,7 +4,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 # JWT
 from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
-from scooter.users.views import CustomerTokenObtainPairView, StationTokenObtainPairView
+from scooter.users.views import CustomerTokenObtainPairView, StationTokenObtainPairView, DeliveryManTokenObtainPairView
 # Views
 from scooter.users.views import users as user_view
 from scooter.users.views import customers as customer_view
@@ -20,6 +20,7 @@ urlpatterns = [
     # JWT
     path('api/v1/customers/login/', CustomerTokenObtainPairView.as_view(), name='token_obtain_pair_customer'),
     path('api/v1/stations/login/', StationTokenObtainPairView.as_view(), name='token_obtain_pair_stations'),
+    path('api/v1/delivery_men/login/', DeliveryManTokenObtainPairView.as_view(), name='token_obtain_pair_delivery_men'),
     path('api/v1/users/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/v1/users/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     # Views

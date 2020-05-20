@@ -15,6 +15,7 @@ from scooter.delivery_men.models import DeliveryMen
 from scooter.utils.functions import send_mail_verification, generate_verification_token
 # Serializers
 from scooter.common.serializers.common import Base64ImageField
+from scooter.users.serializers.users import UserModelSimpleSerializer
 
 
 class DeliveryMenModelSerializer(serializers.ModelSerializer):
@@ -22,6 +23,17 @@ class DeliveryMenModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = DeliveryMen
         fields = '__all__'
+
+
+class DeliveryManUserModelSerializer(serializers.ModelSerializer):
+    user = UserModelSimpleSerializer()
+
+    class Meta:
+        model = DeliveryMen
+        fields = '__all__'
+        read_only_fields = (
+            'reputation',
+        )
 
 
 class CreateDeliveryMenSerializer(serializers.Serializer):

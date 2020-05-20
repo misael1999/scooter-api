@@ -2,7 +2,8 @@
 from rest_framework_simplejwt.views import TokenObtainPairView
 # Serializers
 from scooter.users.serializers import (CustomerTokenObtainPairSerializer,
-                                       StationTokenObtainPairSerializer)
+                                       StationTokenObtainPairSerializer,
+                                       DeliveryManTokenObtainPairSerializer)
 
 
 class CustomerTokenObtainPairView(TokenObtainPairView):
@@ -11,4 +12,8 @@ class CustomerTokenObtainPairView(TokenObtainPairView):
 
 class StationTokenObtainPairView(TokenObtainPairView):
     serializer_class = StationTokenObtainPairSerializer
+
+
+class DeliveryManTokenObtainPairView(TokenObtainPairView):
+    serializer_class = DeliveryManTokenObtainPairSerializer
 
