@@ -14,6 +14,8 @@ urlpatterns = [
     # Users
     path('', include('scooter.users.urls')),
     # Common
-    path('', include('scooter.common.urls'))
+    path('', include('scooter.common.urls')),
+    # Delivery men
+    path('', include('scooter.delivery_men.urls'))
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

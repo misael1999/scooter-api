@@ -22,7 +22,8 @@ class StationTokenObtainPairSerializer(TokenObtainPairSerializer):
             raise serializers.ValidationError({'detail': 'No tienes permisos para iniciar sesión'})
 
         if not self.user.is_verified:
-            raise serializers.ValidationError({'detail': 'Usuario no verificado'})
+            raise serializers.ValidationError({'detail': 'Es necesario que verifique su correo electronico {email}'.
+                                              format(email=self.user.username)})
 
         data['station'] = StationUserModelSerializer(station).data
         # Add extra responses here
