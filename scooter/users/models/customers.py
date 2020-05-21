@@ -11,7 +11,7 @@ class Customer(ScooterModel):
     user = models.OneToOneField('users.User', on_delete=models.DO_NOTHING)
     name = models.CharField(max_length=60)
     last_name = models.CharField(max_length=60)
-    birthdate = models.DateField()
+    birthdate = models.DateField(blank=True, null=True)
     picture = models.ImageField(upload_to='customers/pictures/', blank=True, null=True)
     phone_regex = RegexValidator(
         regex=r'\+?1?\d{9,15}$',
