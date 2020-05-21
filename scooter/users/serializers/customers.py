@@ -61,9 +61,9 @@ class CustomerSignUpSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=60)
     last_name = serializers.CharField(max_length=60)
     password = serializers.CharField(min_length=8, max_length=64)
-    birthdate = serializers.DateField()
+    birthdate = serializers.DateField(required=False)
     picture = Base64ImageField(required=False)
-    phone_number = serializers.CharField(max_length=15)
+    phone_number = serializers.CharField(max_length=15, required=False)
 
     def create(self, data):
         user = User(username=data['username'],
