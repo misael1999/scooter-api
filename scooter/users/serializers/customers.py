@@ -73,7 +73,6 @@ class CustomerSignUpSerializer(serializers.Serializer):
         user.set_password(data['password'])
         user.save()
         customer = Customer.objects.create(user=user,
-                                           birthdate=data['birthdate'],
                                            name=data['name'],
                                            last_name=data['last_name'],
                                            phone_number=data['phone_number'])
