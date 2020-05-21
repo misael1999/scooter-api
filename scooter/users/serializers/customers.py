@@ -74,8 +74,7 @@ class CustomerSignUpSerializer(serializers.Serializer):
         user.save()
         customer = Customer.objects.create(user=user,
                                            name=data['name'],
-                                           last_name=data['last_name'],
-                                           phone_number=data['phone_number'])
+                                           last_name=data['last_name'])
         code = generate_verification_token(user=user,
                                            exp=user.verification_deadline,
                                            token_type='email_confirmation')
