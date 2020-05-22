@@ -8,7 +8,7 @@ info:
   license:
     name: BSD License
   version: v1
-basePath: /
+basePath: /appback/
 consumes:
   - application/json
 produces:
@@ -288,11 +288,136 @@ paths:
       tags:
         - Centrales
     get:
-      operationId: get_delivery_man
-      description: Obtener datos del repartidor
+      operationId: list_delivery_man_stations
+      description: listado de todos los repartidores por centrales.
+      parameters:
+        - name: limit
+          in: query
+          description: Numero de resultados por pagina
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: El índice inicial desde el que devolver los resultados.
+          required: false
+          type: integer
+        - name: sId
+          description: ID Status
+          required: false
+          in: query
+          type: integer
+        - name: search
+          description: Buscar por (nombre)
+          in: query
+          required: false
+          type: string
+        - name: orderBy
+          description: Order By field
+          in: query
+          required: false
+          type: string
+          enum: ['checker_name', 'status', 'created_at']
       responses:
         '201':
           description: 'Información del repartidor'
+      tags:
+        - Centrales
+  /api/v1/stations/{station_id}/vehicles/:
+    parameters:
+      - name: station_id
+        in: path
+        required: true
+        type: string
+    # CREATE VEHICLE BY STATION
+    post:
+      operationId: register_vehicle
+      description: Registro de vehiculos
+      parameters:
+        - name: body
+          in: body
+          description: Registro de vehiculos
+          schema:
+            $ref: '#/definitions/RegisterVehicle'
+      responses:
+        '201':
+          description: 'Información del repartidor creado'
+      tags:
+        - Centrales
+    get:
+      operationId: get_vehicles_station
+      description: Obtener datos del vehiclo
+      parameters:
+        - name: limit
+          in: query
+          description: Numero de resultados por pagina
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: El índice inicial desde el que devolver los resultados.
+          required: false
+          type: integer
+        - name: sId
+          description: ID Status
+          required: false
+          in: query
+          type: integer
+        - name: search
+          description: Buscar por (nombre)
+          in: query
+          required: false
+          type: string
+        - name: orderBy
+          description: Order By field
+          in: query
+          required: false
+          type: string
+          enum: ['checker_name', 'status', 'created_at']
+      responses:
+        '201':
+          description: 'Listado de vehiculos por central'
+      tags:
+        - Centrales
+  /api/v1/stations/{station_id}/vehicles/{vehicle_id}/:
+    parameters:
+      - name: station_id
+        in: path
+        required: true
+        type: string
+      - name: vehicle_id
+        in: path
+        required: true
+        type: string
+  # UPDATE VEHICLE BY STATION
+    patch:
+      operationId: update_vehicle
+      description: Actualizar datos del vehiculo
+      parameters:
+        - name: body
+          in: body
+          description: Actualizar datos del vehiculo
+          schema:
+            $ref: '#/definitions/UpdateVehicle'
+      responses:
+        '201':
+          description: 'Información del vehiculo'
+      tags:
+        - Centrales
+    # GET INFO VEHICLE BY STATION
+    get:
+      operationId: get_vehicle
+      description: Obtener datos del vehiculo
+      responses:
+        '201':
+          description: 'Información del vehiculo'
+      tags:
+        - Centrales
+    delete:
+      operationId: delete_vehicle
+      description: Borra vehiculo
+      responses:
+        '201':
+          description: 'Información del vehiculo'
       tags:
         - Centrales
   # ========== END STATIONS =================
@@ -480,6 +605,41 @@ definitions:
       password:
         type: string
         description: Contraseña para inicio de sesión
+  # VEHICLE'S STATION
+  RegisterVehicle:
+    type: object
+    properties:
+      alias:
+        type: string
+        description: Alias del vehiculo
+      model:
+        type: string
+        description: Modelo del vehiculo
+      year:
+        type: string
+        description: Año del vehiculo
+      plate:
+        type: string
+        description: Placa del vehiculo
+    required:
+      - alias
+  UpdateVehicle:
+    type: object
+    properties:
+      alias:
+        type: string
+        description: Alias del vehiculo
+      model:
+        type: string
+        description: Modelo del vehiculo
+      year:
+        type: string
+        description: Año del vehiculo
+      plate:
+        type: string
+        description: Placa del vehiculo
+    required:
+      - alias
   # DELIVERY MAN
   LoginDeliveryMan:
     type: object

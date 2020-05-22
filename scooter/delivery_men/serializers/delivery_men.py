@@ -2,17 +2,12 @@
 # General
 from datetime import timedelta
 from django.utils import timezone
-# Django
-from django.core.validators import RegexValidator
-from django.conf import settings
 # Django rest framework
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
 # Models
 from scooter.users.models import User, Station
 from scooter.delivery_men.models import DeliveryMen
 # Utilities
-from scooter.utils.functions import send_mail_verification, generate_verification_token
 # Serializers
 from scooter.common.serializers.common import Base64ImageField
 from scooter.users.serializers.users import UserModelSimpleSerializer

@@ -16,13 +16,13 @@ from scooter.users.permissions import IsAccountOwner
 
 
 class DeliveryMenStationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
-                         mixins.UpdateModelMixin, mixins.CreateModelMixin,
-                         mixins.ListModelMixin, AddStationMixin):
-
+                                mixins.UpdateModelMixin, mixins.CreateModelMixin,
+                                mixins.ListModelMixin, AddStationMixin):
     """ View set for the stations can register a new delivery man """
 
     serializer_class = DeliveryMenModelSerializer
     queryset = DeliveryMen.objects.all()
+    permission_classes = (IsAuthenticated, IsAccountOwner)
     station = None
 
     def get_queryset(self):
@@ -31,16 +31,6 @@ class DeliveryMenStationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             return self.station.deliverymen_set.filter(status__slug_name='active')
 
         return self.queryset
-
-    def get_permissions(self):
-        if self.action in ['create']:
-            permission_classes = [AllowAny]
-        elif self.action in ['partial_update', 'update']:
-            permission_classes = [IsAuthenticated, IsAccountOwner]
-        else:
-            permission_classes = [IsAuthenticated]
-
-        return [permission() for permission in permission_classes]
 
     def get_serializer_class(self):
         serializer_class = self.serializer_class
@@ -56,7 +46,3 @@ class DeliveryMenStationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
                                  data=DeliveryMenModelSerializer(obj).data,
                                  message='Se ha registrado un nuevo repartidor')
         return Response(data=data, status=status.HTTP_201_CREATED)
-
-
-
-

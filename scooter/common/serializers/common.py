@@ -38,3 +38,13 @@ class Base64ImageField(serializers.ImageField):
 # Serializer to rename the image and verify it is image
 class ImageColorSerializer(serializers.Serializer):
     file = Base64ImageField(max_length=None, use_url=True)
+
+
+# Overload the get_queryset method, using the station information from the context:
+class StationFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
+    def get_queryset(self):
+        station = self.context.get('station', None)
+        queryset = super(StationFilteredPrimaryKeyRelatedField, self).get_queryset()
+        if not station or not queryset:
+            return None
+        return queryset.filter(station=station)
