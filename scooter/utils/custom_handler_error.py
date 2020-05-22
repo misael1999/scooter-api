@@ -23,13 +23,16 @@ def custom_exception_handler(exc, context):
                     if isinstance(value, type([])):
                         value = value[0]
                     error_dict['message'] = value
-                    error_dict['code'] = value.code
+                    print(type(value))
+                    if not isinstance(value, type({})):
+                        error_dict['code'] = value.code
 
                 else:
                     error_dict['message'] = value
-                    error_dict['code'] = value.code
-
-                errors.append(error_dict)
+                    print(type(value))
+                    if not isinstance(value, type({})):
+                        error_dict['code'] = value.code
+                    errors.append(error_dict)
         except Exception as ex:
             print('ENTRO')
             print("Exception print the error, please check it")

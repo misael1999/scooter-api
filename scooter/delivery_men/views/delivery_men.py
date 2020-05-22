@@ -12,7 +12,7 @@ from scooter.utils.viewsets.scooter import ScooterViewSet
 from scooter.common.mixins.stations import AddStationMixin
 # Permissions
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from scooter.users.permissions import IsAccountOwner
+from scooter.users.permissions import IsAccountOwnerStation
 
 
 class DeliveryMenStationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
@@ -22,7 +22,7 @@ class DeliveryMenStationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
 
     serializer_class = DeliveryMenModelSerializer
     queryset = DeliveryMen.objects.all()
-    permission_classes = (IsAuthenticated, IsAccountOwner)
+    permission_classes = (IsAuthenticated, IsAccountOwnerStation)
     station = None
 
     def get_queryset(self):
