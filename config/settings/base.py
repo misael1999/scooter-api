@@ -6,6 +6,7 @@ from .constants import *
 
 
 ROOT_DIR = environ.Path(__file__) - 3
+APPS_DIR_2 = ROOT_DIR.path('scooter/apps')
 APPS_DIR = ROOT_DIR.path('scooter')
 
 root = environ.Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -56,10 +57,10 @@ THIRD_PARTY_APPS = [
     'corsheaders'
 ]
 LOCAL_APPS = [
-    'scooter.users.apps.UsersAppConfig',
-    'scooter.common.apps.CommonsAppConfig',
-    'scooter.delivery_men.apps.DeliverMenAppConfig',
-    'scooter.vehicles.apps.VehiclesAppConfig',
+    'scooter.apps.users.apps.UsersAppConfig',
+    'scooter.apps.common.apps.CommonsAppConfig',
+    'scooter.apps.delivery_men.apps.DeliverMenAppConfig',
+    'scooter.apps.vehicles.apps.VehiclesAppConfig'
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -149,7 +150,7 @@ ADMINS = [
 MANAGERS = ADMINS
 
 # Celery
-INSTALLED_APPS += ['scooter.taskapp.celery.CeleryAppConfig']
+INSTALLED_APPS += ['scooter.apps.taskapp.celery.CeleryAppConfig']
 if USE_TZ:
     CELERY_TIMEZONE = TIME_ZONE
 CELERY_BROKER_URL = env('CELERY_BROKER_URL')

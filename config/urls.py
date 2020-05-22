@@ -12,12 +12,12 @@ urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
     #  Apps Urls
     # Users
-    path('', include('scooter.users.urls')),
+    path('', include('scooter.apps.users.urls')),
     # Common
-    path('', include('scooter.common.urls')),
+    path('', include('scooter.apps.common.urls')),
     # Delivery men
-    path('', include('scooter.delivery_men.urls')),
+    path('', include('scooter.apps.delivery_men.urls')),
     # Vehicles
-    path('', include('scooter.vehicles.urls'))
+    path('', include('scooter.apps.vehicles.urls'))
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
