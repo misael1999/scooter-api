@@ -497,9 +497,6 @@ definitions:
       name:
         type: string
         description: Nombre(s) del cliente
-      last_name:
-        type: string
-        description: Apellidos del cliente
       birthdate:
         type: string
         description: Fecha de nacimiento
@@ -513,8 +510,6 @@ definitions:
       - password
       - name
       - last_name
-      - birthdate
-      - phone_number
   # UPDATE CUSTOMER
   UpdateCustomer:
     type: object
