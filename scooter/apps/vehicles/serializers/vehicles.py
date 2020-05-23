@@ -3,12 +3,13 @@
 from rest_framework import serializers
 # Models
 from scooter.apps.vehicles.models import Vehicle
-
+# Utilities
+from scooter.utils.serializers.scooter import ScooterModelSerializer
 
 # Serializers
 
 
-class VehicleModelSerializer(serializers.ModelSerializer):
+class VehicleModelSerializer(ScooterModelSerializer):
     class Meta:
         model = Vehicle
         fields = ("id", "alias", "model", "year", "plate", "station", "status")

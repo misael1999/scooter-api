@@ -143,7 +143,7 @@ X_FRAME_OPTIONS = 'DENY'
 EMAIL_BACKEND = env('DJANGO_EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
 
 # Admin
-ADMIN_URL = 'admin/'
+ADMIN_URL = 'appback/admin/'
 ADMINS = [
     ("""Misael Gonzalez""", 'misael@gmail.com'),
 ]

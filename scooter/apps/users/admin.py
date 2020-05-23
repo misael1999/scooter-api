@@ -11,7 +11,7 @@ class CustomUserAdmin(admin.ModelAdmin):
 
 @admin.register(Customer)
 class ClientAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'last_name', 'birthdate', 'phone_number', 'reputation')
+    list_display = ('id', 'name', 'birthdate', 'phone_number', 'reputation')
     search_fields = ('name', 'last_name', 'phone_number')
 
 

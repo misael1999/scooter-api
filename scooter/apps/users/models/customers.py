@@ -1,7 +1,5 @@
 # django
 from django.db import models
-# django
-from django.db import models
 # Utilities
 from django.core.validators import RegexValidator
 from scooter.utils.models.scooter import ScooterModel
@@ -10,7 +8,6 @@ from scooter.utils.models.scooter import ScooterModel
 class Customer(ScooterModel):
     user = models.OneToOneField('users.User', on_delete=models.DO_NOTHING)
     name = models.CharField(max_length=60)
-    last_name = models.CharField(max_length=60)
     birthdate = models.DateField(blank=True, null=True)
     picture = models.ImageField(upload_to='customers/pictures/', blank=True, null=True)
     phone_regex = RegexValidator(
@@ -23,4 +20,4 @@ class Customer(ScooterModel):
     reputation = models.FloatField(default=0)
 
     def __str__(self):
-        return '{name} {lastname}'.format(name=self.name, lastname=self.last_name)
+        return '{name}'.format(name=self.name)

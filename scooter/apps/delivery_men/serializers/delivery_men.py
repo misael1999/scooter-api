@@ -7,19 +7,20 @@ from rest_framework import serializers
 from scooter.apps.users.models import User
 from scooter.apps.delivery_men.models.delivery_men import DeliveryMen
 # Utilities
+from scooter.utils.serializers.scooter import ScooterModelSerializer
 # Serializers
 from scooter.apps.common.serializers import Base64ImageField
 from scooter.apps.users.serializers.users import UserModelSimpleSerializer
 
 
-class DeliveryMenModelSerializer(serializers.ModelSerializer):
+class DeliveryMenModelSerializer(ScooterModelSerializer):
 
     class Meta:
         model = DeliveryMen
         fields = '__all__'
 
 
-class DeliveryManUserModelSerializer(serializers.ModelSerializer):
+class DeliveryManUserModelSerializer(ScooterModelSerializer):
     user = UserModelSimpleSerializer()
 
     class Meta:

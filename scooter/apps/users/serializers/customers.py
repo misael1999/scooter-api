@@ -1,5 +1,4 @@
 """ Customers serializers """
-
 # Django
 from django.conf import settings
 from django.utils import timezone
@@ -59,7 +58,6 @@ class CustomerSignUpSerializer(serializers.Serializer):
             message='El email ya esta en uso')])
 
     name = serializers.CharField(max_length=60)
-    last_name = serializers.CharField(max_length=60)
     password = serializers.CharField(min_length=8, max_length=64)
     birthdate = serializers.DateField(required=False)
     picture = Base64ImageField(required=False)
@@ -73,8 +71,8 @@ class CustomerSignUpSerializer(serializers.Serializer):
         user.set_password(data['password'])
         user.save()
         customer = Customer.objects.create(user=user,
-                                           name=data['name'],
-                                           last_name=data['last_name'])
+                                           name=data['name'])
+
         code = generate_verification_token(user=user,
                                            exp=user.verification_deadline,
                                            token_type='email_confirmation')
