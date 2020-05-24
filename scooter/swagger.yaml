@@ -106,6 +106,22 @@ paths:
       tags:
         - Clientes
     parameters: []
+  /api/v1/customers/login/facebook/:
+    post:
+      operationId: customer_login
+      description: Login de clientes
+      parameters:
+        - name: body
+          in: body
+          description: Login con facebook
+          schema:
+            $ref: '#/definitions/LoginCustomerFacebook'
+      responses:
+        '200':
+          description: 'Regresa información del cliente y su access_token'
+      tags:
+        - Clientes
+    parameters: []
   # REGISTER CUSTOMER
   /api/v1/customers/:
     post:
@@ -454,6 +470,15 @@ definitions:
     required:
       - username
       - password
+  # LOGIN CUSTOMER
+  LoginCustomerFacebook:
+    type: object
+    properties:
+      access_token:
+        type: string
+        description: Token de facebook
+    required:
+      - access_token
   # FORGOT PASSWORD
   ForgotPassword:
     type: object
