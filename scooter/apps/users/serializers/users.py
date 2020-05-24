@@ -17,7 +17,7 @@ from scooter.utils.functions import send_mail_verification, generate_verificatio
 class UserModelSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('username', 'is_verified')
+        fields = ('username', 'is_verified', 'auth_facebook')
 
 
 class AccountVerificationSerializer(serializers.Serializer):

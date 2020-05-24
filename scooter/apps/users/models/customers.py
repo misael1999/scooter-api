@@ -7,9 +7,10 @@ from scooter.utils.models.scooter import ScooterModel
 
 class Customer(ScooterModel):
     user = models.OneToOneField('users.User', on_delete=models.DO_NOTHING)
-    name = models.CharField(max_length=60)
+    name = models.CharField(max_length=150)
     birthdate = models.DateField(blank=True, null=True)
     picture = models.ImageField(upload_to='customers/pictures/', blank=True, null=True)
+    picture_url = models.CharField(max_length=300, blank=True, null=True)
     phone_regex = RegexValidator(
         regex=r'\+?1?\d{9,15}$',
         message='El numero de telefono debe ser ingresado con el formato: +23856671672. Hasta 15 digitos permitidos'

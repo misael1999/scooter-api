@@ -28,6 +28,7 @@ class User(ScooterModel, AbstractBaseUser, PermissionsMixin):
     is_client = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
     auth_facebook = models.BooleanField(default=False)
+    facebook_id = models.CharField(max_length=200, unique=True, blank=True, null=True)
 
     # Extends
     is_staff = models.BooleanField(

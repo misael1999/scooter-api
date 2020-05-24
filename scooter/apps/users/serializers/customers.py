@@ -12,6 +12,7 @@ from scooter.apps.users.models import User, Customer
 from scooter.utils.functions import send_mail_verification, generate_verification_token
 # Serializers
 from scooter.apps.users.serializers.users import UserModelSimpleSerializer
+from scooter.utils.serializers.scooter import ScooterModelSerializer
 from scooter.apps.common.serializers import Base64ImageField
 
 
