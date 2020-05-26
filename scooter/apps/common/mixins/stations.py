@@ -1,7 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.generics import get_object_or_404
 # Models
-from scooter.apps.users.models import Station
+from scooter.apps.stations.models import Station
 # django
 from django.http import Http404, JsonResponse
 

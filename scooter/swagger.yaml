@@ -108,7 +108,7 @@ paths:
     parameters: []
   /api/v1/customers/login/facebook/:
     post:
-      operationId: customer_login
+      operationId: customer_login_facebook
       description: Login de clientes
       parameters:
         - name: body

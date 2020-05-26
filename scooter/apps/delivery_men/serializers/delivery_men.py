@@ -5,7 +5,7 @@ from django.utils import timezone
 from rest_framework import serializers
 # Models
 from scooter.apps.users.models import User
-from scooter.apps.delivery_men.models.delivery_men import DeliveryMen
+from scooter.apps.delivery_men.models.delivery_men import DeliveryMan
 # Utilities
 from scooter.utils.serializers.scooter import ScooterModelSerializer
 # Serializers
@@ -13,10 +13,10 @@ from scooter.apps.common.serializers import Base64ImageField
 from scooter.apps.users.serializers.users import UserModelSimpleSerializer
 
 
-class DeliveryMenModelSerializer(ScooterModelSerializer):
+class DeliveryManModelSerializer(ScooterModelSerializer):
 
     class Meta:
-        model = DeliveryMen
+        model = DeliveryMan
         fields = '__all__'
 
 
@@ -24,14 +24,14 @@ class DeliveryManUserModelSerializer(ScooterModelSerializer):
     user = UserModelSimpleSerializer()
 
     class Meta:
-        model = DeliveryMen
+        model = DeliveryMan
         fields = '__all__'
         read_only_fields = (
             'reputation',
         )
 
 
-class CreateDeliveryMenSerializer(serializers.Serializer):
+class CreateDeliveryManSerializer(serializers.Serializer):
 
     picture = Base64ImageField(required=False)
     password = serializers.CharField(max_length=50)
@@ -58,7 +58,7 @@ class CreateDeliveryMenSerializer(serializers.Serializer):
             user.set_password(data['password'])
             user.save()
 
-            delivery_man = DeliveryMen.objects.create(name=data['name'],
+            delivery_man = DeliveryMan.objects.create(name=data['name'],
                                                       last_name=data['last_name'],
                                                       phone_number=data['phone_number'],
                                                       user=user,

@@ -5,12 +5,14 @@ from rest_framework import serializers
 # Utilities
 from django.utils import timezone
 # Models
-from scooter.apps.users.models import Customer, Station, User
-from scooter.apps.delivery_men.models import DeliveryMen
+from scooter.apps.users.models import User
+from scooter.apps.stations.models import Station
+from scooter.apps.customers.models import Customer
+from scooter.apps.delivery_men.models import DeliveryMan
 # Serializers
-from scooter.apps.users.serializers.customers import CustomerUserModelSerializer
+from scooter.apps.customers.serializers.customers import CustomerUserModelSerializer
 from scooter.apps.delivery_men.serializers.delivery_men import DeliveryManUserModelSerializer
-from scooter.apps.users.serializers.stations import StationUserModelSerializer
+from scooter.apps.stations.serializers.stations import StationUserModelSerializer
 # Facebook
 import facebook
 # JWT
@@ -51,7 +53,7 @@ class CustomerTokenObtainPairSerializer(TokenObtainPairSerializer):
         if timezone.now() > self.user.verification_deadline and not self.user.is_verified:
             raise serializers.ValidationError({'detail': 'Ha expirado su tiempo de verificación'})
 
-        data['user'] = CustomerUserModelSerializer(customer).data
+        data['customer'] = CustomerUserModelSerializer(customer).data
 
         # Add extra responses here
         # data['user'] = UserModelSerializer(self.user).data
@@ -66,10 +68,10 @@ class DeliveryManTokenObtainPairSerializer(TokenObtainPairSerializer):
         data = super().validate(attrs)
         try:
             delivery_man = self.user.deliverymen
-        except DeliveryMen.DoesNotExist:
+        except DeliveryMan.DoesNotExist:
             raise serializers.ValidationError({'detail': 'No tienes permisos para iniciar sesión'})
 
-        data['user'] = DeliveryManUserModelSerializer(delivery_man).data
+        data['delivery_man'] = DeliveryManUserModelSerializer(delivery_man).data
 
         # Add extra responses here
         # data['user'] = UserModelSerializer(self.user).data

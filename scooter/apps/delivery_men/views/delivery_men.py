@@ -2,17 +2,17 @@
 from rest_framework import mixins, status
 from rest_framework.response import Response
 # Models
-from scooter.apps.delivery_men.models.delivery_men import DeliveryMen
+from scooter.apps.delivery_men.models.delivery_men import DeliveryMan
 # Serializers
-from scooter.apps.delivery_men.serializers.delivery_men import (CreateDeliveryMenSerializer,
-                                                                DeliveryMenModelSerializer)
+from scooter.apps.delivery_men.serializers.delivery_men import (CreateDeliveryManSerializer,
+                                                                DeliveryManModelSerializer)
 # Viewset
 from scooter.utils.viewsets.scooter import ScooterViewSet
 # Mixins
 from scooter.apps.common.mixins.stations import AddStationMixin
 # Permissions
 from rest_framework.permissions import IsAuthenticated
-from scooter.apps.users.permissions import IsAccountOwnerStation
+from scooter.apps.stations.permissions import IsAccountOwnerStation
 
 
 class DeliveryMenStationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
@@ -20,8 +20,8 @@ class DeliveryMenStationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
                                 mixins.ListModelMixin, AddStationMixin):
     """ View set for the stations can register a new delivery man """
 
-    serializer_class = DeliveryMenModelSerializer
-    queryset = DeliveryMen.objects.all()
+    serializer_class = DeliveryManModelSerializer
+    queryset = DeliveryMan.objects.all()
     permission_classes = (IsAuthenticated, IsAccountOwnerStation)
     station = None
 
@@ -35,7 +35,7 @@ class DeliveryMenStationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
     def get_serializer_class(self):
         serializer_class = self.serializer_class
         if self.action == 'create':
-            serializer_class = CreateDeliveryMenSerializer
+            serializer_class = CreateDeliveryManSerializer
         return serializer_class
 
     def create(self, request, *args, **kwargs):
@@ -43,6 +43,6 @@ class DeliveryMenStationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         serializer.is_valid(raise_exception=True)
         obj = serializer.save()
         data = self.set_response(status=True,
-                                 data=DeliveryMenModelSerializer(obj).data,
+                                 data=DeliveryManModelSerializer(obj).data,
                                  message='Se ha registrado un nuevo repartidor')
         return Response(data=data, status=status.HTTP_201_CREATED)

@@ -7,12 +7,10 @@ from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 from scooter.apps.users.views import (CustomerTokenObtainPairView, StationTokenObtainPairView,
                                       DeliveryManTokenObtainPairView, CustomerFacebookAuthViewSet)
 # Views
-from scooter.apps.users.views import stations as station_view, users as user_view, customers as customer_view
+from scooter.apps.users.views import users as user_view
 
 router = DefaultRouter()
 router.register(r'api/v1/users', user_view.UserViewSet, basename='users')
-router.register(r'api/v1/stations', station_view.StationViewSet, basename='stations')
-router.register(r'api/v1/customers', customer_view.CustomerViewSet, basename='customers')
 router.register(r'api/v1/customers/login/facebook', CustomerFacebookAuthViewSet, basename='customers_facebook')
 
 urlpatterns = [

@@ -5,10 +5,10 @@ from scooter.utils.models import ScooterModel
 from django.core.validators import RegexValidator
 
 
-class DeliveryMen(ScooterModel):
+class DeliveryMan(ScooterModel):
 
     user = models.OneToOneField('users.User', on_delete=models.DO_NOTHING)
-    station = models.ForeignKey('users.Station', on_delete=models.CASCADE)
+    station = models.ForeignKey('stations.Station', on_delete=models.CASCADE)
     name = models.CharField(max_length=60)
     last_name = models.CharField(max_length=60)
     phone_regex = RegexValidator(
@@ -24,7 +24,7 @@ class DeliveryMen(ScooterModel):
     reputation = models.FloatField(default=0)
 
     class Meta:
-        db_table = 'delivery_men'
+        db_table = 'delivery_men_delivery_man'
 
     def __str__(self):
         return self.name

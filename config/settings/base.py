@@ -60,7 +60,9 @@ LOCAL_APPS = [
     'scooter.apps.users.apps.UsersAppConfig',
     'scooter.apps.common.apps.CommonsAppConfig',
     'scooter.apps.delivery_men.apps.DeliverMenAppConfig',
-    'scooter.apps.vehicles.apps.VehiclesAppConfig'
+    'scooter.apps.customers.apps.CustomersAppConfig',
+    'scooter.apps.stations.apps.StationsAppConfig',
+    'scooter.apps.orders.apps.OrdersAppConfig'
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
