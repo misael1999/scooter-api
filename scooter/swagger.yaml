@@ -165,7 +165,27 @@ paths:
       description: Obtener datos del cliente
       responses:
         '201':
-          description: 'Información del cliente y mensaje'
+          description: 'Información del cliente'
+      tags:
+        - Clientes
+  /api/v1/customers/{customer_id}/change_password/:
+    parameters:
+      - name: customer_id
+        in: path
+        required: true
+        type: string
+    patch:
+      operationId: change_password_customer
+      description: Actualizar contraseña del cliente
+      parameters:
+        - name: body
+          in: body
+          description: Actualizar contraseña del cliente
+          schema:
+            $ref: '#/definitions/ChangePassword'
+      responses:
+        '201':
+          description: 'Información del cliente'
       tags:
         - Clientes
 # REGISTER CUSTOMER ADDRESS
@@ -655,6 +675,18 @@ definitions:
       picture:
         type: string
         description: Imagen de perfil
+  ChangePassword:
+    type: object
+    properties:
+      current_password:
+        type: string
+        description: Contraseña actual
+      new_password:
+        type: string
+        description: Nueva contraseña
+    required:
+      - new_password
+      - current_password
   # REGISTER CUSTOMER ADDRESS
   RegisterCustomerAddress:
     type: object

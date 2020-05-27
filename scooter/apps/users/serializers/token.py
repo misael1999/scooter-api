@@ -105,7 +105,7 @@ class CustomerFacebookAuthSerializer(serializers.Serializer):
                 # Verify that no exist user with the same email
                 if user_exist:
                     message = "No es posible iniciar sesión con facebook, ya se encuentra registrado en la aplicación "
-                    raise serializers.ValidationError(message)
+                    raise ValueError(message)
 
                 # Generate password random
                 password = User.objects.make_random_password()
@@ -128,10 +128,12 @@ class CustomerFacebookAuthSerializer(serializers.Serializer):
                 customer = Customer.objects.create(user=user,
                                                    picture_url=user_info.get('picture')['data']['url'],
                                                    name=full_name)
+            except ValueError as ex:
+                raise serializers.ValidationError({'detail': str(ex)})
             except Exception as ex:
                 print(ex.__str__())
                 print('Error in auth facebook please check it')
-                raise serializers.ValidationError({"detail": ex.args.__repr__()})
+                raise serializers.ValidationError({"detail": 'Ha ocurrido un error desconocido'})
 
         # Generate token
         refresh = RefreshToken.for_user(user)

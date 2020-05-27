@@ -1,5 +1,6 @@
 # Django rest
 from rest_framework import status, mixins
+from rest_framework.decorators import action
 from rest_framework.response import Response
 # Permissions
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -11,7 +12,8 @@ from scooter.apps.customers.models.customers import Customer
 # Serializers
 from scooter.apps.customers.serializers.customers import (CustomerSignUpSerializer,
                                                           CustomerSimpleModelSerializer,
-                                                          CustomerUserModelSerializer)
+                                                          CustomerUserModelSerializer,
+                                                          ChangePasswordCustomerSerializer)
 
 
 class CustomerViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
@@ -60,5 +62,15 @@ class CustomerViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             serializer.save()
             data = CustomerUserModelSerializer(client).data
         except Customer.DoesNotExist:
-            raise Response(self.set_error_response(status=False, field='Detail', message='El usuario no es un clente'))
+            return Response(self.set_error_response(status=False, field='Detail', message='El usuario no es un clente'))
         return Response(self.set_response(status='ok', data=data, message='Perfil actualizado correctamente'))
+
+    @action(detail=True, methods=('PATCH', ))
+    def change_password(self, request, *args, **kwargs):
+        customer = self.get_object()
+        partial = request.method == 'PATCH'
+        serializer = ChangePasswordCustomerSerializer(customer, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(self.set_response(status='ok', data=CustomerUserModelSerializer(customer).data,
+                                          message='Contraseña actualizada correctamente'))

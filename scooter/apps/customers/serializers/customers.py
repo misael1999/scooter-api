@@ -3,6 +3,7 @@
 from django.conf import settings
 from django.utils import timezone
 from datetime import timedelta
+from django.core.exceptions import ValidationError as DjangoCoreValidationError
 # Django rest framework
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
@@ -90,3 +91,23 @@ class CustomerSignUpSerializer(serializers.Serializer):
         if not send_email:
             raise serializers.ValidationError({'detail': 'Ha ocurrido un error al enviar el correo'})
         return customer
+
+
+class ChangePasswordCustomerSerializer(serializers.Serializer):
+    current_password = serializers.CharField(max_length=60)
+    new_password = serializers.CharField(min_length=8, max_length=60)
+
+    def update(self, instance, data):
+        try:
+            # Check if current_password is correct
+            if not instance.user.check_password(data['current_password']):
+                raise ValueError('La contraseña actual no es correcta')
+
+            instance.user.set_password(data['new_password'])
+            instance.user.save()
+            return instance
+        except ValueError as ex:
+            raise serializers.ValidationError({'detail': str(ex)})
+        except Exception as e:
+            raise serializers.ValidationError({'detail': 'Ha ocurrido un error desconocido'})
+
