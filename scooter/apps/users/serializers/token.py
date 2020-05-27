@@ -67,7 +67,7 @@ class DeliveryManTokenObtainPairSerializer(TokenObtainPairSerializer):
         # Delivery man can validate their account
         data = super().validate(attrs)
         try:
-            delivery_man = self.user.deliverymen
+            delivery_man = self.user.deliveryman
         except DeliveryMan.DoesNotExist:
             raise serializers.ValidationError({'detail': 'No tienes permisos para iniciar sesión'})
 
