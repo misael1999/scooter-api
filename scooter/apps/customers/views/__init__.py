@@ -1,2 +1,2 @@
 from .customers import *
-from .customer_addresses import *
+from .addresses import *

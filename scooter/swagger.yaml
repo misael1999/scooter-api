@@ -140,9 +140,9 @@ paths:
         - Clientes
     parameters: []
   # UPDATE CUSTOMER
-  /api/v1/customers/{id}/:
+  /api/v1/customers/{customer_id}/:
     parameters:
-      - name: id
+      - name: customer_id
         in: path
         required: true
         type: string
@@ -168,6 +168,105 @@ paths:
           description: 'Información del cliente y mensaje'
       tags:
         - Clientes
+# REGISTER CUSTOMER ADDRESS
+  /api/v1/customers/{customer_id}/addresses/:
+    parameters:
+      - name: customer_id
+        in: path
+        required: true
+        type: string
+    post:
+      operationId: register_customer_address
+      description: Registro de direcciones del cliente
+      parameters:
+        - name: body
+          in: body
+          description: Registro de direcciones
+          schema:
+            $ref: '#/definitions/RegisterCustomerAddress'
+      responses:
+        '201':
+          description: 'Información de la dirección'
+      tags:
+        - Clientes
+    get:
+      operationId: get_customer_addresses
+      description: Obtener direcciones del cliente
+      parameters:
+        - name: limit
+          in: query
+          description: Numero de resultados por pagina
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: El índice inicial desde el que devolver los resultados.
+          required: false
+          type: integer
+        - name: sId
+          description: ID Status
+          required: false
+          in: query
+          type: integer
+        - name: search
+          description: Buscar por (nombre)
+          in: query
+          required: false
+          type: string
+        - name: orderBy
+          description: Order By field
+          in: query
+          required: false
+          type: string
+          enum: ['checker_name', 'status', 'created_at']
+      responses:
+        '201':
+          description: 'Listado de direcciones'
+      tags:
+        - Clientes
+  /api/v1/customers/{customer_id}/addresses/{address_id}/:
+  # GET INFO CUSTUMER ADDRESS
+    parameters:
+      - name: customer_id
+        in: path
+        required: true
+        type: string
+      - name: address_id
+        in: path
+        required: true
+        type: string
+# UPDATE CUSTOMER ADDRESS
+    patch:
+      operationId: update_customer_address
+      description: Actualización de direcciones del cliente
+      parameters:
+        - name: body
+          in: body
+          description: Actualización de direcciones
+          schema:
+            $ref: '#/definitions/RegisterCustomerAddress'
+      responses:
+        '201':
+          description: 'Información de la dirección'
+      tags:
+        - Clientes
+    get:
+      operationId: get_customer_address
+      description: Obtener datos de la dirección
+      responses:
+        '201':
+          description: 'Información de la dirección'
+      tags:
+        - Clientes
+    delete:
+      operationId: delete_customer_address
+      description: Borrar dirección
+      responses:
+        '201':
+          description: 'Información de la dirección'
+      tags:
+        - Clientes
+
   # ========== BEGIN STATIONS =================
   # STATION LOGIN
   /api/v1/stations/login/:
@@ -556,6 +655,84 @@ definitions:
       picture:
         type: string
         description: Imagen de perfil
+  # REGISTER CUSTOMER ADDRESS
+  RegisterCustomerAddress:
+    type: object
+    properties:
+      alias:
+        type: string
+        description: Alias de la dirección
+      street:
+        type: string
+        description: Calle
+      suburb:
+        type: string
+        description: Colonia
+      postal_code:
+        type: string
+        description: Código postal
+      exterior_number:
+        type: string
+        description: Número exterior
+      inside_number:
+        type: string
+        description: Número interior
+      references:
+        type: string
+        description: Referencias
+      point:
+        type: object
+        properties:
+          lat:
+            type: number
+            description: Latitude
+            example: 18.462859841665864
+          lng:
+            type: number
+            description: Longitude
+            example: -97.39279966871719
+    required:
+      - alias
+      - street
+      - suburb
+      - postal_code
+      - exterior_number
+      - references
+# UPDATE CUSTOMER ADDRESS
+  UpdateCustomerAddress:
+    type: object
+    properties:
+      alias:
+        type: string
+        description: Alias de la dirección
+      street:
+        type: string
+        description: Calle
+      suburb:
+        type: string
+        description: Colonia
+      postal_code:
+        type: string
+        description: Código postal
+      exterior_number:
+        type: string
+        description: Número exterior
+      inside_number:
+        type: string
+        description: Número interior
+      references:
+        type: string
+        description: Referencias
+      point:
+        type: object
+        properties:
+          lat:
+            type: number
+            description: Latitude
+          lng:
+            type: number
+            description: Longitud
+  # ========== END CUSTOMER =============
   # REGISTER STATION
   RegisterStation:
     type: object

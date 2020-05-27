@@ -18,6 +18,10 @@ urlpatterns = [
     # Delivery men
     path('', include('scooter.apps.delivery_men.urls')),
     # Orders
-    path('', include('scooter.apps.orders.urls'))
+    path('', include('scooter.apps.orders.urls')),
+    # Customers
+    path('', include('scooter.apps.customers.urls')),
+    # Stations
+    path('', include('scooter.apps.stations.urls'))
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

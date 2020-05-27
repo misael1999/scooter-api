@@ -5,7 +5,8 @@ from rest_framework.response import Response
 from scooter.apps.customers.models.customers import CustomerAddress
 from scooter.apps.common.models.status import Status
 # Serializers
-from scooter.apps.customers.serializers.customer_addresses import CustomerAddressModelSerializer
+from scooter.apps.customers.serializers.addresses import (CustomerAddressModelSerializer,
+                                                          CreateCustomerAddressSerializer)
 # Viewset
 from scooter.utils.viewsets.scooter import ScooterViewSet
 # Mixins
@@ -42,7 +43,7 @@ class CustomerAddressesViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cre
 
     def create(self, request, *args, **kwargs):
         """ To return a custom response """
-        serializer = self.get_serializer(data=request.data)
+        serializer = CreateCustomerAddressSerializer(data=request.data, context=self.get_serializer_context())
         serializer.is_valid(raise_exception=True)
         obj = serializer.save()
         data = self.set_response(status=True,
@@ -54,8 +55,8 @@ class CustomerAddressesViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cre
         address = self.get_object()
         # Send instance of address for validate of name not exist
         self.address_instance = address
-        serializer = self.get_serializer(address, data=request.data, partial=True,
-                                         context=self.get_serializer_context())
+        serializer = CreateCustomerAddressSerializer(address, data=request.data, partial=True,
+                                                     context=self.get_serializer_context())
         serializer.is_valid(raise_exception=True)
         address = serializer.save()
         address_created = CustomerAddressModelSerializer(address).data

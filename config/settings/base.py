@@ -48,13 +48,15 @@ DJANGO_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.admin'
+    'django.contrib.admin',
+    'django.contrib.gis',
 ]
 
 THIRD_PARTY_APPS = [
     'rest_framework',
     'swagger_ui',
-    'corsheaders'
+    'corsheaders',
+    'rest_framework_gis'
 ]
 LOCAL_APPS = [
     'scooter.apps.users.apps.UsersAppConfig',

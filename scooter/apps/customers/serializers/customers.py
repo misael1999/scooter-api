@@ -53,8 +53,7 @@ class CustomerUserModelSerializer(serializers.ModelSerializer):
 
 
 class CustomerSignUpSerializer(serializers.Serializer):
-    username = serializers.CharField(
-        max_length=150,
+    username = serializers.EmailField(
         validators=[UniqueValidator(
             queryset=User.objects.all(),
             message='El email ya esta en uso')])
