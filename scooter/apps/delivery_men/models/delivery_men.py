@@ -1,12 +1,11 @@
 # django
-from django.db import models
+from django.contrib.gis.db import models
 # Utilities
 from scooter.utils.models import ScooterModel
 from django.core.validators import RegexValidator
 
 
 class DeliveryMan(ScooterModel):
-
     user = models.OneToOneField('users.User', on_delete=models.DO_NOTHING)
     station = models.ForeignKey('stations.Station', on_delete=models.CASCADE)
     name = models.CharField(max_length=60)
@@ -22,6 +21,7 @@ class DeliveryMan(ScooterModel):
     # stats
     total_orders = models.PositiveIntegerField(default=0)
     reputation = models.FloatField(default=0)
+    location = models.PointField(blank=True, null=True)
 
     class Meta:
         db_table = 'delivery_men_delivery_man'

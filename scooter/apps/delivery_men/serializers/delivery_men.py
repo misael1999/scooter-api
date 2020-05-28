@@ -3,6 +3,7 @@
 from django.utils import timezone
 # Django rest framework
 from rest_framework import serializers
+from django.contrib.gis.geos import Point
 # Models
 from scooter.apps.users.models import User
 from scooter.apps.delivery_men.models.delivery_men import DeliveryMan
@@ -17,6 +18,7 @@ class DeliveryManModelSerializer(ScooterModelSerializer):
 
     class Meta:
         model = DeliveryMan
+        geo_field = 'location'
         fields = '__all__'
 
 
@@ -68,3 +70,19 @@ class CreateDeliveryManSerializer(serializers.Serializer):
         except Exception as ex:
             print(ex.args.__str__())
             raise serializers.ValidationError({'detail': 'Ha ocurrido un problema al registrarse un repartidor'})
+
+
+class UpdateLocationDeliverySerializer(serializers.Serializer):
+    latitude = serializers.FloatField()
+    longitude = serializers.FloatField()
+
+    def update(self, instance, data):
+        try:
+            location = Point(x=data['longitude'], y=data['latitude'])
+            instance.location = location
+            instance.save()
+            return instance
+        except Exception as ex:
+            raise serializers.ValidationError({'detail': 'Ha ocurrido un error al guardar la ubicación'})
+
+

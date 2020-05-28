@@ -8,7 +8,7 @@ info:
   license:
     name: BSD License
   version: v1
-basePath: /appback/
+basePath: /
 consumes:
   - application/json
 produces:
@@ -573,6 +573,26 @@ paths:
       tags:
         - Repartidores
     parameters: []
+  /api/v1/delivery_men/{delivery_man_id}/update_location/:
+    parameters:
+      - name: delivery_man_id
+        in: path
+        required: true
+        type: string
+    patch:
+      operationId: delivery_man_update_location
+      description: Actualizar ubicación del repartidor
+      parameters:
+        - name: body
+          in: body
+          description: Actualizar ubicación del repartidor
+          schema:
+            $ref: '#/definitions/UpdateLocationDeliveryMan'
+      responses:
+        '200':
+          description: 'Ubicación actualizada'
+      tags:
+        - Repartidores
 
 # ======== DEFINITIONS ==============
 definitions:
@@ -653,7 +673,6 @@ definitions:
       - username
       - password
       - name
-      - last_name
   # UPDATE CUSTOMER
   UpdateCustomer:
     type: object
@@ -661,9 +680,6 @@ definitions:
       name:
         type: string
         description: Nombre(s) del cliente
-      last_name:
-        type: string
-        description: Apellidos del cliente
       birthdate:
         type: string
         description: Fecha de nacimiento
@@ -882,5 +898,19 @@ definitions:
     required:
       - username
       - password
+  UpdateLocationDeliveryMan:
+    type: object
+    properties:
+      latitude:
+        type: number
+        description: Latitude
+        example: 18.462859841665864
+      longitude:
+        type: number
+        description: Longitude
+        example: -97.39279966871719
+    required:
+      - latitude
+      - longitude
 
 

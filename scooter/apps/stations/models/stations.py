@@ -1,5 +1,5 @@
 # django
-from django.db import models
+from django.contrib.gis.db import models
 # Utilities
 from scooter.utils.models import ScooterModel
 
@@ -15,6 +15,10 @@ class Station(ScooterModel):
     # Config
     assign_delivery_manually = models.BooleanField(default=False)
     cancellation_policies = models.TextField(blank=True, null=True)
+    allow_cancellations = models.BooleanField(default=True)
+
+    # Help
+    information_is_complete = models.BooleanField(default=False)
 
     # stats
     reputation = models.FloatField(default=0)
@@ -25,3 +29,43 @@ class Station(ScooterModel):
 
     def __str__(self):
         return self.station_name
+
+
+class StationService(ScooterModel):
+    service = models.ForeignKey('common.Service', on_delete=models.DO_NOTHING)
+    station = models.ForeignKey(Station, on_delete=models.CASCADE)
+    base_rate_price = models.FloatField()
+    price_kilometer = models.FloatField()
+    from_kilometer = models.FloatField()
+    to_kilometer = models.FloatField()
+
+
+class StationPhoneNumbers(ScooterModel):
+    station = models.ForeignKey(Station, on_delete=models.CASCADE)
+    alias = models.CharField(max_length=30)
+    phone_number = models.CharField(max_length=15)
+    is_default = models.BooleanField(default=False)
+
+
+class StationSchedule(ScooterModel):
+    station = models.ForeignKey(Station, on_delete=models.CASCADE)
+    schedule = models.ForeignKey('common.Schedule', on_delete=models.DO_NOTHING)
+    from_hour = models.TimeField()
+    to_hour = models.TimeField()
+
+
+class StationAddress(ScooterModel):
+    station = models.OneToOneField(Station, on_delete=models.CASCADE)
+    alias = models.CharField(max_length=30)
+    street = models.CharField(max_length=100)
+    suburb = models.CharField(max_length=60)
+    postal_code = models.CharField(max_length=10)
+    exterior_number = models.CharField(max_length=10)
+    inside_number = models.CharField(max_length=10, blank=True, null=True)
+    references = models.CharField(max_length=150)
+    point = models.PointField(blank=True, null=True)
+
+
+
+
+

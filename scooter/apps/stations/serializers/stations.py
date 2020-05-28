@@ -9,7 +9,8 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 # Models
 from scooter.apps.users.models import User
-from scooter.apps.stations.models.stations import Station
+from scooter.apps.stations.models.stations import Station, StationAddress
+from scooter.apps.common.models import Service
 # Utilities
 from scooter.utils.functions import send_mail_verification, generate_verification_token
 # Serializers
@@ -60,6 +61,68 @@ class StationUserModelSerializer(serializers.ModelSerializer):
             'user',
             'station_name',
         )
+
+
+# Serializers of helps
+class PointSerializer(serializers.Serializer):
+    lat = serializers.FloatField()
+    lng = serializers.FloatField()
+
+
+# General information
+class GeneralInfoSerializer(serializers.Serializer):
+    picture = Base64ImageField()
+
+
+# Rates by service
+class RatesServicesSerializer(serializers.Serializer):
+    service_id = serializers.RelatedField(queryset=Service.objects.all(), source="service")
+    base_rate_price = serializers.FloatField()
+    price_kilometer = serializers.FloatField()
+    from_kilometer = serializers.FloatField()
+    to_kilometer = serializers.FloatField()
+
+    def validate(self, data):
+        pass
+
+
+# Station address
+class StationAddressSerializer(serializers.ModelSerializer):
+
+    point = PointSerializer(required=False)
+
+    class Meta:
+        model = StationAddress
+        fields = ("alias", "street", "suburb", "postal_code",
+                  "exterior_number", "inside_number", "references",
+                  "point")
+
+
+# Station Schedule
+class StationScheduleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = StationAddress
+        fields = ("schedule", "from_hour", "to_hour")
+
+
+# Other configurations
+class StationConfigSerializer(serializers.Serializer):
+    assign_delivery_manually = serializers.BooleanField()
+    cancellation_policies = serializers.CharField(max_length=400)
+    allow_cancellations = serializers.BooleanField()
+    schedules = StationScheduleSerializer(many=True)
+
+
+# Update configuration of station
+class StationUpdateSerializer(serializers.Serializer):
+    general = GeneralInfoSerializer()
+    config = StationConfigSerializer()
+    services = RatesServicesSerializer(many=True)
+    address = StationAddressSerializer()
+
+    def update(self, instance, data):
+        pass
 
 
 class StationSignUpSerializer(serializers.Serializer):
