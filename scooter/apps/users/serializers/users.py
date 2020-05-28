@@ -85,6 +85,11 @@ class RecoverPasswordSerializer(serializers.Serializer):
     def create(self, data):
         try:
             user = User.objects.get(username=data['username'])
+
+            if user.auth_facebook:
+                raise serializers.ValidationError({'detail': 'No es posible recuperar'
+                                                             ' la contraseña cuando inicio con facebook'})
+
             code = generate_verification_token(user=user,
                                                exp=timezone.now() + timedelta(minutes=15),
                                                token_type='recover_password')
