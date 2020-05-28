@@ -80,11 +80,11 @@ class ResendCodeAccountVerificationSerializer(serializers.Serializer):
 
 
 class RecoverPasswordSerializer(serializers.Serializer):
-    email = serializers.EmailField()
+    username = serializers.EmailField()
 
     def create(self, data):
         try:
-            user = User.objects.get(username=data['email'])
+            user = User.objects.get(username=data['username'])
             code = generate_verification_token(user=user,
                                                exp=timezone.now() + timedelta(minutes=15),
                                                token_type='recover_password')
@@ -102,7 +102,7 @@ class RecoverPasswordSerializer(serializers.Serializer):
             if not send_email:
                 raise serializers.ValidationError({'detail': 'Ha ocurrido un error al enviar el correo'})
         except User.DoesNotExist:
-            raise serializers.ValidationError({'detail': 'No existe un usuario con ese correo'})
+            raise serializers.ValidationError({'detail': 'No existe una cuenta con ese correo'})
         return user
 
 
