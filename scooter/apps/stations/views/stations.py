@@ -1,5 +1,6 @@
 # Django rest
 from rest_framework import status, mixins
+from rest_framework.decorators import action
 from rest_framework.response import Response
 # Permissions
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -10,7 +11,8 @@ from scooter.utils.viewsets import ScooterViewSet
 from scooter.apps.stations.models.stations import Station
 # Serializers
 from scooter.apps.stations.serializers.stations import (StationSimpleModelSerializer,
-                                                        StationSignUpSerializer, StationUserModelSerializer)
+                                                        StationSignUpSerializer, StationUserModelSerializer,
+                                                        StationUpdateInfoSerializer)
 from scooter.apps.users.serializers.users import UserModelSimpleSerializer
 
 
@@ -54,6 +56,19 @@ class StationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             station = self.get_object()
             partial = request.method == 'PATCH'
             serializer = StationSimpleModelSerializer(station, data=request.data, partial=partial)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            data = StationUserModelSerializer(station).data
+        except Station.DoesNotExist:
+            return Response(
+                self.set_error_response(status=False, field='Detail', message='El usuario no es una estación'))
+        return Response(self.set_response(status='ok', data=data, message='Información actualizada correctamente'))
+
+    @action(detail=True, methods=('PATCH',))
+    def update_info(self, request, *args, **kwargs):
+        try:
+            station = self.get_object()
+            serializer = StationUpdateInfoSerializer(station, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             data = StationUserModelSerializer(station).data

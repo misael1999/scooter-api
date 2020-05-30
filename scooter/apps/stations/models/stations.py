@@ -39,6 +39,9 @@ class StationService(ScooterModel):
     from_kilometer = models.FloatField()
     to_kilometer = models.FloatField()
 
+    class Meta:
+        unique_together = ('station', 'service')
+
 
 class StationPhoneNumbers(ScooterModel):
     station = models.ForeignKey(Station, on_delete=models.CASCADE)
@@ -53,10 +56,12 @@ class StationSchedule(ScooterModel):
     from_hour = models.TimeField()
     to_hour = models.TimeField()
 
+    class Meta:
+        unique_together = ('station', 'schedule')
+
 
 class StationAddress(ScooterModel):
     station = models.OneToOneField(Station, on_delete=models.CASCADE)
-    alias = models.CharField(max_length=30)
     street = models.CharField(max_length=100)
     suburb = models.CharField(max_length=60)
     postal_code = models.CharField(max_length=10)

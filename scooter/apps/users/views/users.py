@@ -44,7 +44,7 @@ class UserViewSet(ScooterViewSet):
         data = {
             'status': 'ok',
             'user': UserModelSimpleSerializer(user).data,
-            "message": "Se ha enviado un correo ha {email}".format(email=user.email)
+            "message": "Se ha enviado un correo ha {email}".format(email=user.username)
         }
         return Response(data, status=status.HTTP_200_OK)
 
@@ -57,7 +57,7 @@ class UserViewSet(ScooterViewSet):
         data = {
             'status': 'ok',
             'user': UserModelSimpleSerializer(user).data,
-            "message": "Se ha cambiado la contraseña para {email}".format(email=user.email)
+            "message": "Se ha cambiado la contraseña para {email}".format(email=user.username)
         }
         return Response(data, status=status.HTTP_200_OK)
 
@@ -70,10 +70,9 @@ class UserViewSet(ScooterViewSet):
         data = {
             'status': 'ok',
             'user': UserModelSimpleSerializer(user).data,
-            "message": "Se ha cambiado un correo de verificación a {email}".format(email=user.email)
+            "message": "Se ha cambiado un correo de verificación a {email}".format(email=user.username)
         }
         return Response(data, status=status.HTTP_200_OK)
-        pass
 
     @action(detail=False, methods=['post'], url_path="verify")
     def verify(self, request):
