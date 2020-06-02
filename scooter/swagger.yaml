@@ -358,14 +358,14 @@ paths:
         - Centrales
     parameters: []
   # UPDATE STATIONS
-  /api/v1/stations/{id}/:
+  /api/v1/stations/{id}/update_info/:
     parameters:
       - name: id
         in: path
         required: true
         type: string
     patch:
-      operationId: update_client
+      operationId: update_station
       description: Actualizar datos de la central
       parameters:
         - name: body
@@ -378,14 +378,21 @@ paths:
           description: 'Información de la central'
       tags:
         - Centrales
-    get:
-      operationId: get_station
-      description: Obtener datos de la central
+    put:
+      operationId: update_station_put
+      description: Actualizar datos de la central
+      parameters:
+        - name: body
+          in: body
+          description: Actualizar datos de la central
+          schema:
+            $ref: '#/definitions/UpdateStation'
       responses:
         '201':
           description: 'Información de la central'
       tags:
         - Centrales
+
   # CREATE DELIVERY MAN BY STATION
   /api/v1/stations/{station_id}/delivery_men/:
     parameters:
@@ -806,12 +813,106 @@ definitions:
   UpdateStation:
     type: object
     properties:
-      contact_person:
-        type: string
-        description: Persona de contacto
-      picture:
-        type: string
-        description: Imagen de perfil
+      general:
+        type: object
+        properties:
+          picture:
+            type: string
+            example: 'data:image/png;base64,....'
+      config:
+        type: object
+        properties:
+          assign_delivery_manually:
+            type: boolean
+            example: true
+            description: Asignar repartidor de manera manual
+          allow_cancellations:
+            type: boolean
+            example: true
+            description: Permitir cancelaciones
+          cancellation_policies:
+            type: string
+            example: Politica 1, no se permite ...
+            description: Politicas de cancelaciones
+          schedules:
+            type: array
+            description: Lista de horarios
+            items:
+              type: object
+              properties:
+                schedule_id:
+                  type: number
+                  description: Id del día
+                  example: 1
+                from_hour:
+                  type: string
+                  example: '10:00'
+                  description: Desde la hora ...
+                to_hour:
+                  type: string
+                  example: '18:00'
+                  description: Hasta la hora ...
+      services:
+        type: array
+        description: Lista de servicios con sus precios
+        items:
+          type: object
+          properties:
+            service_id:
+              type: number
+              description: Id del servicio
+              example: 1
+            base_rate_price:
+              type: number
+              description: Precio base
+              example: 20
+            price_kilometer:
+              type: number
+              description: Precio por cada kilometro
+              example: 3
+            from_kilometer:
+              type: number
+              description: Desde que kilometro el precio base
+              example: 0
+            to_kilometer:
+              type: number
+              description: Hasta que kilometro el precio base
+              example: 5
+      address:
+        type: object
+        properties:
+          alias:
+            type: string
+            description: Alias de la dirección
+          street:
+            type: string
+            description: Calle
+          suburb:
+            type: string
+            description: Colonia
+          postal_code:
+            type: string
+            description: Código postal
+          exterior_number:
+            type: string
+            description: Número exterior
+          inside_number:
+            type: string
+            description: Número interior
+          references:
+            type: string
+            description: Referencias
+          point:
+            type: object
+            properties:
+              lat:
+                type: number
+                description: Latitude
+                example: 18.462859841665864
+              lng:
+                type: number
+                description: Longitude
+                example: -97.39279966871719
   # ======== BEGIN DELIVERY MAN BY STATION ============
   # REGISTER DELIVERY MAN
   RegisterDeliveryMan:

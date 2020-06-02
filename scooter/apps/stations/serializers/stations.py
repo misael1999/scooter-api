@@ -72,12 +72,12 @@ class PointSerializer(serializers.Serializer):
 
 # General information
 class GeneralInfoSerializer(serializers.Serializer):
-    picture = Base64ImageField()
+    picture = Base64ImageField(required=False)
 
 
 # Rates by service
 class RatesServicesSerializer(serializers.Serializer):
-    service_id = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all())
+    service_id = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all(), source="service")
     base_rate_price = serializers.FloatField()
     price_kilometer = serializers.FloatField()
     from_kilometer = serializers.FloatField()
@@ -102,11 +102,18 @@ class StationAddressSerializer(serializers.ModelSerializer):
 
 # Station Schedule
 class StationScheduleSerializer(serializers.ModelSerializer):
-    schedule = serializers.PrimaryKeyRelatedField(queryset=Schedule.objects.all())
+    schedule_id = serializers.PrimaryKeyRelatedField(queryset=Schedule.objects.all(), source="schedule")
 
     class Meta:
         model = StationSchedule
-        fields = ("schedule", "from_hour", "to_hour")
+        fields = ("schedule_id", "from_hour", "to_hour")
+
+    def validate(self, data):
+
+        if data['from_hour'] > data['to_hour']:
+            raise serializers.ValidationError('La hora de apertura debe ser mayor')
+
+        return data
 
 
 # Other configurations
@@ -119,7 +126,7 @@ class StationConfigSerializer(serializers.Serializer):
 
 # Update configuration of station
 class StationUpdateInfoSerializer(serializers.Serializer):
-    general = GeneralInfoSerializer()
+    general = GeneralInfoSerializer(required=False)
     config = StationConfigSerializer()
     services = RatesServicesSerializer(many=True)
     address = StationAddressSerializer()
@@ -127,28 +134,47 @@ class StationUpdateInfoSerializer(serializers.Serializer):
     def update(self, instance, data):
         """ Update station info"""
         try:
+
+            # Variables
+            schedules_to_save = []
+            schedules_to_update = []
+            address_to_save = None
+            services_to_update = []
+            services_to_save = []
+
             # Save general info
             general = data.pop('general', None)
-            instance = self.save_general_info(instance=instance, general=general)
+            if general:
+                instance = self.save_general_info(instance=instance, general=general)
 
             # Save config
             config = data.pop('config', None)
-            instance = self.save_config(instance=instance, config=config)
+            if config:
+                instance = self.save_config(instance=instance, config=config)
 
             schedules = config.pop('schedules', None)
-            schedules_to_save = self.save_schedules(instance, schedules)
+            if schedules:
+                schedules_dict = self.save_schedules(instance, schedules)
+                schedules_to_save = schedules_dict['save']
+                schedules_to_update = schedules_dict['update']
 
             # Save station address
             address = data.pop('address', None)
-            address_to_save = self.save_station_address(instance=instance, address=address)
+            if address:
+                address_to_save = self.save_station_address(instance=instance, address=address)
 
             # Save station services
             services = data.pop('services', None)
-            services_to_save = self.save_station_services(instance=instance, services=services)
+            if services:
+                services_dict = self.save_station_services(instance=instance, services=services)
+                services_to_save = services_dict['save']
+                services_to_update = services_dict['update']
 
             # Save all models
             self.save_all_models(instance=instance, schedules_to_save=schedules_to_save,
-                                 address_to_save=address_to_save, services_to_save=services_to_save)
+                                 schedules_to_update=schedules_to_update,
+                                 address_to_save=address_to_save, services_to_update=services_to_update,
+                                 services_to_save=services_to_save)
 
             return instance
         except ValueError as e:
@@ -161,7 +187,8 @@ class StationUpdateInfoSerializer(serializers.Serializer):
     def save_general_info(self, instance, general):
         """ Before updating we have to delete the previous image """
         try:
-            instance.picture.delete(save=True)
+            # import pdb; pdb.set_trace()
+            instance.picture.delete()
             instance.picture = general['picture']
             return instance
         except ValueError as e:
@@ -189,10 +216,21 @@ class StationUpdateInfoSerializer(serializers.Serializer):
         """ Save array of station schedules """
         try:
             schedules_to_save = []
+            schedules_to_update = []
             for schedule in schedules:
                 """ add each schedule in an array and then save it with the function bulk_create """
-                schedules_to_save = [StationSchedule(**schedule, station=instance)]
-            return schedules_to_save
+                station_schedule = StationSchedule.objects.filter(station=instance, schedule=schedule['schedule'])
+                if station_schedule:
+                    sta_schedule = station_schedule[0]
+                    for field, value in schedule.items():
+                        setattr(sta_schedule, field, value)
+
+                    schedules_to_update.append(sta_schedule)
+                    continue
+
+                schedules_to_save.append(StationSchedule(**schedule, station=instance))
+
+            return {'save': schedules_to_save, 'update': schedules_to_update}
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
         except Exception as ex:
@@ -204,7 +242,7 @@ class StationUpdateInfoSerializer(serializers.Serializer):
         try:
             data_point = address.pop('point', None)
             point = Point(x=data_point['lng'], y=data_point['lat'])
-            address = StationAddress(**address, station=instance, point=point)
+            address['point'] = point
             return address
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
@@ -216,12 +254,23 @@ class StationUpdateInfoSerializer(serializers.Serializer):
     def save_station_services(self, instance, services):
         try:
             services_to_save = []
+            services_to_update = []
             for service in services:
                 """ Add each service in an array and then save it with the function bulk_create """
-                RatesServicesSerializer(data=service).is_valid(raise_exception=True)
-                services_to_save = [StationService(**service, station=instance)]
+                # Search by service and if it exists update instead of create
+                station_service = StationService.objects.filter(station=instance, service=service['service'])
+                if station_service:
+                    sta_service = station_service[0]
+                    # Update attributes
+                    for field, value in service.items():
+                        setattr(sta_service, field, value)
+                    # Append to list of service to update
+                    services_to_update.append(sta_service)
+                    continue
 
-            return services_to_save
+                services_to_save.append(StationService(**service, station=instance))
+
+            return {'save': services_to_save, 'update': services_to_update}
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
         except Exception as ex:
@@ -229,12 +278,31 @@ class StationUpdateInfoSerializer(serializers.Serializer):
             print(ex.args.__str__())
             raise serializers.ValidationError({'detail': 'Ha ocurrido un error desconocido'})
 
-    def save_all_models(self, instance, schedules_to_save, services_to_save, address_to_save):
+    def save_all_models(self, instance, schedules_to_save, schedules_to_update,
+                        services_to_save, services_to_update, address_to_save):
+
+        """ Save all data if everything goes well """
         try:
             instance.save()
             StationSchedule.objects.bulk_create(schedules_to_save)
+            StationSchedule.objects.bulk_update(schedules_to_update, fields=["from_hour", "to_hour"])
             StationService.objects.bulk_create(services_to_save)
-            address_to_save.save()
+            StationService.objects.bulk_update(services_to_update, fields=["base_rate_price",
+                                                                           'price_kilometer',
+                                                                           'from_kilometer',
+                                                                           'to_kilometer'])
+
+            if address_to_save:
+                address_exist = StationAddress.objects.filter(station=instance)
+                # If exist address update attribute and if it not exist create
+                if address_exist:
+                    station_address = address_exist[0]
+                    for field, value in address_to_save.items():
+                        setattr(station_address, field, value)
+                    station_address.save()
+                else:
+                    StationAddress(**address_to_save, station=instance).save()
+
             return instance
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})

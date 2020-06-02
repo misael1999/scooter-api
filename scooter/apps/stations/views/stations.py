@@ -33,7 +33,7 @@ class StationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
     def get_permissions(self):
         if self.action in ['create']:
             permission_classes = [AllowAny]
-        elif self.action in ['partial_update', 'update']:
+        elif self.action in ['partial_update', 'update', 'update_info']:
             permission_classes = [IsAuthenticated, IsAccountOwner]
         else:
             permission_classes = [IsAuthenticated]
@@ -64,15 +64,16 @@ class StationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
                 self.set_error_response(status=False, field='Detail', message='El usuario no es una estación'))
         return Response(self.set_response(status='ok', data=data, message='Información actualizada correctamente'))
 
-    @action(detail=True, methods=('PATCH',))
+    @action(detail=True, methods=('PATCH', 'PUT'))
     def update_info(self, request, *args, **kwargs):
         try:
             station = self.get_object()
-            serializer = StationUpdateInfoSerializer(station, data=request.data, partial=True)
+            partial = request.method == 'PATCH'
+            serializer = StationUpdateInfoSerializer(station, data=request.data, partial=partial)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             data = StationUserModelSerializer(station).data
         except Station.DoesNotExist:
             return Response(
-                self.set_error_response(status=False, field='Detail', message='El usuario no es una estación'))
+                self.set_error_response(status=False, field='Detail', message='No existe la central'))
         return Response(self.set_response(status='ok', data=data, message='Información actualizada correctamente'))
