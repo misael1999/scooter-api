@@ -11,7 +11,7 @@ from scooter.apps.customers.models import Customer
 from scooter.apps.delivery_men.models import DeliveryMan
 # Serializers
 from scooter.apps.customers.serializers.customers import CustomerUserModelSerializer
-from scooter.apps.delivery_men.serializers.delivery_men import DeliveryManUserModelSerializer
+from scooter.apps.stations.serializers.delivery_men import DeliveryManUserModelSerializer
 from scooter.apps.stations.serializers.stations import StationUserModelSerializer
 # Facebook
 import facebook
