@@ -5,6 +5,7 @@ from django.utils import timezone
 # Django
 from django.conf import settings
 from django.contrib.gis.geos import Point
+from django.db import IntegrityError
 # Django rest framework
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
@@ -180,7 +181,7 @@ class StationUpdateInfoSerializer(serializers.Serializer):
         except ValueError as e:
             raise serializers.ValidationError({'detail': e})
         except Exception as ex:
-            print("Exception save info station, please check it")
+            print("Exception save info station main method, please check it")
             print(ex.args.__str__())
             raise serializers.ValidationError({'detail': 'Error al actualizar la información'})
 
@@ -206,11 +207,11 @@ class StationUpdateInfoSerializer(serializers.Serializer):
             instance.allow_cancellations = config['allow_cancellations']
             return instance
         except ValueError as e:
-            raise serializers.ValidationError({'detail': str(e)})
+            raise ValueError(str(e))
         except Exception as ex:
             print("Exception save station config, please check it")
             print(ex.args.__str__())
-            raise serializers.ValidationError({'detail': 'Ha ocurrido un error desconocido'})
+            raise ValueError(str(ex))
 
     def save_schedules(self, instance, schedules):
         """ Save array of station schedules """
@@ -232,11 +233,11 @@ class StationUpdateInfoSerializer(serializers.Serializer):
 
             return {'save': schedules_to_save, 'update': schedules_to_update}
         except ValueError as e:
-            raise serializers.ValidationError({'detail': str(e)})
+            raise ValueError(str(e))
         except Exception as ex:
             print("Exception save schedules, please check it")
             print(ex.args.__str__())
-            raise serializers.ValidationError({'detail': 'Ha ocurrido un error desconocido'})
+            raise ValueError(str(ex))
 
     def save_station_address(self, instance, address):
         try:
@@ -245,11 +246,11 @@ class StationUpdateInfoSerializer(serializers.Serializer):
             address['point'] = point
             return address
         except ValueError as e:
-            raise serializers.ValidationError({'detail': str(e)})
+            raise ValueError(str(e))
         except Exception as ex:
             print("Exception save station address, please check it")
             print(ex.args.__str__())
-            raise serializers.ValidationError({'detail': 'Ha ocurrido un error desconocido'})
+            raise ValueError(str(ex))
 
     def save_station_services(self, instance, services):
         try:
@@ -272,11 +273,11 @@ class StationUpdateInfoSerializer(serializers.Serializer):
 
             return {'save': services_to_save, 'update': services_to_update}
         except ValueError as e:
-            raise serializers.ValidationError({'detail': str(e)})
+            raise ValueError(str(e))
         except Exception as ex:
             print("Exception save station services, please check it")
             print(ex.args.__str__())
-            raise serializers.ValidationError({'detail': 'Ha ocurrido un error desconocido'})
+            raise ValueError(str(ex))
 
     def save_all_models(self, instance, schedules_to_save, schedules_to_update,
                         services_to_save, services_to_update, address_to_save):
@@ -304,12 +305,15 @@ class StationUpdateInfoSerializer(serializers.Serializer):
                     StationAddress(**address_to_save, station=instance).save()
 
             return instance
+        except IntegrityError as iex:
+            print(str(iex))
+            raise ValueError(str('Revisar si ingreso llaves primarias repetidas'))
         except ValueError as e:
-            raise serializers.ValidationError({'detail': str(e)})
+            raise ValueError(str(e))
         except Exception as ex:
             print("Exception save all models, please check it")
             print(ex.args.__str__())
-            raise serializers.ValidationError({'detail': 'Ha ocurrido un error desconocido'})
+            raise ValueError(str(ex))
 
 
 # Create a new station
