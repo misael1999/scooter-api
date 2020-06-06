@@ -38,6 +38,11 @@ ROOT_URLCONF = 'config.urls'
 # WSGI
 WSGI_APPLICATION = 'config.wsgi.application'
 
+# ASGI
+ASGI_APPLICATION = 'config.settings.routing.application'
+
+
+
 # USERS AND AUTHENTICATION
 AUTH_USER_MODEL = 'users.User'
 
@@ -56,7 +61,8 @@ THIRD_PARTY_APPS = [
     'rest_framework',
     'swagger_ui',
     'corsheaders',
-    'rest_framework_gis'
+    'rest_framework_gis',
+    'channels',
 ]
 LOCAL_APPS = [
     'scooter.apps.users.apps.UsersAppConfig',
@@ -164,6 +170,20 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_TIME_LIMIT = 5 * 60
 CELERY_TASK_SOFT_TIME_LIMIT = 60
+
+redis_host = os.environ.get('REDIS_HOST', '127.0.0.1')
+
+# Channel layer definitions
+# http://channels.readthedocs.io/en/latest/topics/channel_layers.html
+CHANNEL_LAYERS = {
+    "default": {
+        # This example app uses the Redis channel layer implementation channels_redis
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [(redis_host, 6379)],
+        },
+    },
+}
 
 # Django rest framework
 REST_FRAMEWORK = {

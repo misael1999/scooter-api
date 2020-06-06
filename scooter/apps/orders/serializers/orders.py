@@ -1,15 +1,18 @@
 # Rest framework
+from asgiref.sync import async_to_sync
 from rest_framework import serializers
-# models
-from scooter.apps.orders.models.orders import (Order, OrderDetail)
 # Serializers
 from scooter.apps.common.serializers.common import Base64ImageField
 # Models
+from scooter.apps.orders.models.orders import (Order, OrderDetail)
 from scooter.apps.delivery_men.models import DeliveryMan
 from scooter.apps.stations.models import Station, StationService
 from scooter.apps.common.models import Service
 from scooter.apps.customers.models import CustomerAddress
 from scooter.apps.orders.models.orders import Order
+# Functions channels
+from scooter.apps.orders.utils.orders import send_order_to_station_or_delivery
+from asgiref.sync import async_to_sync
 
 
 # For requests we must put all the fields as read only
@@ -18,14 +21,10 @@ class OrderModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ("customer", "delivery_man", "station", "service",
+        fields = ("delivery_man", "station", "service",
                   "from_address_id", "to_address_id", "service_price",
                   "indications", "approximate_price_order",
                   "date_delivered_order", "qr_code", "order_status", "order_date")
-        read_only_fields = ("customer", "delivery_man", "station", "service",
-                            "from_address_id", "to_address_id", "service_price",
-                            "indications", "approximate_price_order",
-                            "date_delivered_order", "qr_code", "order_status", "order_date")
 
 
 class DetailOrderSerializer(serializers.Serializer):
@@ -56,6 +55,7 @@ class CreateOrderSerializer(serializers.Serializer):
         return data
 
     def create(self, data):
+        """ Create a new order and send message socket """
         try:
             details = data.pop('details', None)
             order = Order.objects.create(**data)
@@ -65,12 +65,12 @@ class CreateOrderSerializer(serializers.Serializer):
             OrderDetail.objects.bulk_create(details_to_save)
 
             # Check if the station has manual assignment activated
-
-            # Send push notification to station or delivery man
-
+            # Send push notification or message by channel to station or delivery man
+            customer = data['customer']
+            async_to_sync(send_order_to_station_or_delivery)(customer.user)
             return order
         except ValueError as e:
-            raise ValueError(str(e))
+            raise serializers.ValidationError({'detail': str(e)})
         except Exception as ex:
             print("Exception in create order, please check it")
             print(ex.args.__str__())
