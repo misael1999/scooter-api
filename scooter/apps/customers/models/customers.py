@@ -35,9 +35,10 @@ class CustomerAddress(ScooterModel):
     inside_number = models.CharField(max_length=10, blank=True, null=True)
     references = models.CharField(max_length=150)
     point = models.PointField(blank=True, null=True)
+    type_address = models.ForeignKey('common.TypeAddress', on_delete=models.DO_NOTHING)
 
     class Meta:
-        db_table = 'users_customer_address'
+        db_table = 'customers_customer_address'
 
     def __str__(self):
         return self.alias

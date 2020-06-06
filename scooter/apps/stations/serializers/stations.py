@@ -197,7 +197,7 @@ class StationUpdateInfoSerializer(serializers.Serializer):
         except Exception as ex:
             print("Exception save general info, please check it")
             print(ex.args.__str__())
-            raise serializers.ValidationError({'detail': 'Ha ocurrido un error desconocido'})
+            raise ValueError(str(ex))
 
     def save_config(self, instance, config):
         """ Save station config """

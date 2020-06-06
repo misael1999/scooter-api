@@ -12,3 +12,8 @@ class Service(ScooterModel):
 class Schedule(ScooterModel):
     name = models.CharField(max_length=30)
     slug_name = models.CharField(max_length=30)
+
+
+class TypeAddress(ScooterModel):
+    name = models.CharField(max_length=30)
+    slug_name = models.CharField(max_length=30)
