@@ -11,4 +11,3 @@ async def send_order_to_station_or_delivery(user):
         {"type": "notify", "content": 'Hola prro'},
     )
     print('SEND MESSAGE')
-    print(group_name)

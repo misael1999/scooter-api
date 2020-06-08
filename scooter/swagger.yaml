@@ -8,7 +8,7 @@ info:
   license:
     name: BSD License
   version: v1
-basePath: /
+basePath: /appback/
 consumes:
   - application/json
 produces:
@@ -580,6 +580,26 @@ paths:
       tags:
         - Repartidores
     parameters: []
+  /api/v1/delivery_men/{delivery_id}/:
+    parameters:
+      - name: delivery_id
+        in: path
+        required: true
+        type: string
+    patch:
+      operationId: update_delivery_man
+      description: Actualizar repartidores
+      parameters:
+        - name: body
+          in: body
+          description: Actualizar repartidor
+          schema:
+            $ref: '#/definitions/UpdateDeliveryManId'
+      responses:
+        '200':
+          description: 'Regresa información del repartidor y su access_token'
+      tags:
+        - Repartidores
   /api/v1/delivery_men/{delivery_man_id}/update_location/:
     parameters:
       - name: delivery_man_id
@@ -972,6 +992,12 @@ definitions:
       password:
         type: string
         description: Contraseña para inicio de sesión
+  UpdateDeliveryManId:
+    type: object
+    properties:
+      picture:
+        type: string
+        description: Imagen del repartidor
   # VEHICLE'S STATION
   RegisterVehicle:
     type: object
@@ -1038,11 +1064,11 @@ definitions:
   CreateOrder:
     type: object
     properties:
-      station:
+      station_id:
         type: number
         description: Id de la estación
         example: 1
-      service:
+      service_id:
         type: number
         description: Id del servicio
         example: 1
@@ -1066,10 +1092,25 @@ definitions:
         type: number
         description: Precio aproximado de la compra
         example: 100.0
+      details:
+        type: array
+        description: Lista de productos
+        items:
+          type: object
+          properties:
+            product_name:
+              type: string
+              description: Nombre del producto
+              example: Arroz
+            picture:
+              type: string
+              description: Imagen del producto
+              example: base64Image
     required:
-      - station
-      - service
+      - station_id
+      - service_id
       - from_address_id
       - to_address_id
       - service_price
       - approximate_price_order
+      - details
