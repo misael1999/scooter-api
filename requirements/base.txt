@@ -39,7 +39,13 @@ django-cors-headers==3.2.1
 # Facebook
 facebook-sdk==3.1.0
 
+# Notifications FCM
+fcm-django==0.3.4
+
 # Swagger
 django-swagger-ui==0.1.11
 django-rest-swagger==2.2.0
 pyyaml==5.3.1
+
+# Geo
+geopy==1.22.0

@@ -29,7 +29,7 @@ class CreateCustomerAddressSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomerAddress
-        fields = ("alias", "street", "suburb",
+        fields = ("alias", "street", "suburb", "type_address_id",
                   "postal_code", "exterior_number",
                   "inside_number", "references", "point")
 

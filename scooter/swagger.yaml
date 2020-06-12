@@ -8,7 +8,7 @@ info:
   license:
     name: BSD License
   version: v1
-basePath: /appback/
+basePath: /
 consumes:
   - application/json
 produces:
@@ -37,6 +37,56 @@ paths:
           description: 'Regresa todos los estatus que se ocupan de manera general'
       tags:
         - Común
+    parameters: []
+  /api/v1/commons/order_status/:
+    get:
+      operationId: orders_status_get
+      description: Listado de status de ordenes.
+      parameters: []
+      responses:
+        '200':
+          description: 'Regresa todos los estatus que se ocupan para las ordenes'
+      tags:
+        - Común
+    parameters: []
+  /api/v1/commons/schedules/:
+    get:
+      operationId: schedules_get
+      description: Listado de horarios.
+      parameters: []
+      responses:
+        '200':
+          description: 'Listado de horarios'
+      tags:
+        - Común
+    parameters: []
+  /api/v1/commons/services/:
+    get:
+      operationId: services_get
+      description: Listado de servicios.
+      parameters: []
+      responses:
+        '200':
+          description: 'Listado de servicios'
+      tags:
+        - Común
+    parameters: []
+  # DEVICES
+  /api/v1/devices/:
+    post:
+      operationId: Register_token_user
+      description: Registrar token de usuario para notificaciones push
+      parameters:
+        - name: body
+          in: body
+          description: Registrar token de usuario para notificaciones push
+          schema:
+            $ref: '#/definitions/RegisterTokenUser'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Usuarios general
     parameters: []
   # VERIFY ACCOUNT
   /api/v1/users/verify/:
@@ -645,6 +695,19 @@ paths:
 # ======== DEFINITIONS ==============
 definitions:
   # LOGIN CUSTOMER
+  RegisterTokenUser:
+    type: object
+    properties:
+      registration_id:
+        type: string
+        description: Token de FCM
+      type:
+        type: string
+        example: 'android'
+        description: Tipo de dispositivo
+    required:
+      - registration_id
+      - type
   LoginToken:
     type: object
     properties:
@@ -764,6 +827,10 @@ definitions:
       suburb:
         type: string
         description: Colonia
+      type_address:
+        type: number
+        exmaple: 1
+        description: Tipo de direccion (personal, compra)
       postal_code:
         type: string
         description: Código postal

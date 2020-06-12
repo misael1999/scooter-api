@@ -48,3 +48,12 @@ class StationFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
         if not station or not queryset:
             return None
         return queryset.filter(station=station)
+
+
+class CustomerFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
+    def get_queryset(self):
+        customer = self.context.get('customer', None)
+        queryset = super(CustomerFilteredPrimaryKeyRelatedField, self).get_queryset()
+        if not customer or not queryset:
+            return None
+        return queryset.filter(customer=customer)

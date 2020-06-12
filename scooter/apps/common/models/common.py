@@ -8,12 +8,21 @@ class Service(ScooterModel):
     name = models.CharField(max_length=30)
     slug_name = models.CharField(max_length=30)
 
+    def __str__(self):
+        return self.name
+
 
 class Schedule(ScooterModel):
     name = models.CharField(max_length=30)
     slug_name = models.CharField(max_length=30)
 
+    def __str__(self):
+        return self.name
+
 
 class TypeAddress(ScooterModel):
     name = models.CharField(max_length=30)
     slug_name = models.CharField(max_length=30)
+
+    def __str__(self):
+        return self.name

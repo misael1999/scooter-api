@@ -140,5 +140,5 @@ class CustomerFacebookAuthSerializer(serializers.Serializer):
         response = dict()
         response['refresh'] = str(refresh)
         response['access'] = str(refresh.access_token)
-        response['user'] = CustomerUserModelSerializer(customer).data
+        response['customer'] = CustomerUserModelSerializer(customer).data
         return response

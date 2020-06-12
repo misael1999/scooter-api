@@ -9,7 +9,8 @@ from rest_framework.permissions import IsAuthenticated
 from scooter.apps.customers.permissions.customers import IsAccountOwnerCustomer
 # Serializers
 from scooter.apps.orders.serializers.orders import (OrderModelSerializer,
-                                                    CreateOrderSerializer)
+                                                    CreateOrderSerializer,
+                                                    CalculateServicePriceSerializer)
 # Mixin
 from scooter.apps.common.mixins.customers import AddCustomerMixin
 
@@ -24,7 +25,8 @@ class CustomerOrderViewSet(ScooterViewSet, mixins.CreateModelMixin, AddCustomerM
     """ Method dispatch in AddCustomerMixin """
 
     def create(self, request, *args, **kwargs):
-        """ To return a custom response """
+        """Create a new order
+        To return a custom response """
         serializer = CreateOrderSerializer(data=request.data, context=self.get_serializer_context())
         serializer.is_valid(raise_exception=True)
         obj = serializer.save()
@@ -35,4 +37,11 @@ class CustomerOrderViewSet(ScooterViewSet, mixins.CreateModelMixin, AddCustomerM
 
     @action(methods=['POST'], detail=False)
     def service_price(self, request, *args, **kwargs):
-        pass
+        """ Calculate price of the servive before request the service """
+        serializer = CalculateServicePriceSerializer(data=request.data, context=self.get_serializer_context())
+        serializer.is_valid(raise_exception=True)
+        obj = serializer.save()
+        data = self.set_response(status=True,
+                                 data={'price_service': obj},
+                                 message='Solicitud de servicio enviada')
+        return Response(data=data, status=status.HTTP_200_OK)

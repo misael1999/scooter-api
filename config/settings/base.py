@@ -4,13 +4,12 @@ import environ
 import os
 from .constants import *
 
-
 ROOT_DIR = environ.Path(__file__) - 3
 APPS_DIR_2 = ROOT_DIR.path('scooter/apps')
 APPS_DIR = ROOT_DIR.path('scooter')
 
 root = environ.Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-env = environ.Env(DEBUG=(bool, False),)
+env = environ.Env(DEBUG=(bool, False), )
 environ.Env.read_env()
 
 # Base
@@ -41,8 +40,6 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # ASGI
 ASGI_APPLICATION = 'config.settings.routing.application'
 
-
-
 # USERS AND AUTHENTICATION
 AUTH_USER_MODEL = 'users.User'
 
@@ -63,6 +60,7 @@ THIRD_PARTY_APPS = [
     'corsheaders',
     'rest_framework_gis',
     'channels',
+    'fcm_django'
 ]
 LOCAL_APPS = [
     'scooter.apps.users.apps.UsersAppConfig',
@@ -207,9 +205,20 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 15
 }
 
+FCM_DJANGO_SETTINGS = {
+    "APP_VERBOSE_NAME": "Scooter",
+    # default: _('FCM Django')
+    "FCM_SERVER_KEY": "AAAAg9bmMBM:APA91bHJiRLZfMs9U5Nm-9ovjIy1iEyI7ewEb_b9MBAe--6L3ZqvOg8tpCp3hUmAtUoCf2SpkT55iXAjEXbZ8ZWpa6NIdIAG9JcgFfXMiQk1FGK_u5g4PRsk6LzA6blsYa5t8Fl0W2QM",
+    # true if you want to have only one active device per registered user at a time
+    # default: False
+    "ONE_DEVICE_PER_USER": False,
+    # devices to which notifications cannot be sent,
+    # are deleted upon receiving error response from FCM
+    # default: False
+    "DELETE_INACTIVE_DEVICES": False,
+}
+
 # Swagger
 SWAGGER_YAML_FILE = str(APPS_DIR.path('swagger.yaml'))  # os.path.join(BASE_DIR, 'swagger.yaml')
 FACEBOOK_APP_ID = '690189338433902'
 FACEBOOK_APP_SECRET = '4c55431b063952e631df380e0e73a10a'
-
-
