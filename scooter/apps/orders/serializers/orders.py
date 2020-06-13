@@ -21,6 +21,7 @@ from fcm_django.models import FCMDevice
 # Serializers primary field
 from scooter.apps.common.serializers.common import CustomerFilteredPrimaryKeyRelatedField
 # GeoPy
+# from geopy import distance
 
 
 # For requests we must put all the fields as read only
@@ -173,7 +174,11 @@ def calculate_service_price(data):
         pnt1 = fromstr(
             to_address.point, srid=4326
         ).transform(900913, clone=True)
-        distance_points = (pnt.distance(pnt1) / 1000) + 1
+        distance_points = (pnt.distance(pnt1) / 1000)
+        distance_points = distance_points + (distance_points * 0.40)
+        # distance_points = distance.vincenty(from_point, to_point).kilometers
+        # distance_points = distance_points + (distance_points * 0.45)
+
         service = data['station_service']
         price_service = 0.0
         if distance_points <= service.to_kilometer:
