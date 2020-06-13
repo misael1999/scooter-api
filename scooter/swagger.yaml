@@ -8,7 +8,7 @@ info:
   license:
     name: BSD License
   version: v1
-basePath: /
+basePath: /appback/
 consumes:
   - application/json
 produces:
@@ -670,7 +670,7 @@ paths:
           description: 'Ubicación actualizada'
       tags:
         - Repartidores
-  # ==== ORDERS
+  # ==== ORDERS =====
   /api/v1/customers/{customer_id}/orders/:
     parameters:
       - name: customer_id
@@ -686,6 +686,26 @@ paths:
           description: Crear un nuevo pedido
           schema:
             $ref: '#/definitions/CreateOrder'
+      responses:
+        '200':
+          description: 'Pedido creado'
+      tags:
+        - Pedidos
+  /api/v1/customers/{customer_id}/orders/service_price/:
+    parameters:
+      - name: customer_id
+        in: path
+        required: true
+        type: string
+    post:
+      operationId: calculate_price_order_customer
+      description: Calcular el precio del servicio
+      parameters:
+        - name: body
+          in: body
+          description: Calcular el precio del servicio
+          schema:
+            $ref: '#/definitions/CalculatePriceOrder'
       responses:
         '200':
           description: 'Pedido creado'
@@ -1128,6 +1148,30 @@ definitions:
       - latitude
       - longitude
   # ==== ORDERS
+  CalculatePriceOrder:
+    type: object
+    properties:
+      station_id:
+        type: number
+        description: Id de la estación
+        example: 1
+      service_id:
+        type: number
+        description: Id del servicio
+        example: 1
+      from_address_id:
+        type: number
+        description: Id de la dirección para compra o recolección
+        example: 1
+      to_address_id:
+        type: number
+        description: Id de la dirección de entrega
+        example: 1
+    required:
+      - station_id
+      - service_id
+      - from_address_id
+      - to_address_id
   CreateOrder:
     type: object
     properties:

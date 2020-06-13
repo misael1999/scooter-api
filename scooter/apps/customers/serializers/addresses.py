@@ -25,7 +25,7 @@ class PointSerializer(serializers.Serializer):
 
 
 class CreateCustomerAddressSerializer(serializers.ModelSerializer):
-    point = PointSerializer(required=False)
+    point = PointSerializer()
 
     class Meta:
         model = CustomerAddress

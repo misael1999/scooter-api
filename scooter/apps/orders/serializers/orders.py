@@ -1,5 +1,6 @@
 # Rest framework
 from asgiref.sync import async_to_sync
+from django.contrib.gis.geos import fromstr
 from rest_framework import serializers
 # Serializers
 from scooter.apps.common.serializers.common import Base64ImageField
@@ -19,6 +20,7 @@ from django.contrib.gis.measure import D
 from fcm_django.models import FCMDevice
 # Serializers primary field
 from scooter.apps.common.serializers.common import CustomerFilteredPrimaryKeyRelatedField
+# GeoPy
 
 
 # For requests we must put all the fields as read only
@@ -58,13 +60,48 @@ class CalculateServicePriceSerializer(serializers.Serializer):
 
     def validate(self, data):
         # Check if the station has the requested service
-        exist_service = StationService.objects.filter(station=data['station'], service=data['service']).exists()
-        if not exist_service:
+        try:
+            station = data['station']
+            exist_service = station.stationservice_set.get(service=data['service'])
+            # if not exist_service:
+            #     raise serializers.ValidationError({'detail': 'La central no cuenta con el servicio solicitado'})
+            data['station_service'] = exist_service
+        except StationService.DoesNotExist:
             raise serializers.ValidationError({'detail': 'La central no cuenta con el servicio solicitado'})
+
         return data
 
     def create(self, data):
-        return data
+        try:
+            from_address = data['from_address']
+            to_address = data['to_address']
+            # longitude position 0 and latitude position 1
+            # from_point = (from_address.point[1], from_address.point[0])
+            # to_point = (to_address.point[1], to_address.point[0])
+            pnt = fromstr(
+                from_address.point, srid=4326
+            ).transform(900913, clone=True)
+            pnt1 = fromstr(
+                to_address.point, srid=4326
+            ).transform(900913, clone=True)
+            distance_points = (pnt.distance(pnt1) / 1000) + 1
+            service = data['station_service']
+            price_service = 0.0
+            if distance_points <= service.to_kilometer:
+                price_service = service.base_rate_price
+            else:
+                kilometers_left = distance_points - service.to_kilometer
+                price_service = service.base_rate_price + (kilometers_left * service.price_kilometer)
+
+            return price_service
+        except ValueError as e:
+            raise serializers.ValidationError({'detail': str(e)})
+        except Exception as ex:
+            print("Exception in create order, please check it")
+            print(ex.args.__str__())
+            raise serializers.ValidationError({'detail': 'Error al consultar precio de la orden'})
+
+
 
 
 class CreateOrderSerializer(serializers.Serializer):

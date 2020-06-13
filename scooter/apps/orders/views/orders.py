@@ -43,5 +43,5 @@ class CustomerOrderViewSet(ScooterViewSet, mixins.CreateModelMixin, AddCustomerM
         obj = serializer.save()
         data = self.set_response(status=True,
                                  data={'price_service': obj},
-                                 message='Solicitud de servicio enviada')
+                                 message='Precio del servicio')
         return Response(data=data, status=status.HTTP_200_OK)
