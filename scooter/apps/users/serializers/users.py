@@ -12,6 +12,8 @@ from scooter.apps.users.models.users import User
 import jwt
 # Functions
 from scooter.utils.functions import send_mail_verification, generate_verification_token
+# Task
+from scooter.apps.taskapp.tasks import send_email_task
 
 
 class UserModelSimpleSerializer(serializers.ModelSerializer):
@@ -50,7 +52,6 @@ class AccountVerificationSerializer(serializers.Serializer):
 
 
 class ResendCodeAccountVerificationSerializer(serializers.Serializer):
-
     username = serializers.EmailField()
 
     def create(self, data):
@@ -96,16 +97,15 @@ class RecoverPasswordSerializer(serializers.Serializer):
 
             subject = 'Completa tu solicitud de restablecimiento de contraseña'
             data = {
-                'user': user,
+                'user': UserModelSimpleSerializer(user).data,
                 'token': code,
                 'url': settings.URL_SERVER_FRONTEND
             }
-            send_email = send_mail_verification(subject=subject,
-                                                to_user=user.username,
-                                                path_template="emails/users/recover_password.html",
-                                                data=data)
-            if not send_email:
-                raise serializers.ValidationError({'detail': 'Ha ocurrido un error al enviar el correo'})
+            # Celery task
+            send_email_task.delay(subject=subject,
+                                  to_user=user.username,
+                                  path_template="emails/users/recover_password.html",
+                                  data=data)
         except User.DoesNotExist:
             raise serializers.ValidationError({'detail': 'No existe una cuenta con ese correo'})
         return user
@@ -134,4 +134,3 @@ class RecoverPasswordVerificationSerializer(serializers.Serializer):
         user.set_password(data['password'])
         user.save()
         return user
-

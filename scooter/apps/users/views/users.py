@@ -43,7 +43,7 @@ class UserViewSet(ScooterViewSet):
         user = serializer.save()
         data = {
             'status': 'ok',
-            'user': UserModelSimpleSerializer(user).data,
+            'data': {},
             "message": "Se ha enviado un correo ha {email}".format(email=user.username)
         }
         return Response(data, status=status.HTTP_200_OK)
@@ -56,7 +56,7 @@ class UserViewSet(ScooterViewSet):
         user = serializer.save()
         data = {
             'status': 'ok',
-            'user': UserModelSimpleSerializer(user).data,
+            'data': {},
             "message": "Se ha cambiado la contraseña para {email}".format(email=user.username)
         }
         return Response(data, status=status.HTTP_200_OK)

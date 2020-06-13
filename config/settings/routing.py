@@ -1,11 +1,7 @@
-from django.urls import path
-
-from channels.http import AsgiHandler
 from channels.routing import ProtocolTypeRouter, URLRouter
 from config.settings.middlewares import TokenAuthMiddlewareStack
 import scooter.apps.orders.routing as order_routing
-from channels.security.websocket import AllowedHostsOriginValidator
-from channels.auth import AuthMiddlewareStack
+
 
 # from chat.consumers import ChatConsumer
 
