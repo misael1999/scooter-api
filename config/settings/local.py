@@ -13,6 +13,7 @@ ALLOWED_HOSTS = [
     "localhost",
     "0.0.0.0",
     "127.0.0.1",
+    "35.236.92.131",
     '127.0.0.1:4200',
     'localhost:4200',
     'scooter-app.team',
