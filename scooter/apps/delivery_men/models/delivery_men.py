@@ -22,9 +22,11 @@ class DeliveryMan(ScooterModel):
     total_orders = models.PositiveIntegerField(default=0)
     reputation = models.FloatField(default=0)
     location = models.PointField(blank=True, null=True)
+    delivery_status = models.ForeignKey('common.DeliveryManStatus', on_delete=models.DO_NOTHING, default=1)
 
     class Meta:
         db_table = 'delivery_men_delivery_man'
 
     def __str__(self):
         return self.name
+

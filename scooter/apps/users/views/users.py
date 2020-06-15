@@ -86,3 +86,16 @@ class UserViewSet(ScooterViewSet):
             "message": "Se ha verificado correctamente"
         }
         return Response(data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'])
+    def test_notifications(self, request):
+        """ Verify user account (merchant and client) """
+        serializer = AccountVerificationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        data = {
+            'status': 'ok',
+            'user': UserModelSimpleSerializer(user).data,
+            "message": "Se ha enviado la notificacion correctamente"
+        }
+        return Response(data, status=status.HTTP_200_OK)

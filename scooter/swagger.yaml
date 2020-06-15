@@ -8,7 +8,7 @@ info:
   license:
     name: BSD License
   version: v1
-basePath: /appback/
+basePath: /
 consumes:
   - application/json
 produces:
@@ -68,6 +68,17 @@ paths:
       responses:
         '200':
           description: 'Listado de servicios'
+      tags:
+        - Común
+    parameters: []
+  /api/v1/commons/type_addresses/:
+    get:
+      operationId: type_addresses_get
+      description: Listado de tipos de direcciones.
+      parameters: []
+      responses:
+        '200':
+          description: 'Listado de tipos de direcciones'
       tags:
         - Común
     parameters: []
@@ -691,6 +702,41 @@ paths:
           description: 'Pedido creado'
       tags:
         - Pedidos
+    get:
+      operationId: get_orders_customer
+      description: Obtener todas las ordenes
+      parameters:
+        - name: limit
+          in: query
+          description: Numero de resultados por pagina
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: El índice inicial desde el que devolver los resultados.
+          required: false
+          type: integer
+        - name: sId
+          description: ID Status
+          required: false
+          in: query
+          type: integer
+        - name: search
+          description: Buscar por (nombre)
+          in: query
+          required: false
+          type: string
+        - name: orderBy
+          description: Order By field
+          in: query
+          required: false
+          type: string
+          enum: ['order_date', 'date_delivered_order', 'station']
+      responses:
+        '200':
+          description: 'Listado de pedidos'
+      tags:
+        - Pedidos
   /api/v1/customers/{customer_id}/orders/service_price/:
     parameters:
       - name: customer_id
@@ -1191,10 +1237,6 @@ definitions:
         type: number
         description: Id de la dirección de entrega
         example: 1
-      service_price:
-        type: number
-        description: Precio consultado previamente
-        example: 25.0
       indications:
         type: string
         description: Indicaciones del pedido

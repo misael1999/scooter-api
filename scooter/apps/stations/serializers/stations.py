@@ -335,7 +335,7 @@ class StationSignUpSerializer(serializers.Serializer):
             user = User(username=data['username'],
                         is_verified=False,
                         is_client=False,
-                        verification_deadline=timezone.now() + timedelta(minutes=20))
+                        verification_deadline=timezone.localtime(timezone.now()) + timedelta(minutes=20))
             user.set_password(data['password'])
             user.save()
             station = Station.objects.create(user=user,
@@ -344,7 +344,7 @@ class StationSignUpSerializer(serializers.Serializer):
                                              )
 
             code = generate_verification_token(user=user,
-                                               exp=timezone.now() + timedelta(minutes=20),
+                                               exp=timezone.localtime(timezone.now()) + timedelta(minutes=20),
                                                token_type='email_confirmation')
 
             subject = 'Bienvenido {name}, Verifica tu cuenta para comenzar'.format(name=station.station_name)

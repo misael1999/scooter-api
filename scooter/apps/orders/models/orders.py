@@ -22,6 +22,8 @@ class Order(ScooterModel):
     date_delivered_order = models.DateTimeField(null=True, blank=True)
     qr_code = models.CharField(max_length=15, blank=True, null=True)
     order_status = models.ForeignKey('common.OrderStatus', on_delete=models.DO_NOTHING, default=1)
+    # For notice to user that not response his request
+    maximum_response_time = models.DateTimeField()
 
 
 class OrderDetail(ScooterModel):

@@ -1,4 +1,6 @@
 # Rest framework
+from datetime import timedelta
+from django.utils import timezone
 from asgiref.sync import async_to_sync
 from django.contrib.gis.geos import fromstr
 from rest_framework import serializers
@@ -20,6 +22,8 @@ from django.contrib.gis.measure import D
 from fcm_django.models import FCMDevice
 # Serializers primary field
 from scooter.apps.common.serializers.common import CustomerFilteredPrimaryKeyRelatedField
+
+
 # GeoPy
 # from geopy import distance
 
@@ -92,7 +96,6 @@ class CreateOrderSerializer(serializers.Serializer):
     service_id = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all(), source="service")
     from_address_id = CustomerFilteredPrimaryKeyRelatedField(queryset=CustomerAddress.objects, source="from_address")
     to_address_id = CustomerFilteredPrimaryKeyRelatedField(queryset=CustomerAddress.objects, source="to_address")
-    service_price = serializers.FloatField()
     indications = serializers.CharField(max_length=300, required=False)
     approximate_price_order = serializers.FloatField()
 
@@ -116,8 +119,11 @@ class CreateOrderSerializer(serializers.Serializer):
         try:
             details = data.pop('details', None)
             # Calculate price between two address
-            price_service = calculate_service_price(data)
-            order = Order.objects.create(**data, price_service=price_service)
+            service_price = calculate_service_price(data)
+            maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=1.5)
+            order = Order.objects.create(**data,
+                                         service_price=service_price,
+                                         maximum_response_time=maximum_response_time)
 
             # Save detail order
             details_to_save = [OrderDetail(**detail, order=order) for detail in details]

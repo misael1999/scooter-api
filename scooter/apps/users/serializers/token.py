@@ -50,7 +50,8 @@ class CustomerTokenObtainPairSerializer(TokenObtainPairSerializer):
         except Customer.DoesNotExist:
             raise serializers.ValidationError({'detail': 'No tienes permisos para iniciar sesión'})
 
-        if timezone.now() > self.user.verification_deadline and not self.user.is_verified:
+        # Check the maximum time to validate
+        if timezone.localtime(timezone.now()) > self.user.verification_deadline and not self.user.is_verified:
             raise serializers.ValidationError({'detail': 'Ha expirado su tiempo de verificación'})
 
         data['customer'] = CustomerUserModelSerializer(customer).data
@@ -114,7 +115,7 @@ class CustomerFacebookAuthSerializer(serializers.Serializer):
                     username=user_info.get('email', '{0} sin email'.format(user_info.get('first_name'))),
                     facebook_id=user_info.get('id'),
                     auth_facebook=True,
-                    verification_deadline=timezone.now(),
+                    verification_deadline=timezone.localtime(timezone.now()),
                     is_verified=True)
                 user.set_password(password)
                 user.save()

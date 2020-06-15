@@ -60,7 +60,7 @@ class ResendCodeAccountVerificationSerializer(serializers.Serializer):
             if user.is_verified:
                 raise serializers.ValidationError({'detail': 'El usuario ya se encuentra verificado'})
             code = generate_verification_token(user=user,
-                                               exp=timezone.now() + timedelta(minutes=15),
+                                               exp=timezone.localtime(timezone.now()) + timedelta(minutes=15),
                                                token_type='email_confirmation')
 
             subject = 'Verifica tu cuenta para comenzar'
@@ -92,7 +92,7 @@ class RecoverPasswordSerializer(serializers.Serializer):
                                                              ' la contraseña cuando inicio con facebook'})
 
             code = generate_verification_token(user=user,
-                                               exp=timezone.now() + timedelta(minutes=15),
+                                               exp=timezone.localtime(timezone.now()) + timedelta(minutes=15),
                                                token_type='recover_password')
 
             subject = 'Completa tu solicitud de restablecimiento de contraseña'

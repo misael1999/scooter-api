@@ -1,4 +1,14 @@
 from rest_framework import serializers
+# Models
+from scooter.apps.common.models import TypeAddress
+
+
+class TypeAddressModelSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = TypeAddress
+        fields = ('id', 'name', 'slug_name')
+        read_only_fields = ('id', 'name', 'slug_name')
 
 
 # Convert to base 64

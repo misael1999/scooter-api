@@ -69,7 +69,7 @@ class CustomerSignUpSerializer(serializers.Serializer):
         user = User(username=data['username'],
                     is_verified=False,
                     is_client=True,
-                    verification_deadline=timezone.now() + timedelta(days=1))
+                    verification_deadline=timezone.localtime(timezone.now()) + timedelta(days=1))
         user.set_password(data['password'])
         user.save()
         customer = Customer.objects.create(user=user,

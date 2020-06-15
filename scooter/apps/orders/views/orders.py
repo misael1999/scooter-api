@@ -11,18 +11,28 @@ from scooter.apps.customers.permissions.customers import IsAccountOwnerCustomer
 from scooter.apps.orders.serializers.orders import (OrderModelSerializer,
                                                     CreateOrderSerializer,
                                                     CalculateServicePriceSerializer)
+# Models
+from scooter.apps.orders.models.orders import Order
 # Mixin
-from scooter.apps.common.mixins.customers import AddCustomerMixin
+from scooter.apps.common.mixins import AddCustomerMixin, AddDeliveryManMixin
 
 
 class CustomerOrderViewSet(ScooterViewSet, mixins.CreateModelMixin, AddCustomerMixin,
                            mixins.RetrieveModelMixin, mixins.ListModelMixin):
 
+    queryset = Order.objects.all()
     serializer_class = OrderModelSerializer
     permission_classes = (IsAuthenticated, IsAccountOwnerCustomer)
     customer = None
 
     """ Method dispatch in AddCustomerMixin """
+
+    def get_queryset(self):
+
+        if self.action == 'list':
+            return self.customer.order_set.all()
+
+        return self.queryset
 
     def create(self, request, *args, **kwargs):
         """Create a new order
@@ -45,3 +55,21 @@ class CustomerOrderViewSet(ScooterViewSet, mixins.CreateModelMixin, AddCustomerM
                                  data={'price_service': obj},
                                  message='Precio del servicio')
         return Response(data=data, status=status.HTTP_200_OK)
+
+
+class DeliveryMenOrderViewSet(ScooterViewSet, AddDeliveryManMixin,
+                              mixins.RetrieveModelMixin, mixins.ListModelMixin):
+
+    queryset = Order.objects.all()
+    serializer_class = OrderModelSerializer
+    delivery_man = None
+
+    def get_queryset(self):
+        if self.action == 'list':
+            return self.delivery_man.order_set.all()
+        return self.queryset
+
+    @action(methods=['put'], detail=True)
+    def reject_order(self):
+
+        pass
