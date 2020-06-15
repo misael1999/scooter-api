@@ -8,7 +8,7 @@ info:
   license:
     name: BSD License
   version: v1
-basePath: /
+basePath: /appback/
 consumes:
   - application/json
 produces:
@@ -93,6 +93,22 @@ paths:
           description: Registrar token de usuario para notificaciones push
           schema:
             $ref: '#/definitions/RegisterTokenUser'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Usuarios general
+    parameters: []
+  /api/v1/users/test_notifications/:
+    post:
+      operationId: Test_notifications
+      description: Pruebas de notificaciones
+      parameters:
+        - name: body
+          in: body
+          description: Realizar pruebas de notificaciones
+          schema:
+            $ref: '#/definitions/TestNotificationUser'
       responses:
         '200':
           description: ''
@@ -774,6 +790,27 @@ definitions:
     required:
       - registration_id
       - type
+  TestNotificationUser:
+    type: object
+    properties:
+      title:
+        type: string
+        example: "Prueba"
+        description: Titulo
+      message:
+        type: string
+        example: "Mensaje prueba"
+        description: Mensaje
+      data:
+        type: object
+        properties:
+          comida:
+            type: string
+            example: "Arroz"
+    required:
+      - title
+      - message
+      - data
   LoginToken:
     type: object
     properties:

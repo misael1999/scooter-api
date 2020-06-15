@@ -14,6 +14,8 @@ import jwt
 from scooter.utils.functions import send_mail_verification, generate_verification_token
 # Task
 from scooter.apps.taskapp.tasks import send_email_task
+# Test notifications
+from fcm_django.models import FCMDevice
 
 
 class UserModelSimpleSerializer(serializers.ModelSerializer):
@@ -134,3 +136,24 @@ class RecoverPasswordVerificationSerializer(serializers.Serializer):
         user.set_password(data['password'])
         user.save()
         return user
+
+
+class TestNotificationSerializer(serializers.Serializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    title = serializers.CharField(max_length=30)
+    message = serializers.CharField(max_length=30)
+    data = serializers.JSONField()
+
+    def create(self, data):
+        try:
+            devices = FCMDevice.objects.filter(user=data['user'])
+            if not devices:
+                raise ValueError('No se encontraron dispositivos registrados')
+            devices.send_message(title=data['title'], body=data['message'], data=data['data'])
+            return data
+        except ValueError as e:
+            raise serializers.ValidationError({'detail': str(e)})
+        except Exception as ex:
+            print("Exception in create order, please check it")
+            print(ex.args.__str__())
+            raise serializers.ValidationError({'detail': 'Error al enviar notificación'})

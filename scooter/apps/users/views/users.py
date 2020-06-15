@@ -10,6 +10,7 @@ from scooter.apps.users.permissions import IsAccountOwner
 from scooter.apps.users.models.users import User
 # Serializers
 from scooter.apps.users.serializers.users import (UserModelSimpleSerializer,
+                                                  TestNotificationSerializer,
                                                   RecoverPasswordSerializer,
                                                   RecoverPasswordVerificationSerializer,
                                                   AccountVerificationSerializer,
@@ -28,7 +29,7 @@ class UserViewSet(ScooterViewSet):
         if self.action in ['signup_client', 'signup_merchant', 'verify',
                            'forgot_password', 'recover_password', 'resend_code_verification']:
             permission_classes = [AllowAny]
-        elif self.action in ['retrieve', 'client', 'merchant']:
+        elif self.action in ['retrieve', 'client', 'merchant', 'test_notifications']:
             permission_classes = [IsAuthenticated, IsAccountOwner]
         else:
             permission_classes = [IsAuthenticated]
@@ -89,13 +90,13 @@ class UserViewSet(ScooterViewSet):
 
     @action(detail=False, methods=['post'])
     def test_notifications(self, request):
-        """ Verify user account (merchant and client) """
-        serializer = AccountVerificationSerializer(data=request.data)
+        """ Delete after testing """
+        serializer = TestNotificationSerializer(data=request.data, context=self.get_serializer_context())
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()
+        notify = serializer.save()
         data = {
             'status': 'ok',
-            'user': UserModelSimpleSerializer(user).data,
-            "message": "Se ha enviado la notificacion correctamente"
+            'data': {},
+            "message": "Se ha enviado la notificación"
         }
         return Response(data, status=status.HTTP_200_OK)
