@@ -8,7 +8,7 @@ info:
   license:
     name: BSD License
   version: v1
-basePath: /appback/
+basePath: /
 consumes:
   - application/json
 produces:
@@ -753,6 +753,24 @@ paths:
           description: 'Listado de pedidos'
       tags:
         - Pedidos
+  /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/:
+    parameters:
+      - name: delivery_man_id
+        in: path
+        required: true
+        type: string
+      - name: order_id
+        in: path
+        required: true
+        type: string
+    get:
+      operationId: get_info_order
+      description: Obtener información detallada de un pedido
+      responses:
+        '200':
+          description: 'Información del pedido'
+      tags:
+        - Pedidos
   /api/v1/customers/{customer_id}/orders/service_price/:
     parameters:
       - name: customer_id
@@ -771,6 +789,90 @@ paths:
       responses:
         '200':
           description: 'Pedido creado'
+      tags:
+        - Pedidos
+  /api/v1/delivery_men/{delivery_man_id}/orders/:
+    parameters:
+      - name: delivery_man_id
+        in: path
+        required: true
+        type: string
+    get:
+      operationId: get_orders_delivery_man
+      description: Obtener todas las ordenes de un repartidor
+      parameters:
+        - name: limit
+          in: query
+          description: Numero de resultados por pagina
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: El índice inicial desde el que devolver los resultados.
+          required: false
+          type: integer
+        - name: search
+          description: Buscar por (nombre)
+          in: query
+          required: false
+          type: string
+        - name: orderBy
+          description: Order By field
+          in: query
+          required: false
+          type: string
+          enum: ['order_date', 'date_delivered_order', 'customer']
+      responses:
+        '200':
+          description: 'Listado de pedidos por repartidor'
+      tags:
+        - Pedidos
+  /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/reject_order/:
+    parameters:
+      - name: delivery_man_id
+        in: path
+        required: true
+        type: number
+      - name: order_id
+        in: path
+        required: true
+        type: number
+    put:
+      operationId: reject_order_delivery_man
+      description: Rechazar orden por repartidor
+      parameters:
+        - name: body
+          in: body
+          description: Rechazar la orden
+          schema:
+            $ref: '#/definitions/RejectOrderDeliveryMan'
+      responses:
+        '200':
+          description: 'Pedido rechazado correctamente'
+      tags:
+        - Pedidos
+  /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/accept_order/:
+    parameters:
+      - name: delivery_man_id
+        in: path
+        required: true
+        type: number
+      - name: order_id
+        in: path
+        required: true
+        type: number
+    put:
+      operationId: accept_order_delivery_man
+      description: Aceptar orden por repartidor
+      parameters:
+        - name: body
+          in: body
+          description: Aceptar la orden
+          schema:
+            $ref: '#/definitions/AcceptOrderDeliveryMan'
+      responses:
+        '200':
+          description: 'Pedido rechazado correctamente'
       tags:
         - Pedidos
 
@@ -1231,6 +1333,9 @@ definitions:
       - latitude
       - longitude
   # ==== ORDERS
+  RejectOrderDeliveryMan:
+    type: object
+    properties:
   CalculatePriceOrder:
     type: object
     properties:

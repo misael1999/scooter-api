@@ -42,6 +42,9 @@ class StationService(ScooterModel):
     class Meta:
         unique_together = ('station', 'service')
 
+    def __str__(self):
+        return self.service.name
+
 
 class StationPhoneNumbers(ScooterModel):
     station = models.ForeignKey(Station, on_delete=models.CASCADE)

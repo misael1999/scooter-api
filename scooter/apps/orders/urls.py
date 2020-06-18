@@ -8,6 +8,9 @@ from scooter.apps.orders.views import orders as orders_view
 router = DefaultRouter()
 router.register(r'api/v1/customers/(?P<customer_id>[a-zA-Z0-9_-]+)/orders',
                 orders_view.CustomerOrderViewSet, basename='customers_orders')
+
+router.register(r'api/v1/delivery_men/(?P<delivery_man_id>[a-zA-Z0-9_-]+)/orders',
+                orders_view.DeliveryMenOrderViewSet, basename='delivery_men_orders')
 urlpatterns = [
     # Views
     path('', include(router.urls))

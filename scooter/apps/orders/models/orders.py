@@ -10,7 +10,8 @@ class Order(ScooterModel):
                                      on_delete=models.DO_NOTHING, related_name="delivery_man",
                                      null=True, blank=True)
     station = models.ForeignKey('stations.Station', on_delete=models.DO_NOTHING)
-    service = models.ForeignKey('common.Service', on_delete=models.DO_NOTHING)
+    station_service = models.ForeignKey('stations.StationService', on_delete=models.DO_NOTHING,
+                                        related_name="station_service")
     from_address = models.ForeignKey('customers.CustomerAddress', on_delete=models.DO_NOTHING,
                                      help_text='Place of purchase or place of delivery depending on the service',
                                      related_name='from_address', null=True, blank=True)
@@ -27,9 +28,18 @@ class Order(ScooterModel):
 
 
 class OrderDetail(ScooterModel):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    product_name = models.CharField(max_length=60)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="details")
+    product_name = models.CharField(max_length=200)
     picture = models.ImageField(upload_to='orders/pictures/', blank=True, null=True)
 
     class Meta:
         db_table = 'orders_order_detail'
+
+
+class HistoryRejectedOrders(ScooterModel):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    delivery_man = models.ForeignKey('delivery_men.DeliveryMan', on_delete=models.CASCADE)
+    reason_rejection = models.CharField(max_length=100, null=True, blank=True)
+
+    class Meta:
+        db_table = 'orders_history_rejected_orders'

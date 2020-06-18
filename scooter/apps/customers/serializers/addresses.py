@@ -9,13 +9,17 @@ from scooter.utils.serializers.scooter import ScooterModelSerializer
 from django.contrib.gis.geos import Point
 
 
-class CustomerAddressModelSerializer(ScooterModelSerializer):
+class CustomerAddressModelSerializer(serializers.ModelSerializer):
+    type_address = serializers.StringRelatedField(read_only=True)
+    status = serializers.StringRelatedField(read_only=True)
+
     class Meta:
         model = CustomerAddress
         geo_field = 'point'
         fields = ("id", "alias", "street", "suburb",
-                  "postal_code", "exterior_number",
-                  "inside_number", "references", "point", "status")
+                  "postal_code", "exterior_number", 'type_address',
+                  "inside_number", "references", "status", "point",)
+        read_only_fields = fields
 
 
 # Help serializer
