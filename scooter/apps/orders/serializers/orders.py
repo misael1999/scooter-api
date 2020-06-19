@@ -290,12 +290,12 @@ def calculate_service_price(from_address, to_address, service):
         # to_point = (to_address.point[1], to_address.point[0])
         pnt = fromstr(
             from_address.point, srid=4326
-        ).transform(900913, clone=True)
+        ).transform(3857, clone=True)
         pnt1 = fromstr(
             to_address.point, srid=4326
-        ).transform(900913, clone=True)
+        ).transform(3857, clone=True)
         distance_points = (pnt.distance(pnt1) / 1000)
-        distance_points = distance_points + (distance_points * 0.40)
+        distance_points = distance_points + (distance_points * 0.30)
         # distance_points = distance.vincenty(from_point, to_point).kilometers
         # distance_points = distance_points + (distance_points * 0.45)
 
@@ -309,7 +309,7 @@ def calculate_service_price(from_address, to_address, service):
             # Verify how to much kilometers left and after multiply for the price kilomers ans
             kilometers_left = distance_points - service.to_kilometer
             price_service = service.base_rate_price + (kilometers_left * service.price_kilometer)
-
+        import pdb; pdb.set_trace()
         return price_service
     except ValueError as e:
         print(e)
