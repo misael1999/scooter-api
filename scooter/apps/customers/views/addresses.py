@@ -14,6 +14,9 @@ from scooter.apps.common.mixins.customers import AddCustomerMixin
 # Permissions
 from rest_framework.permissions import IsAuthenticated
 from scooter.apps.customers.permissions import IsAccountOwnerCustomer
+# Filters
+from rest_framework.filters import SearchFilter, OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class CustomerAddressesViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.CreateModelMixin,
@@ -24,6 +27,14 @@ class CustomerAddressesViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cre
     serializer_class = CustomerAddressModelSerializer
     queryset = CustomerAddress.objects.all()
     permission_classes = (IsAuthenticated, IsAccountOwnerCustomer)
+    # Filters
+    filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
+    search_fields = ('alias', 'street')
+    # ordering_fields = ('created',)
+    # Affect the default order
+    # ordering = ('-created', 'passengers__count')
+    filter_fields = ('type_address',)
+
     """ Method dispatch in AddCustomerMixin """
     customer = None
     address_instance = None

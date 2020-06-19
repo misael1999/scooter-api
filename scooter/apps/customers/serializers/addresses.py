@@ -30,6 +30,7 @@ class PointSerializer(serializers.Serializer):
 
 class CreateCustomerAddressSerializer(serializers.ModelSerializer):
     point = PointSerializer()
+    type_address_id = serializers.IntegerField(default=1)
 
     class Meta:
         model = CustomerAddress

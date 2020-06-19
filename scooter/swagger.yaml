@@ -300,8 +300,8 @@ paths:
           description: El índice inicial desde el que devolver los resultados.
           required: false
           type: integer
-        - name: sId
-          description: ID Status
+        - name: type_address
+          description: Tipo de dirección
           required: false
           in: query
           type: integer
@@ -310,12 +310,6 @@ paths:
           in: query
           required: false
           type: string
-        - name: orderBy
-          description: Order By field
-          in: query
-          required: false
-          type: string
-          enum: ['checker_name', 'status', 'created_at']
       responses:
         '201':
           description: 'Listado de direcciones'
@@ -1032,10 +1026,10 @@ definitions:
       suburb:
         type: string
         description: Colonia
-      type_address:
+      type_address_id:
         type: number
-        exmaple: 1
-        description: Tipo de direccion (personal, compra)
+        example: 1
+        description: Tipo de direccion (Para entrega, Para compra)
       postal_code:
         type: string
         description: Código postal
