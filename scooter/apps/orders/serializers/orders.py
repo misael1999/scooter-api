@@ -182,7 +182,9 @@ class CalculateServicePriceSerializer(serializers.Serializer):
 
     def create(self, data):
         try:
-            price_service = calculate_service_price(data)
+            price_service = calculate_service_price(from_address=data['from_address'],
+                                                    to_address=data['to_address'],
+                                                    service=data['station_service'])
             return price_service
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
@@ -223,10 +225,13 @@ class CreateOrderSerializer(serializers.Serializer):
         try:
             details = data.pop('details', None)
             # Calculate price between two address
-            service_price = calculate_service_price(data)
+            price_service = calculate_service_price(from_address=data['from_address'],
+                                                    to_address=data['to_address'],
+                                                    service=data['station_service'])
+
             maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=1.5)
             order = Order.objects.create(**data,
-                                         service_price=service_price,
+                                         service_price=price_service,
                                          maximum_response_time=maximum_response_time)
 
             # Save detail order
@@ -248,7 +253,7 @@ class CreateOrderSerializer(serializers.Serializer):
                     raise ValueError('No se encuentran repartidores disponibles')
                 send_notification_push_task.delay(delivery_man.user.id, 'Solicitud nueva',
                                                   'Pedido de compra', {"type": "NEW_ORDER", "order_id": order.id})
-                return order
+            return order
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
         except Exception as ex:
@@ -276,10 +281,10 @@ def send_notification_push(user, title, body, data):
         devices.send_message(title=title, body=body, data=data)
 
 
-def calculate_service_price(data):
+def calculate_service_price(from_address, to_address, service):
     try:
-        from_address = data['from_address']
-        to_address = data['to_address']
+        # from_address = data['from_address']
+        # to_address = data['to_address']
         # longitude position 0 and latitude position 1
         # from_point = (from_address.point[1], from_address.point[0])
         # to_point = (to_address.point[1], to_address.point[0])
@@ -294,7 +299,7 @@ def calculate_service_price(data):
         # distance_points = distance.vincenty(from_point, to_point).kilometers
         # distance_points = distance_points + (distance_points * 0.45)
 
-        service = data['station_service']
+        # service = data['station_service']
         price_service = 0.0
         # If the distance is less than one kilometer from the base rate price,
         # then the service price is equal to the base rate price
@@ -307,6 +312,8 @@ def calculate_service_price(data):
 
         return price_service
     except ValueError as e:
+        print(e)
         raise ValueError('Error al consultar precio de la orden')
     except Exception as ex:
+        print(ex)
         raise ValueError('Error al consultar precio de la orden')

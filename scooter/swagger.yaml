@@ -711,7 +711,7 @@ paths:
         '200':
           description: 'Pedido creado'
       tags:
-        - Pedidos
+        - Pedidos clientes
     get:
       operationId: get_orders_customer
       description: Obtener todas las ordenes
@@ -746,7 +746,7 @@ paths:
         '200':
           description: 'Listado de pedidos'
       tags:
-        - Pedidos
+        - Pedidos clientes
   /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/:
     parameters:
       - name: delivery_man_id
@@ -764,7 +764,7 @@ paths:
         '200':
           description: 'Información del pedido'
       tags:
-        - Pedidos
+        - Pedidos repartidor
   /api/v1/customers/{customer_id}/orders/service_price/:
     parameters:
       - name: customer_id
@@ -784,7 +784,7 @@ paths:
         '200':
           description: 'Pedido creado'
       tags:
-        - Pedidos
+        - Pedidos clientes
   /api/v1/delivery_men/{delivery_man_id}/orders/:
     parameters:
       - name: delivery_man_id
@@ -820,7 +820,7 @@ paths:
         '200':
           description: 'Listado de pedidos por repartidor'
       tags:
-        - Pedidos
+        - Pedidos repartidor
   /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/reject_order/:
     parameters:
       - name: delivery_man_id
@@ -844,7 +844,7 @@ paths:
         '200':
           description: 'Pedido rechazado correctamente'
       tags:
-        - Pedidos
+        - Pedidos repartidor
   /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/accept_order/:
     parameters:
       - name: delivery_man_id
@@ -868,7 +868,7 @@ paths:
         '200':
           description: 'Pedido rechazado correctamente'
       tags:
-        - Pedidos
+        - Pedidos repartidor
 
 # ======== DEFINITIONS ==============
 definitions:
