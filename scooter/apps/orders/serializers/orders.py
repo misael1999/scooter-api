@@ -309,7 +309,6 @@ def calculate_service_price(from_address, to_address, service):
             # Verify how to much kilometers left and after multiply for the price kilomers ans
             kilometers_left = distance_points - service.to_kilometer
             price_service = service.base_rate_price + (kilometers_left * service.price_kilometer)
-        import pdb; pdb.set_trace()
         return price_service
     except ValueError as e:
         print(e)
