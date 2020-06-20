@@ -32,14 +32,15 @@ class CustomerSimpleModelSerializer(serializers.ModelSerializer):
             'user'
         )
 
-    def update(self, instance, validated_data):
+    def update(self, instance, data):
         """ Before updating we have to delete the previous image """
         try:
-            instance.picture.delete(save=True)
+            if data['picture']:
+                instance.picture.delete(save=True)
         except Exception as ex:
             print("Exception deleting image client, please check it")
             print(ex.args.__str__())
-        return super().update(instance, validated_data)
+        return super().update(instance, data)
 
 
 class CustomerUserModelSerializer(serializers.ModelSerializer):
