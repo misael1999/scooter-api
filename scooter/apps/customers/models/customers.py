@@ -11,11 +11,7 @@ class Customer(ScooterModel):
     birthdate = models.DateField(blank=True, null=True)
     picture = models.ImageField(upload_to='customers/pictures/', blank=True, null=True)
     picture_url = models.CharField(max_length=300, blank=True, null=True)
-    phone_regex = RegexValidator(
-        regex=r'\+?1?\d{9,15}$',
-        message='El numero de telefono debe ser ingresado con el formato: +23856671672. Hasta 15 digitos permitidos'
-    )
-    phone_number = models.CharField(validators=[phone_regex], max_length=20, blank=True, null=True)
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
 
     # stats
     reputation = models.FloatField(default=0)
