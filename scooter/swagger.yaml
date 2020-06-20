@@ -1378,9 +1378,9 @@ definitions:
         description: Indicaciones del pedido
         example: Quiero que el producto este ...
       approximate_price_order:
-        type: number
+        type: string
         description: Precio aproximado de la compra
-        example: 100.0
+        example: Menos de 100
       details:
         type: array
         description: Lista de productos

@@ -19,7 +19,7 @@ class Order(ScooterModel):
                                    related_name='to_address', null=True, blank=True)
     service_price = models.FloatField()
     indications = models.TextField(blank=True, null=True)
-    approximate_price_order = models.FloatField()
+    approximate_price_order = models.CharField(max_length=30)
     date_delivered_order = models.DateTimeField(null=True, blank=True)
     qr_code = models.CharField(max_length=15, blank=True, null=True)
     order_status = models.ForeignKey('common.OrderStatus', on_delete=models.DO_NOTHING, default=1)
