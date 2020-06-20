@@ -20,7 +20,7 @@ class StationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
                      mixins.CreateModelMixin, mixins.ListModelMixin,
                      mixins.UpdateModelMixin):
     """ Handle signup and update of station """
-    queryset = Station.objects.filter(status=1)
+    queryset = Station.objects.filter(status=1, information_is_complete=True)
     serializer_class = StationUserModelSerializer
     lookup_field = 'id'
 
