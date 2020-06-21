@@ -28,6 +28,8 @@ class StationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         serializer_class = self.serializer_class
         if self.action == 'create':
             serializer_class = StationSignUpSerializer
+        if self.action == 'list':
+            serializer_class = StationSimpleModelSerializer
         return serializer_class
 
     def get_permissions(self):
@@ -39,6 +41,12 @@ class StationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             permission_classes = [IsAuthenticated]
 
         return [permission() for permission in permission_classes]
+
+    def list(self, request, *args, **kwargs):
+        data = self.set_response(status='ok',
+                                 data=StationSimpleModelSerializer(self.queryset, many=True).data,
+                                 message='Gracias por registrarse, en breve recibira un correo para confirmar su cuenta')
+        return Response(data, status=status.HTTP_201_CREATED)
 
     def create(self, request, *args, **kwargs):
         """ Station sign up """
