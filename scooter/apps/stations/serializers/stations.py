@@ -189,8 +189,9 @@ class StationUpdateInfoSerializer(serializers.Serializer):
         """ Before updating we have to delete the previous image """
         try:
             # import pdb; pdb.set_trace()
-            instance.picture.delete()
-            instance.picture = general['picture']
+            if general['picture']:
+                instance.picture.delete()
+                instance.picture = general['picture']
             return instance
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
