@@ -285,6 +285,7 @@ class StationUpdateInfoSerializer(serializers.Serializer):
 
         """ Save all data if everything goes well """
         try:
+            instance.information_is_complete = True
             instance.save()
             StationSchedule.objects.bulk_create(schedules_to_save)
             StationSchedule.objects.bulk_update(schedules_to_update, fields=["from_hour", "to_hour"])

@@ -14,15 +14,28 @@ from scooter.apps.stations.serializers.stations import (StationSimpleModelSerial
                                                         StationSignUpSerializer, StationUserModelSerializer,
                                                         StationUpdateInfoSerializer)
 from scooter.apps.users.serializers.users import UserModelSimpleSerializer
+# Filters
+from rest_framework.filters import SearchFilter, OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class StationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
                      mixins.CreateModelMixin, mixins.ListModelMixin,
                      mixins.UpdateModelMixin):
     """ Handle signup and update of station """
-    queryset = Station.objects.filter(status=1, information_is_complete=True)
+    queryset = Station.objects.filter()
     serializer_class = StationUserModelSerializer
     lookup_field = 'id'
+    # Filters
+    filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
+    search_fields = ('station_name',)
+    ordering = ('-reputation', '-created')
+    filter_fields = ('reputation',)
+
+    def get_queryset(self):
+        if self.action == 'list':
+            return Station.objects.filter(status=1, information_is_complete=True)
+        return self.queryset
 
     def get_serializer_class(self):
         serializer_class = self.serializer_class
