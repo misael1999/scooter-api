@@ -57,7 +57,7 @@ class StationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
 
     def list(self, request, *args, **kwargs):
         data = self.set_response(status='ok',
-                                 data=StationSimpleModelSerializer(self.queryset, many=True).data,
+                                 data=StationSimpleModelSerializer(self.get_queryset(), many=True).data,
                                  message='Listado de centrales')
         return Response(data, status=status.HTTP_201_CREATED)
 
