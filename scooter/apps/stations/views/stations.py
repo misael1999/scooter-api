@@ -30,7 +30,8 @@ class StationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
     # Filters
     filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
     search_fields = ('station_name',)
-    ordering = ('reputation', 'created')
+    ordering_fields = ('reputation',)
+    ordering = ('-reputation', 'created')
     filter_fields = ('reputation',)
 
     def get_queryset(self):
