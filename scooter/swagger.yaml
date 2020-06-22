@@ -406,8 +406,8 @@ paths:
           description: El índice inicial desde el que devolver los resultados.
           required: false
           type: integer
-        - name: sId
-          description: ID Status
+        - name: reputation
+          description: Reputación
           required: false
           in: query
           type: integer
@@ -416,12 +416,12 @@ paths:
           in: query
           required: false
           type: string
-        - name: orderBy
-          description: Order By field
+        - name: ordering
+          description: Order por
           in: query
           required: false
           type: string
-          enum: ['checker_name', 'status', 'created_at']
+          enum: ['reputation', 'created']
       responses:
         '200':
           description: 'Listado de centrales'

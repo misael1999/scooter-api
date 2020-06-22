@@ -25,17 +25,26 @@ class StationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
     """ Handle signup and update of station """
     queryset = Station.objects.filter()
     serializer_class = StationUserModelSerializer
+    pagination_class = None
     lookup_field = 'id'
     # Filters
     filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
     search_fields = ('station_name',)
-    ordering = ('-reputation', '-created')
+    ordering = ('reputation', 'created')
     filter_fields = ('reputation',)
 
     def get_queryset(self):
         if self.action == 'list':
             return Station.objects.filter(status=1, information_is_complete=True)
         return self.queryset
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        data = self.set_response(status='ok',
+                                 data=response.data,
+                                 message='Listado de centrales')
+
+        return Response(data, status=status.HTTP_200_OK)
 
     def get_serializer_class(self):
         serializer_class = self.serializer_class
@@ -54,12 +63,6 @@ class StationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             permission_classes = [IsAuthenticated]
 
         return [permission() for permission in permission_classes]
-
-    def list(self, request, *args, **kwargs):
-        data = self.set_response(status='ok',
-                                 data=StationSimpleModelSerializer(self.get_queryset(), many=True).data,
-                                 message='Listado de centrales')
-        return Response(data, status=status.HTTP_201_CREATED)
 
     def create(self, request, *args, **kwargs):
         """ Station sign up """
