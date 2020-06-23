@@ -222,3 +222,6 @@ FCM_DJANGO_SETTINGS = {
 SWAGGER_YAML_FILE = str(APPS_DIR.path('swagger.yaml'))  # os.path.join(BASE_DIR, 'swagger.yaml')
 FACEBOOK_APP_ID = '690189338433902'
 FACEBOOK_APP_SECRET = '4c55431b063952e631df380e0e73a10a'
+
+URL_SERVER_BACKEND = os.environ.get('URL_SERVER_BACKEND', 'http://localhost:8000')
+URL_SERVER_FRONTEND = os.environ.get('URL_SERVER_FRONTEND', 'http://localhost:4200')

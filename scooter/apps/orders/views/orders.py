@@ -31,6 +31,11 @@ class CustomerOrderViewSet(ScooterViewSet, mixins.CreateModelMixin, AddCustomerM
 
     """ Method dispatch in AddCustomerMixin """
 
+    def get_serializer_class(self):
+        if self.action in ['retrieve', 'list']:
+            return OrderWithDetailModelSerializer
+        return self.serializer_class
+
     def get_queryset(self):
         if self.action == 'list':
             return self.customer.order_set.all()

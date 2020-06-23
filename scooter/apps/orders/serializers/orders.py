@@ -15,7 +15,7 @@ from scooter.apps.common.models import Service, DeliveryManStatus, OrderStatus
 from scooter.apps.customers.models import CustomerAddress
 from scooter.apps.orders.models.orders import Order, HistoryRejectedOrders
 # Functions channels
-from scooter.apps.orders.utils.orders import send_order
+from scooter.apps.orders.utils.orders import send_order_channel
 from asgiref.sync import async_to_sync
 # Django Geo
 from django.contrib.gis.measure import D
@@ -49,6 +49,7 @@ class OrderModelSerializer(serializers.ModelSerializer):
 
 class OrderWithDetailModelSerializer(serializers.ModelSerializer):
     station = serializers.StringRelatedField(read_only=True)
+    customer = serializers.StringRelatedField()
     order_date = serializers.DateTimeField(source='created')
     from_address = CustomerAddressModelSerializer()
     to_address = CustomerAddressModelSerializer()
@@ -58,7 +59,7 @@ class OrderWithDetailModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ("id", "delivery_man", "station", "service",
+        fields = ("id", "customer","delivery_man", "station", "service",
                   "from_address", "to_address", "service_price",
                   "indications", "approximate_price_order",
                   "date_delivered_order", "qr_code", "order_status", "order_date",
@@ -241,10 +242,12 @@ class CreateOrderSerializer(serializers.Serializer):
 
             # Check if the station has manual assignment activated
             station = data['station']
+            # Is assign delivery manually is true, then send notification
             if station.assign_delivery_manually:
-                send_notification_push(station.user, 'Prueba central', 'Esta es una prueba', {"test": "test"})
+                send_notification_push_task.delay(station.user.id, 'Solicitud nueva',
+                                                  'Ha recibido una nueva solicitud', {"type": "NEW_ORDER", "order_id": order.id})
                 # Send message by django channel
-                # async_to_sync(send_order)(station.user, order)
+                async_to_sync(send_order_channel)(station.user, order.id)
             else:
                 # Get nearest delivery man
                 delivery_man = get_nearest_delivery_man(from_location=data['from_address'], station=data['station'],

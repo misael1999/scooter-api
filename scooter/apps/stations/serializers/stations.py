@@ -150,10 +150,11 @@ class StationUpdateInfoSerializer(serializers.Serializer):
 
             # Save config
             config = data.pop('config', None)
+            schedules = None
             if config:
                 instance = self.save_config(instance=instance, config=config)
+                schedules = config.pop('schedules', None)
 
-            schedules = config.pop('schedules', None)
             if schedules:
                 schedules_dict = self.save_schedules(instance, schedules)
                 schedules_to_save = schedules_dict['save']
