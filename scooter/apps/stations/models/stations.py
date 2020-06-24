@@ -74,6 +74,26 @@ class StationAddress(ScooterModel):
     point = models.PointField(blank=True, null=True)
 
 
+# For the clients of each station
+class MemberStation(ScooterModel):
+    station = models.ForeignKey(Station, on_delete=models.CASCADE)
+    customer = models.ForeignKey('customers.Customer', on_delete=models.CASCADE)
+    total_orders = models.PositiveIntegerField(default=0)
+    total_orders_cancelled = models.PositiveIntegerField(default=0)
+    first_order_date = models.DateTimeField(auto_now_add=True)
+    last_order_date = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('station', 'customer')
+        db_table = 'stations_member_station'
+
+    def __str__(self):
+        return self.customer.name
+
+
+
+
+
 
 
 

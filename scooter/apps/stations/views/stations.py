@@ -10,9 +10,9 @@ from scooter.utils.viewsets import ScooterViewSet
 # Models
 from scooter.apps.stations.models.stations import Station
 # Serializers
-from scooter.apps.stations.serializers.stations import (StationSimpleModelSerializer,
+from scooter.apps.stations.serializers import (StationSimpleModelSerializer,
                                                         StationSignUpSerializer, StationUserModelSerializer,
-                                                        StationUpdateInfoSerializer)
+                                                        StationUpdateInfoSerializer, MembersStationModelSerializer)
 from scooter.apps.users.serializers.users import UserModelSimpleSerializer
 # Filters
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -102,3 +102,14 @@ class StationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             return Response(
                 self.set_error_response(status=False, field='Detail', message='No existe la central'))
         return Response(self.set_response(status='ok', data=data, message='Información actualizada correctamente'))
+
+    @action(detail=True, methods=['GET'])
+    def clients(self, request, *args, **kwargs):
+        try:
+            station = self.get_object()
+            queryset = station.memberstation_set.all()
+            data = self.get_queryset_pagination(queryset=queryset, serialize_class=MembersStationModelSerializer)
+            return Response(data, status=status.HTTP_200_OK)
+        except Exception as ex:
+            return Response(
+                self.set_error_response(status=False, field='Detail', message='Error al consultar los clientes'))

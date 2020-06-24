@@ -6,7 +6,7 @@ from rest_framework import serializers
 from scooter.apps.orders.serializers import DetailOrderSerializer
 # Models
 from scooter.apps.orders.models.orders import (OrderDetail)
-from scooter.apps.stations.models import Station, StationService
+from scooter.apps.stations.models import Station, StationService, MemberStation
 from scooter.apps.common.models import Service
 from scooter.apps.customers.models import CustomerAddress
 from scooter.apps.orders.models.orders import Order
@@ -88,8 +88,13 @@ class CreateOrderSerializer(serializers.Serializer):
                 # Send push notification to delivery_man
                 if not delivery_man:
                     raise ValueError('No se encuentran repartidores disponibles')
+
                 send_notification_push_task.delay(delivery_man.user.id, 'Solicitud nueva',
                                                   'Pedido de compra', {"type": "NEW_ORDER", "order_id": order.id})
+
+            # Add client to station or update info
+            member = MemberStation.objects.get_or_create(customer=data['customer'],
+                                                         station=station)
             return order
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})

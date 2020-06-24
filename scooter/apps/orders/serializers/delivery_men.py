@@ -41,7 +41,7 @@ class AcceptOrderByDeliveryManSerializer(serializers.Serializer):
             # Send notification push to customer
             send_notification_push_task.delay(order.customer.user.id, 'Repartidor en camino',
                                               'Puedes ver el seguimiento de tu producto',
-                                              {"type": "NEW_ORDER",
+                                              {"type": "ACCEPTED_ORDER",
                                                "order_id": order.id})
             return data
         except ValueError as e:
