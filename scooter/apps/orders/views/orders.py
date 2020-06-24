@@ -1,25 +1,31 @@
+""" Station, customer, delivery man for order view """
 # Django rest framework
 from rest_framework import mixins, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.generics import get_object_or_404
 # Utilities
 from scooter.utils.viewsets.scooter import ScooterViewSet
 # Permissions
 from rest_framework.permissions import IsAuthenticated
+from scooter.apps.orders.permissions import IsOrderStationOwner, IsOrderDeliveryManOwner
 from scooter.apps.customers.permissions.customers import IsAccountOwnerCustomer
 from scooter.apps.delivery_men.permissions import IsAccountOwnerDeliveryMan
+from scooter.apps.stations.permissions import IsAccountOwnerStation
 # Serializers
-from scooter.apps.orders.serializers.orders import (OrderModelSerializer,
-                                                    CreateOrderSerializer,
-                                                    CalculateServicePriceSerializer,
-                                                    RejectOrderByDeliverySerializer,
-                                                    AcceptOrderByDeliveryManSerializer,
-                                                    OrderWithDetailModelSerializer)
+from scooter.apps.orders.serializers import (OrderModelSerializer,
+                                             CreateOrderSerializer,
+                                             CalculateServicePriceSerializer,
+                                             RejectOrderByDeliverySerializer,
+                                             AcceptOrderByDeliveryManSerializer,
+                                             OrderWithDetailModelSerializer)
 # Models
 from scooter.apps.orders.models.orders import Order
 from scooter.apps.delivery_men.models import DeliveryMan
 # Mixin
-from scooter.apps.common.mixins import AddCustomerMixin, AddDeliveryManMixin
+from scooter.apps.common.mixins import AddCustomerMixin, AddDeliveryManMixin, AddStationMixin
+
+""" Customer view set """
 
 
 class CustomerOrderViewSet(ScooterViewSet, mixins.CreateModelMixin, AddCustomerMixin,
@@ -41,6 +47,11 @@ class CustomerOrderViewSet(ScooterViewSet, mixins.CreateModelMixin, AddCustomerM
             return self.customer.order_set.all()
 
         return self.queryset
+
+    def get_object(self):
+        obj = get_object_or_404(Order,
+                                id=self.kwargs['pk'])
+        return obj
 
     def create(self, request, *args, **kwargs):
         """Create a new order
@@ -65,6 +76,9 @@ class CustomerOrderViewSet(ScooterViewSet, mixins.CreateModelMixin, AddCustomerM
         return Response(data=data, status=status.HTTP_200_OK)
 
 
+""" Delivery man view set """
+
+
 class DeliveryMenOrderViewSet(ScooterViewSet, AddDeliveryManMixin,
                               mixins.RetrieveModelMixin, mixins.ListModelMixin):
     serializer_class = OrderModelSerializer
@@ -73,10 +87,19 @@ class DeliveryMenOrderViewSet(ScooterViewSet, AddDeliveryManMixin,
     permission_classes = (IsAuthenticated, IsAccountOwnerDeliveryMan)
     lookup_field = 'pk'
 
+    """ Method dispatch in AddCustomerMixin """
+
     def get_queryset(self):
         if self.action == 'list':
             return Order.objects.filter(delivery_man=self.delivery_man)
         return self.queryset
+
+    def get_permissions(self):
+        """Assign permission based on action."""
+        permissions = [IsAuthenticated, IsAccountOwnerDeliveryMan]
+        if self.action in ['reject_order', 'accept_order', 'retrieve']:
+            permissions.append(IsOrderDeliveryManOwner)
+        return [p() for p in permissions]
 
     def get_serializer_class(self):
         if self.action == 'retrieve':
@@ -84,7 +107,9 @@ class DeliveryMenOrderViewSet(ScooterViewSet, AddDeliveryManMixin,
         return self.serializer_class
 
     def get_object(self):
-        return self.queryset.get(id=self.kwargs['pk'])
+        obj = get_object_or_404(Order,
+                                id=self.kwargs['pk'])
+        return obj
 
     @action(methods=['put'], detail=True)
     def reject_order(self, request, *args, **kwargs):
@@ -116,4 +141,70 @@ class DeliveryMenOrderViewSet(ScooterViewSet, AddDeliveryManMixin,
         data = self.set_response(status=True,
                                  data={},
                                  message='Solicitud aceptada')
+        return Response(data=data, status=status.HTTP_200_OK)
+
+
+""" Stations view set """
+
+
+class StationOrderViewSet(ScooterViewSet, AddStationMixin,
+                          mixins.RetrieveModelMixin, mixins.ListModelMixin):
+    serializer_class = OrderModelSerializer
+    queryset = Order.objects.all()
+    station = None
+    permission_classes = (IsAuthenticated, IsAccountOwnerStation)
+    lookup_field = 'pk'
+
+    def get_queryset(self):
+        if self.action == 'list':
+            return Order.objects.filter(station=self.station)
+        return self.queryset
+
+    def get_serializer_class(self):
+        if self.action in ['retrieve', 'list']:
+            return OrderWithDetailModelSerializer
+        return self.serializer_class
+
+    def get_permissions(self):
+        """Assign permission based on action."""
+        permissions = [IsAuthenticated, IsAccountOwnerStation]
+        if self.action in ['reject_order', 'assign_order', 'retrieve']:
+            permissions.append(IsOrderStationOwner)
+        return [p() for p in permissions]
+
+    def get_object(self):
+        obj = get_object_or_404(Order,
+                                id=self.kwargs['pk'])
+        return obj
+
+    @action(methods=['put'], detail=True)
+    def reject_order(self, request, *args, **kwargs):
+        order = self.get_object()
+        serializer = RejectOrderByDeliverySerializer(
+            order,
+            data=request.data,
+            context={'station': self.station, 'order': order},
+            partial=False
+        )
+        serializer.is_valid(raise_exception=True)
+        order = serializer.save()
+        data = self.set_response(status=True,
+                                 data={},
+                                 message='Solicitud rechazada')
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    @action(methods=['put'], detail=True)
+    def assign_order(self, request, *args, **kwargs):
+        order = self.get_object()
+        serializer = AcceptOrderByDeliveryManSerializer(
+            order,
+            data=request.data,
+            context={'station': self.station, 'order': order},
+            partial=False
+        )
+        serializer.is_valid(raise_exception=True)
+        order = serializer.save()
+        data = self.set_response(status=True,
+                                 data={},
+                                 message='Pedido asignado correctamente')
         return Response(data=data, status=status.HTTP_200_OK)

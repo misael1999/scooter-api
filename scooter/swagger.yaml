@@ -747,6 +747,89 @@ paths:
           description: 'Listado de pedidos'
       tags:
         - Pedidos clientes
+  /api/v1/stations/{station_id}/orders/:
+    parameters:
+      - name: station_id
+        in: path
+        required: true
+        type: string
+    get:
+      operationId: get_orders_customer
+      description: Obtener todas las ordenes
+      parameters:
+        - name: limit
+          in: query
+          description: Numero de resultados por pagina
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: El índice inicial desde el que devolver los resultados.
+          required: false
+          type: integer
+        - name: sId
+          description: ID Status
+          required: false
+          in: query
+          type: integer
+        - name: search
+          description: Buscar por (nombre)
+          in: query
+          required: false
+          type: string
+        - name: orderBy
+          description: Order By field
+          in: query
+          required: false
+          type: string
+          enum: ['order_date', 'date_delivered_order', 'station']
+      responses:
+        '200':
+          description: 'Listado de pedidos por central'
+      tags:
+        - Pedidos centrales
+  /api/v1/stations/{station_id}/orders/{order_id}/:
+    parameters:
+      - name: station_id
+        in: path
+        required: true
+        type: number
+      - name: order_id
+        in: path
+        required: true
+        type: number
+    get:
+      operationId: get_order_station
+      description: Obtener detalle del pedido
+      responses:
+        '200':
+          description: 'Info del pedido'
+      tags:
+        - Pedidos centrales
+  /api/v1/stations/{station_id}/orders/{order_id}/assign_order/:
+    parameters:
+      - name: station_id
+        in: path
+        required: true
+        type: number
+      - name: order_id
+        in: path
+        required: true
+        type: number
+    put:
+      operationId: assign_order_delivery_station
+      description: Rechazar orden por repartidor
+      parameters:
+        - name: body
+          in: body
+          description: Asignar orden a un repartidor
+          schema:
+            $ref: '#/definitions/AssignOrderDeliveryManStation'
+      responses:
+        '200':
+          description: 'Pedido rechazado correctamente'
+      tags:
+        - Pedidos centrales
   /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/:
     parameters:
       - name: delivery_man_id
@@ -1330,6 +1413,13 @@ definitions:
   RejectOrderDeliveryMan:
     type: object
     properties:
+  AssignOrderDeliveryManStation:
+    type: object
+    properties:
+      delivery_man_id:
+        type: number
+        description: Id del repartidor
+        example: 1
   CalculatePriceOrder:
     type: object
     properties:
