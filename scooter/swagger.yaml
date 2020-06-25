@@ -535,6 +535,27 @@ paths:
           description: 'Información del repartidor'
       tags:
         - Centrales
+  # GET DELIVERY MAN NEAREST BY ADDRESS
+  /api/v1/stations/{station_id}/delivery_men/nearest/:
+    parameters:
+      - name: station_id
+        in: path
+        required: true
+        type: string
+    post:
+      operationId: get_delivery_men_nearest
+      description: Obtener los repartidores mas cercanos de un pedido
+      parameters:
+        - name: body
+          in: body
+          description: Obtener los repartidores mas cercanos de un pedido
+          schema:
+            $ref: '#/definitions/GetDeliveryMenNearest'
+      responses:
+        '201':
+          description: 'Listado de repartidores'
+      tags:
+        - Centrales
   /api/v1/stations/{station_id}/vehicles/:
     parameters:
       - name: station_id
@@ -1378,6 +1399,15 @@ definitions:
       password:
         type: string
         description: Contraseña para inicio de sesión
+  GetDeliveryMenNearest:
+    type: object
+    properties:
+      order_id:
+        type: string
+        description: Id de la orden
+      distance:
+        type: string
+        description: Distancia para buscar
   UpdateDeliveryManId:
     type: object
     properties:

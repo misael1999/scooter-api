@@ -7,6 +7,7 @@ from scooter.apps.delivery_men.models.delivery_men import DeliveryMan
 # Serializers
 from scooter.apps.stations.serializers.delivery_men import (CreateDeliveryManSerializer,
                                                             DeliveryManModelSerializer)
+from scooter.apps.stations.serializers.delivery_men import GetDeliveryMenNearestSerializer
 # Viewset
 from scooter.utils.viewsets.scooter import ScooterViewSet
 # Mixins
@@ -28,7 +29,7 @@ class DeliveryMenStationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
 
     def get_queryset(self):
         """ Personalized query when the action is a list so that it only returns active delivery men """
-        if self.action == 'list':
+        if self.action in ['list', 'nearest']:
             return self.station.deliveryman_set.filter(status__slug_name='active')
 
         return self.queryset
@@ -37,6 +38,8 @@ class DeliveryMenStationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         serializer_class = self.serializer_class
         if self.action == 'create':
             serializer_class = CreateDeliveryManSerializer
+        if self.action == 'nearest':
+            serializer_class = GetDeliveryMenNearestSerializer
         return serializer_class
 
     def create(self, request, *args, **kwargs):
@@ -47,3 +50,13 @@ class DeliveryMenStationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
                                  data=DeliveryManModelSerializer(obj).data,
                                  message='Se ha registrado un nuevo repartidor')
         return Response(data=data, status=status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=['POST'])
+    def nearest(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, context=self.get_serializer_context())
+        serializer.is_valid(raise_exception=True)
+        obj = serializer.save()
+        data = self.set_response(status=True,
+                                 data=DeliveryManModelSerializer(obj, many=True).data,
+                                 message='Listado de repartidores mas cercanos')
+        return Response(data=data, status=status.HTTP_200_OK)

@@ -108,7 +108,8 @@ class StationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         try:
             station = self.get_object()
             queryset = station.memberstation_set.all()
-            data = self.get_queryset_pagination(queryset=queryset, serialize_class=MembersStationModelSerializer)
+            data = self.get_queryset_pagination(queryset=queryset,
+                                                serialize_class=MembersStationModelSerializer)
             return Response(data, status=status.HTTP_200_OK)
         except Exception as ex:
             return Response(
