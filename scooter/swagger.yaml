@@ -784,13 +784,13 @@ paths:
           description: El índice inicial desde el que devolver los resultados.
           required: false
           type: integer
-        - name: sId
-          description: ID Status
+        - name: order_status
+          description: ID del status de la orden
           required: false
           in: query
           type: integer
         - name: search
-          description: Buscar por (nombre)
+          description: Buscar por (estación, dirección)
           in: query
           required: false
           type: string
@@ -825,17 +825,17 @@ paths:
           description: El índice inicial desde el que devolver los resultados.
           required: false
           type: integer
-        - name: sId
-          description: ID Status
+        - name: order_status
+          description: ID del status de la orden
           required: false
           in: query
           type: integer
         - name: search
-          description: Buscar por (nombre)
+          description: Buscar por (estación, dirección)
           in: query
           required: false
           type: string
-        - name: orderBy
+        - name: ordering
           description: Order By field
           in: query
           required: false

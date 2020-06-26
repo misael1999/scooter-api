@@ -37,7 +37,12 @@ class CustomerOrderViewSet(ScooterViewSet, mixins.CreateModelMixin, AddCustomerM
     serializer_class = OrderModelSerializer
     permission_classes = (IsAuthenticated, IsAccountOwnerCustomer)
     customer = None
-
+    filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
+    search_fields = ('customer__name', 'from_address__street', 'from_address__suburb', 'qr_code')
+    ordering_fields = ('created', 'customer__name')
+    # Affect the default order
+    # ordering = ('-created', 'passengers__count')
+    filter_fields = ('order_status',)
     """ Method dispatch in AddCustomerMixin """
 
     def get_serializer_class(self):
