@@ -2,20 +2,24 @@
 from django.contrib.gis.geos import fromstr
 from rest_framework import serializers
 # Serializers
+from scooter.apps.common.serializers import OrderStatusModelSerializer
 from scooter.apps.common.serializers.common import Base64ImageField
 from scooter.apps.customers.serializers import CustomerAddressModelSerializer
 # Models
 from scooter.apps.delivery_men.models import DeliveryMan
+from scooter.apps.delivery_men.serializers import DeliveryManOrderSerializer
 from scooter.apps.stations.models import Station, StationService
 from scooter.apps.common.models import Service
 from scooter.apps.customers.models import CustomerAddress
 from scooter.apps.orders.models.orders import Order
 # Django Geo
 from django.contrib.gis.measure import D
+from django.contrib.gis.db.models.functions import Distance
 # Serializers primary field
 from scooter.apps.common.serializers.common import CustomerFilteredPrimaryKeyRelatedField
-# Task Celery
 
+
+# Task Celery
 
 
 class DetailOrderSerializer(serializers.Serializer):
@@ -42,12 +46,14 @@ class OrderWithDetailModelSerializer(serializers.ModelSerializer):
     from_address = CustomerAddressModelSerializer()
     to_address = CustomerAddressModelSerializer()
     service = serializers.StringRelatedField(read_only=True, source="station_service")
-    order_status = serializers.StringRelatedField(read_only=True)
+    # order_status = serializers.StringRelatedField(read_only=True)
     details = DetailOrderSerializer(many=True)
+    delivery_man = DeliveryManOrderSerializer(required=False)
+    order_status = OrderStatusModelSerializer(read_only=True)
 
     class Meta:
         model = Order
-        fields = ("id", "customer","delivery_man", "station", "service",
+        fields = ("id", "customer", "delivery_man", "station", "service",
                   "from_address", "to_address", "service_price",
                   "indications", "approximate_price_order",
                   "date_delivered_order", "qr_code", "order_status", "order_date",
@@ -97,10 +103,18 @@ def get_nearest_delivery_man(from_location, station, list_exclude, distance):
     """ Get nearest delivery man and exclude who are in the history of rejected orders """
 
     # List of delivery men nearest
-    delivery_man = DeliveryMan.objects.filter(station=station,
-                                              location__distance_lte=(
-                                                  from_location.point, D(km=distance))
-                                              ).exclude(id__in=list_exclude).last()
+    delivery_man = DeliveryMan.objects. \
+        exclude(id__in=list_exclude). \
+        filter(station=station,
+               location__distance_lte=(
+                   from_location.point,
+                   D(km=distance))) \
+        .annotate(distance=Distance('location', from_location.point))\
+        .order_by('distance').first()
+    # delivery_man = DeliveryMan.objects.filter(station=station,
+    #                                           location__distance_lte=(
+    #                                               from_location.point, D(km=distance))
+    #                                           ).exclude(id__in=list_exclude).last()
 
     return delivery_man
 

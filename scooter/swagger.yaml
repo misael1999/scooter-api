@@ -8,7 +8,7 @@ info:
   license:
     name: BSD License
   version: v1
-basePath: /
+basePath: /appback/
 consumes:
   - application/json
 produces:
@@ -888,6 +888,31 @@ paths:
           description: 'Pedido rechazado correctamente'
       tags:
         - Pedidos centrales
+  /api/v1/stations/{station_id}/orders/{order_id}/reject_order/:
+    parameters:
+      - name: station_id
+        in: path
+        required: true
+        type: number
+      - name: order_id
+        in: path
+        required: true
+        type: number
+    put:
+      operationId: reject_order_station
+      description: Rechazar orden por central
+      parameters:
+        - name: body
+          in: body
+          description: Rechazar la orden
+          schema:
+            $ref: '#/definitions/RejectOrderStation'
+      responses:
+        '200':
+          description: 'Pedido rechazado correctamente'
+      tags:
+        - Pedidos centrales
+
   /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/:
     parameters:
       - name: delivery_man_id
@@ -1480,12 +1505,23 @@ definitions:
   RejectOrderDeliveryMan:
     type: object
     properties:
+      reason_rejection:
+        type: string
+        description: Razón del rechazo
+        example: 1
   AssignOrderDeliveryManStation:
     type: object
     properties:
       delivery_man_id:
         type: number
         description: Id del repartidor
+        example: 1
+  RejectOrderStation:
+    type: object
+    properties:
+      reason_rejection:
+        type: string
+        description: Razón del rechazo
         example: 1
   CalculatePriceOrder:
     type: object

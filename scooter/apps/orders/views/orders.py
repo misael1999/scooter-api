@@ -18,13 +18,16 @@ from scooter.apps.orders.serializers import (OrderModelSerializer,
                                              CalculateServicePriceSerializer,
                                              RejectOrderByDeliverySerializer,
                                              AcceptOrderByDeliveryManSerializer,
-                                             OrderWithDetailModelSerializer)
+                                             OrderWithDetailModelSerializer,
+                                             RejectOrderStationSerializer)
 # Models
 from scooter.apps.orders.models.orders import Order
 from scooter.apps.delivery_men.models import DeliveryMan
 # Mixin
 from scooter.apps.common.mixins import AddCustomerMixin, AddDeliveryManMixin, AddStationMixin
-
+# Filters
+from rest_framework.filters import SearchFilter, OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
 """ Customer view set """
 
 
@@ -154,6 +157,12 @@ class StationOrderViewSet(ScooterViewSet, AddStationMixin,
     station = None
     permission_classes = (IsAuthenticated, IsAccountOwnerStation)
     lookup_field = 'pk'
+    filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
+    search_fields = ('customer__name', 'from_address__street', 'from_address__suburb', 'qr_code')
+    ordering_fields = ('created', 'customer__name')
+    # Affect the default order
+    # ordering = ('-created', 'passengers__count')
+    filter_fields = ('order_status',)
 
     def get_queryset(self):
         if self.action == 'list':
@@ -207,4 +216,20 @@ class StationOrderViewSet(ScooterViewSet, AddStationMixin,
         data = self.set_response(status=True,
                                  data={},
                                  message='Pedido asignado correctamente')
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    @action(methods=['put'], detail=True)
+    def reject_order(self, request, *args, **kwargs):
+        order = self.get_object()
+        serializer = RejectOrderStationSerializer(
+            order,
+            data=request.data,
+            context={'station': self.station, 'order': order},
+            partial=False
+        )
+        serializer.is_valid(raise_exception=True)
+        order = serializer.save()
+        data = self.set_response(status=True,
+                                 data={},
+                                 message='Pedido rechazado correctamente')
         return Response(data=data, status=status.HTTP_200_OK)

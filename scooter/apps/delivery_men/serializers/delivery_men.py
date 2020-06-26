@@ -18,6 +18,20 @@ class DeliveryManModelSerializer(ScooterModelSerializer):
         fields = '__all__'
 
 
+class DeliveryManOrderSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = DeliveryMan
+        fields = (
+            'id',
+            'station',
+            'name',
+            'phone_number',
+            'picture',
+            'reputation')
+        read_only_fields = fields
+
+
 class DeliveryManUserModelSerializer(ScooterModelSerializer):
     user = UserModelSimpleSerializer()
 
