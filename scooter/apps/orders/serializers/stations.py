@@ -22,7 +22,7 @@ class AssignDeliveryManStationSerializer(serializers.Serializer):
     def update(self, instance, data):
         try:
             delivery_man = data['delivery_man']
-            send_notification_push_task.delay(delivery_man.user.id, 'Solicitud nueva',
+            send_notification_push_task.delay(delivery_man.user.id, 'Solicitud nueva por la central',
                                               'Pedido de compra', {"type": "NEW_ORDER", "order_id": instance.id})
             return instance
         except ValueError as e:
@@ -44,11 +44,11 @@ class RejectOrderStationSerializer(serializers.Serializer):
             order_sts = OrderStatus.objects.get(slug_name="rejected")
             instance.order_status = order_sts
             instance.save()
-            # send_notification_push_task.delay(customer.user.id, 'Pedido rechazado',
-            #                                   'Se ha rechazado tu pedido',
-            #                                   {"type": "REJECT_ORDER",
-            #                                    "order_id": instance.id,
-            #                                    'click_action': 'FLUTTER_NOTIFICATION_CLICK'})
+            send_notification_push_task.delay(customer.user.id, 'Pedido rechazado',
+                                              'Se ha rechazado tu pedido',
+                                              {"type": "REJECT_ORDER",
+                                               "order_id": instance.id,
+                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'})
             return instance
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})

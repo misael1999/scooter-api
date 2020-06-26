@@ -19,7 +19,7 @@ from scooter.apps.orders.serializers import (OrderModelSerializer,
                                              RejectOrderByDeliverySerializer,
                                              AcceptOrderByDeliveryManSerializer,
                                              OrderWithDetailModelSerializer,
-                                             RejectOrderStationSerializer)
+                                             RejectOrderStationSerializer, AssignDeliveryManStationSerializer)
 # Models
 from scooter.apps.orders.models.orders import Order
 from scooter.apps.delivery_men.models import DeliveryMan
@@ -210,7 +210,7 @@ class StationOrderViewSet(ScooterViewSet, AddStationMixin,
     @action(methods=['put'], detail=True)
     def assign_order(self, request, *args, **kwargs):
         order = self.get_object()
-        serializer = AcceptOrderByDeliveryManSerializer(
+        serializer = AssignDeliveryManStationSerializer(
             order,
             data=request.data,
             context={'station': self.station, 'order': order},

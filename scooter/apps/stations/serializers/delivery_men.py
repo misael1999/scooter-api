@@ -21,10 +21,17 @@ from django.contrib.gis.db.models.functions import Distance
 
 
 class DeliveryManModelSerializer(ScooterModelSerializer):
+    delivery_status = serializers.StringRelatedField(read_only=True)
+
     class Meta:
         model = DeliveryMan
         geo_field = 'location'
-        fields = '__all__'
+        fields = (
+            'id', 'user', 'station',
+            'name', 'last_name', 'phone_number',
+            'picture', 'salary_per_order', 'total_orders', 'reputation',
+            'location', 'delivery_status')
+        read_only_fields = fields
 
 
 class DeliveryManUserModelSerializer(ScooterModelSerializer):
@@ -84,9 +91,14 @@ class GetDeliveryMenNearestSerializer(serializers.Serializer):
         try:
             station = self.context['station']
             order = data['order']
+            request = self.context['request']
+            is_all = request.query_params.get('all', None)
+            filters = dict()
+            if is_all == 'false':
+                filters['delivery_status'] = 1
             from_location = order.from_address
             # List of delivery men nearest (from_location)
-            delivery_men = DeliveryMan.objects.filter(station=station,
+            delivery_men = DeliveryMan.objects.filter(**filters, station=station,
                                                       location__distance_lte=(
                                                           from_location.point, D(km=data['distance']))
                                                       ).annotate(
