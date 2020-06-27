@@ -7,11 +7,11 @@ from scooter.apps.orders.serializers import DetailOrderSerializer
 # Models
 from scooter.apps.orders.models.orders import (OrderDetail)
 from scooter.apps.stations.models import Station, StationService, MemberStation
-from scooter.apps.common.models import Service
+from scooter.apps.common.models import Service, OrderStatus
 from scooter.apps.customers.models import CustomerAddress
 from scooter.apps.orders.models.orders import Order
 # Functions channels
-from scooter.apps.orders.utils.orders import send_order_channel
+from scooter.apps.orders.utils.orders import send_order_to_station_channel
 from asgiref.sync import async_to_sync
 # Serializers primary field
 from scooter.apps.common.serializers.common import CustomerFilteredPrimaryKeyRelatedField
@@ -63,10 +63,12 @@ class CreateOrderSerializer(serializers.Serializer):
 
             maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=2)
             qr_code = generate_qr_code()
+            order_status = OrderStatus.objects.get(slug_name="without_delivery")
             order = Order.objects.create(**data,
                                          qr_code=qr_code,
                                          service_price=price_service,
-                                         maximum_response_time=maximum_response_time)
+                                         maximum_response_time=maximum_response_time,
+                                         order_status=order_status)
 
             # Save detail order
             details_to_save = [OrderDetail(**detail, order=order) for detail in details]
@@ -80,7 +82,7 @@ class CreateOrderSerializer(serializers.Serializer):
                                                   'Ha recibido una nueva solicitud',
                                                   {"type": "NEW_ORDER", "order_id": order.id})
                 # Send message by django channel
-                async_to_sync(send_order_channel)(station.user, order.id)
+                async_to_sync(send_order_to_station_channel)(station.id, order.id)
             else:
                 # Get nearest delivery man
                 delivery_man = get_nearest_delivery_man(from_location=data['from_address'], station=data['station'],

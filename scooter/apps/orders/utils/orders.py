@@ -3,12 +3,13 @@
 from channels.layers import get_channel_layer
 
 
-async def send_order_channel(user, order_id):
+async def send_order_to_station_channel(station_id, order_id):
     channel_layer = get_channel_layer()
-    group_name = 'station-{id}'.format(id=user.id)
+    group_name = 'orders-{id}'.format(id=station_id)
     content = {
         'data': {
-            'order_id': order_id
+            'order_id': order_id,
+            'type': 'NEW_ORDER'
         },
     }
     await channel_layer.group_send(

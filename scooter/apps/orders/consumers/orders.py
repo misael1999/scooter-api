@@ -17,15 +17,22 @@ class OrderConsumer(AsyncJsonWebsocketConsumer):
     # WebSocket event handlers
 
     async def connect(self):
-        self.room_name = 'order'
-
+        self.room_name = 'orders'
         if self.scope['user'] == AnonymousUser():
             raise DenyConnection("Invalid User")
 
-        user_id = self.scope['user'].id
+        user = self.scope['user']
+        station_id = self.scope['url_route']['kwargs']['station_id']
 
-        self.room_group_name = '{room}-{id}'.format(id=user_id, room=self.room_name)
-        print(self.room_group_name)
+        if user.station is None:
+            self.scope['user'] = AnonymousUser()
+            raise DenyConnection("Invalid User")
+
+        if user.station.id != int(station_id):
+            self.scope['user'] = AnonymousUser()
+            raise DenyConnection("Invalid User")
+
+        self.room_group_name = '{room}-{id}'.format(room=self.room_name, id=station_id)
         # Join room group
         await self.channel_layer.group_add(
             self.room_group_name,
@@ -36,10 +43,13 @@ class OrderConsumer(AsyncJsonWebsocketConsumer):
 
     async def disconnect(self, close_code):
         # Leave room group
-        await self.channel_layer.group_discard(
-            self.room_group_name,
-            self.channel_name
-        )
+        if self.scope['user'] == AnonymousUser():
+            return
+        else:
+            await self.channel_layer.group_discard(
+                self.room_group_name,
+                self.channel_name
+            )
 
     async def notify(self, event):
         """

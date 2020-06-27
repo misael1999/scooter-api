@@ -56,4 +56,4 @@ class RejectOrderStationSerializer(serializers.Serializer):
             print("Exception in reject order, please check it")
             print(ex.args.__str__())
             raise serializers.ValidationError({'detail': 'Error al rechazar el pedido'})
-    pass
+

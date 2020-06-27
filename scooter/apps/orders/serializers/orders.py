@@ -53,11 +53,11 @@ class OrderWithDetailModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ("id", "customer", "delivery_man", "station", "service",
+        fields = ("id", "service",
                   "from_address", "to_address", "service_price",
-                  "indications", "approximate_price_order",
-                  "date_delivered_order", "qr_code", "order_status", "order_date",
-                  'details')
+                  "indications", "approximate_price_order", 'reason_rejection',
+                  "order_date", "date_delivered_order", "qr_code", "order_status",
+                  "customer", "delivery_man", "station", 'details')
         read_only_fields = fields
 
 

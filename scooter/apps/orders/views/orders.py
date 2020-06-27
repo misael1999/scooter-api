@@ -5,6 +5,9 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 # Utilities
+from scooter.apps.common.filters.common import ListFilter
+from scooter.apps.common.models import OrderStatus
+from scooter.apps.orders.utils.filters import OrderFilter
 from scooter.utils.viewsets.scooter import ScooterViewSet
 # Permissions
 from rest_framework.permissions import IsAuthenticated
@@ -27,8 +30,33 @@ from scooter.apps.delivery_men.models import DeliveryMan
 from scooter.apps.common.mixins import AddCustomerMixin, AddDeliveryManMixin, AddStationMixin
 # Filters
 from rest_framework.filters import SearchFilter, OrderingFilter
-from django_filters.rest_framework import DjangoFilterBackend
+from django_filters.rest_framework import (DjangoFilterBackend, FilterSet, ModelChoiceFilter, ModelMultipleChoiceFilter,
+                                           BaseCSVFilter, CharFilter, MultipleChoiceFilter)
+
 """ Customer view set """
+
+
+# class MultiValueCharFilter(MultipleChoiceFilter):
+#     def filter(self, qs, value):
+#         # value is either a list or an 'empty' value
+#         # values = value or []
+#         # print(values)
+#         # import pdb; pdb.set_trace()
+#         qs = super(MultiValueCharFilter, self).filter(qs, value)
+#         return qs
+#
+#
+# class OrderFilter(FilterSet):
+#     order_status = MultipleChoiceFilter(
+#         lookup_expr='in',
+#         field_name='order_status_id',
+#         conjoined=False,
+#         choices=[]
+#     )
+#
+#     class Meta:
+#         model = Order
+#         fields = ['order_status']
 
 
 class CustomerOrderViewSet(ScooterViewSet, mixins.CreateModelMixin, AddCustomerMixin,
@@ -42,7 +70,7 @@ class CustomerOrderViewSet(ScooterViewSet, mixins.CreateModelMixin, AddCustomerM
     ordering_fields = ('created', 'customer__name')
     # Affect the default order
     # ordering = ('-created', 'passengers__count')
-    filter_fields = ('order_status',)
+    filter_class = OrderFilter
     """ Method dispatch in AddCustomerMixin """
 
     def get_serializer_class(self):
@@ -94,6 +122,7 @@ class DeliveryMenOrderViewSet(ScooterViewSet, AddDeliveryManMixin,
     delivery_man = None
     permission_classes = (IsAuthenticated, IsAccountOwnerDeliveryMan)
     lookup_field = 'pk'
+    filter_class = OrderFilter
 
     """ Method dispatch in AddCustomerMixin """
 
@@ -167,7 +196,7 @@ class StationOrderViewSet(ScooterViewSet, AddStationMixin,
     ordering_fields = ('created', 'customer__name')
     # Affect the default order
     # ordering = ('-created', 'passengers__count')
-    filter_fields = ('order_status',)
+    filter_class = OrderFilter
 
     def get_queryset(self):
         if self.action == 'list':
