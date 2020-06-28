@@ -40,3 +40,5 @@ class DeliveryMenViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         serializer.save()
         return Response(self.set_response(status='ok', data={},
                                           message='Cambio de disponibilidad correctamente'))
+
+

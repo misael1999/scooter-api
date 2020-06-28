@@ -1092,6 +1092,30 @@ paths:
           description: 'Pedido rechazado correctamente'
       tags:
         - Pedidos repartidor
+  /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/scan_qr/:
+    parameters:
+      - name: delivery_man_id
+        in: path
+        required: true
+        type: number
+      - name: order_id
+        in: path
+        required: true
+        type: number
+    put:
+      operationId: scan_qr_order
+      description: Escanear código QR de repartidor
+      parameters:
+        - name: body
+          in: body
+          description: Escanear código QR
+          schema:
+            $ref: '#/definitions/ScanQRDeliveryMan'
+      responses:
+        '200':
+          description: 'Código escaneado correctamente'
+      tags:
+        - Pedidos repartidor
 
 # ======== DEFINITIONS ==============
 definitions:
@@ -1590,6 +1614,12 @@ definitions:
         type: string
         description: Razón del rechazo
         example: 1
+  ScanQRDeliveryMan:
+    type: object
+    properties:
+      qr_code:
+        type: string
+        description: Codigo QR
   AssignOrderDeliveryManStation:
     type: object
     properties:

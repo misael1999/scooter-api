@@ -9,7 +9,7 @@ from scooter.apps.orders.utils.filters import OrderFilter
 from scooter.utils.viewsets.scooter import ScooterViewSet
 # Permissions
 from rest_framework.permissions import IsAuthenticated
-from scooter.apps.orders.permissions import IsOrderStationOwner, IsOrderDeliveryManOwner
+from scooter.apps.orders.permissions import IsOrderStationOwner, IsOrderDeliveryManStationOwner, IsOrderDeliveryManOwner
 from scooter.apps.customers.permissions.customers import IsAccountOwnerCustomer
 from scooter.apps.delivery_men.permissions import IsAccountOwnerDeliveryMan
 from scooter.apps.stations.permissions import IsAccountOwnerStation
@@ -20,7 +20,8 @@ from scooter.apps.orders.serializers import (OrderModelSerializer,
                                              RejectOrderByDeliverySerializer,
                                              AcceptOrderByDeliveryManSerializer,
                                              OrderWithDetailModelSerializer,
-                                             RejectOrderStationSerializer, AssignDeliveryManStationSerializer)
+                                             RejectOrderStationSerializer, AssignDeliveryManStationSerializer,
+                                             ScanQrOrderSerializer)
 # Models
 from scooter.apps.orders.models.orders import Order
 from scooter.apps.delivery_men.models import DeliveryMan
@@ -132,6 +133,8 @@ class DeliveryMenOrderViewSet(ScooterViewSet, AddDeliveryManMixin,
         """Assign permission based on action."""
         permissions = [IsAuthenticated, IsAccountOwnerDeliveryMan]
         if self.action in ['reject_order', 'accept_order', 'retrieve']:
+            permissions.append(IsOrderDeliveryManStationOwner)
+        if self.action in ['scan_qr']:
             permissions.append(IsOrderDeliveryManOwner)
         return [p() for p in permissions]
 
@@ -175,6 +178,22 @@ class DeliveryMenOrderViewSet(ScooterViewSet, AddDeliveryManMixin,
         data = self.set_response(status=True,
                                  data={},
                                  message='Solicitud aceptada')
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['PUT'])
+    def scan_qr(self, request, *args, **kwargs):
+        order = self.get_object()
+        serializer = ScanQrOrderSerializer(
+            order,
+            data=request.data,
+            context={'delivery_man': self.delivery_man, 'order': order},
+            partial=False
+        )
+        serializer.is_valid(raise_exception=True)
+        order = serializer.save()
+        data = self.set_response(status=True,
+                                 data={},
+                                 message='Código qr correcto')
         return Response(data=data, status=status.HTTP_200_OK)
 
 

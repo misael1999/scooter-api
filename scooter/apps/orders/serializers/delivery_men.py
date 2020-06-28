@@ -101,3 +101,38 @@ class RejectOrderByDeliverySerializer(serializers.Serializer):
             print("Exception in reject order, please check it")
             print(ex.args.__str__())
             raise serializers.ValidationError({'detail': 'Error al rechazar el pedido'})
+
+
+class ScanQrOrderSerializer(serializers.Serializer):
+    """ Scan qr to mark the order as delivered """
+
+    qr_code = serializers.CharField(max_length=10)
+
+    def validate_qr_code(self, qr_code):
+        order = self.context['order']
+        if order.qr_code != qr_code:
+            raise serializers.ValidationError({'detail': 'Código QR no valido para ese pedido'})
+        return qr_code
+
+    def update(self, instance, data):
+        try:
+            if instance.order_status.slug_name == 'delivered':
+                raise ValueError('El pedido ya ha sido entregado')
+            order_status = OrderStatus.objects.get(slug_name='delivered')
+            instance.order_status = order_status
+            instance.save()
+
+            send_notification_push_task.delay(instance.customer.user_id,
+                                              'Califica a tu repartidor',
+                                              'Gracias por utilizar scooter',
+                                              {"type": "RATING_DELIVERY", "order_id": instance.id,
+                                               "message": "Califica a tu repartidor",
+                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                               })
+            return instance
+        except ValueError as e:
+            raise serializers.ValidationError({'detail': str(e)})
+        except Exception as ex:
+            print("Exception in reject order, please check it")
+            print(ex.args.__str__())
+            raise serializers.ValidationError({'detail': 'Error al escanear el códigp'})
