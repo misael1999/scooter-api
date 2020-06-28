@@ -135,9 +135,7 @@ class GetDeliveryMenNearestSerializer(serializers.Serializer):
             # ).order_by('distance')
 
             if not delivery_men:
-                raise serializers.ValidationError(
-                    {'detail': 'No se encontraron repartidores disponibles en ese rango'},
-                    code='no_found_delivery_men')
+                raise ValueError('No se encontraron repartidores')
 
             return delivery_men
         except ValueError as e:
