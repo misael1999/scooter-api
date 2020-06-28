@@ -30,3 +30,19 @@ class DeliveryMan(ScooterModel):
     def __str__(self):
         return self.name
 
+
+class DeliveryManAddress(ScooterModel):
+    delivery_man = models.OneToOneField(DeliveryMan, on_delete=models.CASCADE, related_name='address')
+    street = models.CharField(max_length=100)
+    suburb = models.CharField(max_length=60)
+    postal_code = models.CharField(max_length=10)
+    exterior_number = models.CharField(max_length=10)
+    inside_number = models.CharField(max_length=10, blank=True, null=True)
+    references = models.CharField(max_length=150)
+
+    class Meta:
+        db_table = 'delivery_man_address'
+
+    def __str__(self):
+        return self.street
+

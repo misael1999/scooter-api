@@ -536,6 +536,25 @@ paths:
       tags:
         - Centrales
   # GET DELIVERY MAN NEAREST BY ADDRESS
+  /api/v1/stations/{station_id}/delivery_men/{delivery_man_id}/:
+    parameters:
+      - name: station_id
+        in: path
+        required: true
+        type: string
+      - name: delivery_man_id
+        in: path
+        required: true
+        type: string
+    get:
+      operationId: get_delivery_station
+      description: Obtener datos de un repartidor
+      responses:
+        '200':
+          description: 'Info del repartidor'
+      tags:
+        - Centrales
+
   /api/v1/stations/{station_id}/delivery_men/nearest/:
     parameters:
       - name: station_id
@@ -744,6 +763,26 @@ paths:
           description: Actualizar ubicación del repartidor
           schema:
             $ref: '#/definitions/UpdateLocationDeliveryMan'
+      responses:
+        '200':
+          description: 'Ubicación actualizada'
+      tags:
+        - Repartidores
+  /api/v1/delivery_men/{delivery_man_id}/update_availability/:
+    parameters:
+      - name: delivery_man_id
+        in: path
+        required: true
+        type: string
+    patch:
+      operationId: delivery_man_update_availability
+      description: Actualizar la disponibilidad del repartidor
+      parameters:
+        - name: body
+          in: body
+          description: Actualizar la availability del repartidor
+          schema:
+            $ref: '#/definitions/UpdateAvailabilityDeliveryMan'
       responses:
         '200':
           description: 'Ubicación actualizada'
@@ -1406,6 +1445,28 @@ definitions:
       password:
         type: string
         description: Contraseña para inicio de sesión
+      address:
+        type: object
+        description: Dirección del repartidor
+        properties:
+          street:
+            type: string
+            description: Calle
+          suburb:
+            type: string
+            description: Colonia
+          postal_code:
+            type: string
+            description: Código postal
+          exterior_number:
+            type: string
+            description: Número exterior
+          inside_number:
+            type: string
+            description: Número interior
+          references:
+            type: string
+            description: Referencias
   UpdateDeliveryMan:
     type: object
     properties:
@@ -1501,6 +1562,8 @@ definitions:
     required:
       - latitude
       - longitude
+  UpdateAvailabilityDeliveryMan:
+    type: object
   # ==== ORDERS
   RejectOrderDeliveryMan:
     type: object

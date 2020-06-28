@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from scooter.apps.delivery_men.models.delivery_men import DeliveryMan
 # Serializers
 from scooter.apps.stations.serializers.delivery_men import (CreateDeliveryManSerializer,
-                                                            DeliveryManModelSerializer)
+                                                            DeliveryManModelSerializer, DeliveryManWithAddressSerializer)
 from scooter.apps.stations.serializers.delivery_men import GetDeliveryMenNearestSerializer
 # Viewset
 from scooter.utils.viewsets.scooter import ScooterViewSet
@@ -15,6 +15,9 @@ from scooter.apps.common.mixins.stations import AddStationMixin
 # Permissions
 from rest_framework.permissions import IsAuthenticated
 from scooter.apps.stations.permissions import IsAccountOwnerStation
+# Filters
+from rest_framework.filters import SearchFilter, OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class DeliveryMenStationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
@@ -26,6 +29,13 @@ class DeliveryMenStationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
     queryset = DeliveryMan.objects.all()
     permission_classes = (IsAuthenticated, IsAccountOwnerStation)
     station = None
+    # Filters
+    filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
+    search_fields = ('name', 'last_name', 'phone_number')
+    ordering_fields = ('name', 'last_name', 'reputation')
+    # Affect the default order
+    # ordering = ('-created', 'passengers__count')
+    filter_fields = ('reputation',)
 
     def get_queryset(self):
         """ Personalized query when the action is a list so that it only returns active delivery men """
@@ -40,6 +50,8 @@ class DeliveryMenStationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             serializer_class = CreateDeliveryManSerializer
         if self.action == 'nearest':
             serializer_class = GetDeliveryMenNearestSerializer
+        if self.action == 'retrieve':
+            return DeliveryManWithAddressSerializer
         return serializer_class
 
     def create(self, request, *args, **kwargs):

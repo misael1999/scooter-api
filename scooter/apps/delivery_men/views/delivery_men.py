@@ -6,7 +6,8 @@ from rest_framework.response import Response
 from scooter.apps.delivery_men.models.delivery_men import DeliveryMan
 # Serializers
 from scooter.apps.delivery_men.serializers.delivery_men import (DeliveryManModelSerializer,
-                                                                UpdateLocationDeliverySerializer)
+                                                                UpdateLocationDeliverySerializer,
+                                                                AvailabilityDeliverySerializer)
 # Viewset
 from scooter.utils.viewsets.scooter import ScooterViewSet
 # Permissions
@@ -29,3 +30,13 @@ class DeliveryMenViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         serializer.save()
         return Response(self.set_response(status='ok', data={},
                                           message='Ubicación actualizada correctamente'))
+
+    @action(detail=True, methods=('PATCH',))
+    def update_availability(self, request, *args, **kwargs):
+        delivery_man = self.get_object()
+        partial = request.method == 'PATCH'
+        serializer = AvailabilityDeliverySerializer(delivery_man, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(self.set_response(status='ok', data={},
+                                          message='Cambio de disponibilidad correctamente'))

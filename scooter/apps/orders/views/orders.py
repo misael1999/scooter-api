@@ -5,8 +5,6 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 # Utilities
-from scooter.apps.common.filters.common import ListFilter
-from scooter.apps.common.models import OrderStatus
 from scooter.apps.orders.utils.filters import OrderFilter
 from scooter.utils.viewsets.scooter import ScooterViewSet
 # Permissions
@@ -30,8 +28,7 @@ from scooter.apps.delivery_men.models import DeliveryMan
 from scooter.apps.common.mixins import AddCustomerMixin, AddDeliveryManMixin, AddStationMixin
 # Filters
 from rest_framework.filters import SearchFilter, OrderingFilter
-from django_filters.rest_framework import (DjangoFilterBackend, FilterSet, ModelChoiceFilter, ModelMultipleChoiceFilter,
-                                           BaseCSVFilter, CharFilter, MultipleChoiceFilter)
+from django_filters.rest_framework import (DjangoFilterBackend)
 
 """ Customer view set """
 

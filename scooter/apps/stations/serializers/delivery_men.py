@@ -7,7 +7,7 @@ from django.contrib.gis.geos import Point
 # Models
 from scooter.apps.orders.models import Order
 from scooter.apps.users.models import User
-from scooter.apps.delivery_men.models.delivery_men import DeliveryMan
+from scooter.apps.delivery_men.models.delivery_men import DeliveryMan, DeliveryManAddress
 from scooter.apps.customers.models import CustomerAddress
 # Utilities
 from scooter.utils.serializers.scooter import ScooterModelSerializer
@@ -45,6 +45,29 @@ class DeliveryManUserModelSerializer(ScooterModelSerializer):
         )
 
 
+class DeliveryManAddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DeliveryManAddress
+        fields = (
+            'street', 'suburb', 'postal_code',
+            'exterior_number', 'inside_number', 'references'
+        )
+
+
+class DeliveryManWithAddressSerializer(serializers.ModelSerializer):
+    address = DeliveryManAddressSerializer()
+
+    class Meta:
+        model = DeliveryMan
+        geo_field = 'location'
+        fields = (
+            'id', 'user', 'station',
+            'name', 'last_name', 'phone_number',
+            'picture', 'salary_per_order', 'total_orders', 'reputation',
+            'location', 'delivery_status', 'address')
+        read_only_fields = fields
+
+
 class CreateDeliveryManSerializer(serializers.Serializer):
     picture = Base64ImageField(required=False)
     password = serializers.CharField(max_length=50)
@@ -52,6 +75,7 @@ class CreateDeliveryManSerializer(serializers.Serializer):
     last_name = serializers.CharField(max_length=60)
     phone_number = serializers.CharField(max_length=15)
     salary_per_order = serializers.FloatField(default=0)
+    address = DeliveryManAddressSerializer()
 
     def validate(self, data):
         user_exist = User.objects.filter(username=data['phone_number']).exists()
@@ -63,6 +87,7 @@ class CreateDeliveryManSerializer(serializers.Serializer):
     def create(self, data):
         try:
             station = self.context['station']
+            address = data.pop('address', None)
             user = User(username=data['phone_number'],
                         is_client=False,
                         is_verified=True,
@@ -76,6 +101,8 @@ class CreateDeliveryManSerializer(serializers.Serializer):
                                                       phone_number=data['phone_number'],
                                                       user=user,
                                                       station=station)
+            DeliveryManAddress.objects.create(**address, delivery_man=delivery_man)
+
             # in the future send an email to the station when a new delivery man register
             return delivery_man
         except Exception as ex:
