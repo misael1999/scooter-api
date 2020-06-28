@@ -4,6 +4,7 @@ from rest_framework import serializers
 from django.contrib.gis.geos import Point
 # Models
 from scooter.apps.common.models import DeliveryManStatus
+from scooter.apps.common.serializers import Base64ImageField
 from scooter.apps.delivery_men.models.delivery_men import DeliveryMan
 # Utilities
 from scooter.utils.serializers.scooter import ScooterModelSerializer
@@ -16,6 +17,7 @@ from asgiref.sync import async_to_sync
 
 
 class DeliveryManModelSerializer(ScooterModelSerializer):
+    picture = Base64ImageField(max_length=None, use_url=False, required=False)
 
     class Meta:
         model = DeliveryMan
@@ -32,7 +34,6 @@ class DeliveryManOrderSerializer(serializers.ModelSerializer):
             'station',
             'name',
             'phone_number',
-            'picture',
             'reputation')
         read_only_fields = fields
 
