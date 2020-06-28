@@ -39,10 +39,14 @@ class AcceptOrderByDeliveryManSerializer(serializers.Serializer):
             order.delivery_man = delivery_man
             order.save()
             # Send notification push to customer
-            send_notification_push_task.delay(order.customer.user.id, 'Repartidor en camino',
+            send_notification_push_task.delay(order.customer.user.id,
+                                              'Repartidor en camino',
                                               'Puedes ver el seguimiento de tu producto',
                                               {"type": "ACCEPTED_ORDER",
-                                               "order_id": order.id})
+                                               "order_id": order.id,
+                                               "message": "Puedes ver el seguimiento de tu producto",
+                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                               })
             return data
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
@@ -83,8 +87,13 @@ class RejectOrderByDeliverySerializer(serializers.Serializer):
             if not delivery_man:
                 raise ValueError('No se encuentran repartidores disponibles')
 
-            send_notification_push_task.delay(delivery_man.user.id, 'Solicitud nueva',
-                                              'Pedido de compra', {"type": "NEW_ORDER", "order_id": instance.id})
+            send_notification_push_task.delay(delivery_man.user.id,
+                                              'Solicitud nueva',
+                                              'Pedido de compra',
+                                              {"type": "NEW_ORDER", "order_id": instance.id,
+                                               "message": "Ha recibido una nueva solicitud",
+                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                               })
             return data
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})

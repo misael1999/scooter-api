@@ -61,7 +61,7 @@ class CreateOrderSerializer(serializers.Serializer):
                                                     to_address=data['to_address'],
                                                     service=data['station_service'])
 
-            maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=2)
+            maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=2.5)
             qr_code = generate_qr_code()
             order_status = OrderStatus.objects.get(slug_name="without_delivery")
             order = Order.objects.create(**data,
@@ -78,9 +78,14 @@ class CreateOrderSerializer(serializers.Serializer):
             station = data['station']
             # Is assign delivery manually is true, then send notification
             if station.assign_delivery_manually:
-                send_notification_push_task.delay(station.user.id, 'Solicitud nueva',
+                send_notification_push_task.delay(station.user.id,
+                                                  'Solicitud nueva',
                                                   'Ha recibido una nueva solicitud',
-                                                  {"type": "NEW_ORDER", "order_id": order.id})
+                                                  {"type": "NEW_ORDER",
+                                                   "order_id": order.id,
+                                                   "message": "Ha recibido una nueva solicitud",
+                                                   'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                                   })
                 # Send message by django channel
                 async_to_sync(send_order_to_station_channel)(station.id, order.id)
             else:
@@ -91,8 +96,14 @@ class CreateOrderSerializer(serializers.Serializer):
                 if not delivery_man:
                     raise ValueError('No se encuentran repartidores disponibles')
 
-                send_notification_push_task.delay(delivery_man.user.id, 'Solicitud nueva',
-                                                  'Pedido de compra', {"type": "NEW_ORDER", "order_id": order.id})
+                send_notification_push_task.delay(delivery_man.user.id,
+                                                  'Solicitud nueva',
+                                                  'Pedido de nuevo',
+                                                  {"type": "NEW_ORDER",
+                                                   "order_id": order.id,
+                                                   "message": "Pedido de nuevo",
+                                                   'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                                   })
 
             # Add client to station or update info
             member = MemberStation.objects.get_or_create(customer=data['customer'],

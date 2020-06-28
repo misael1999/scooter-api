@@ -1,12 +1,9 @@
+# Django
+from datetime import timedelta
+from django.utils import timezone
 # Celery
-from celery.task import task
+from celery.task import periodic_task
 # FCM
 from fcm_django.models import FCMDevice
 
 
-# @task(name='send_notification_push_task', max_retries=3)
-# def send_notification_push_task(user_id, title, body, data):
-#     """ Send push notifications in all user """
-#     devices = FCMDevice.objects.filter(user_id=user_id)
-#     if devices:
-#         devices.send_message(title=title, body=body, data=data)
