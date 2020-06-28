@@ -673,8 +673,8 @@ paths:
           description: 'Información del vehiculo'
       tags:
         - Centrales
-  # STATION CLIENTS
-  /api/v1/stations/{station_id}/clients/:
+  # STATION CUSTOMERS
+  /api/v1/stations/{station_id}/customers/:
     parameters:
       - name: station_id
         in: path
@@ -708,6 +708,24 @@ paths:
       responses:
         '201':
           description: 'Listado de centrales'
+      tags:
+        - Centrales
+  /api/v1/stations/{station_id}/customers/{customer_id}/:
+    parameters:
+      - name: station_id
+        in: path
+        required: true
+        type: string
+      - name: customer_id
+        in: path
+        required: true
+        type: string
+    get:
+      operationId: get_client_station
+      description: Obtener datos de un cliente
+      responses:
+        '200':
+          description: 'Info de clientes'
       tags:
         - Centrales
   # ========== END STATIONS =================

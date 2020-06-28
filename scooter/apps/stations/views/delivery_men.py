@@ -39,7 +39,7 @@ class DeliveryMenStationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
 
     def get_queryset(self):
         """ Personalized query when the action is a list so that it only returns active delivery men """
-        if self.action in ['list', 'nearest']:
+        if self.action in ['list', 'nearest', 'retrieve']:
             return self.station.deliveryman_set.filter(status__slug_name='active')
 
         return self.queryset

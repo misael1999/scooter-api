@@ -1,12 +1,13 @@
 # Rest framework
 from rest_framework import serializers
 # Models
+from scooter.apps.customers.serializers import CustomerSimpleModelSerializer
 from scooter.apps.stations.models import MemberStation
 
 
 class MembersStationModelSerializer(serializers.ModelSerializer):
 
-    customer = serializers.StringRelatedField(read_only=True)
+    customer = CustomerSimpleModelSerializer(read_only=True)
 
     class Meta:
         model = MemberStation

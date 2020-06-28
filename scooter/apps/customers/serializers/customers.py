@@ -20,17 +20,21 @@ from scooter.apps.common.serializers import Base64ImageField
 
 class CustomerSimpleModelSerializer(serializers.ModelSerializer):
     picture = Base64ImageField(max_length=None, use_url=True, required=False)
+    user = UserModelSimpleSerializer()
 
     class Meta:
         model = Customer
-        fields = '__all__'
-        read_only_fields = (
-            'reputation',
-            'created',
-            'modified',
-            'status',
-            'user'
+        fields = (
+            'id',
+            'user',
+            'name',
+            'birthdate',
+            'picture',
+            'picture_url',
+            'phone_number',
+            'reputation'
         )
+        read_only_fields = fields
 
     def update(self, instance, data):
         """ Before updating we have to delete the previous image """

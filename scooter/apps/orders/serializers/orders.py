@@ -39,6 +39,23 @@ class OrderModelSerializer(serializers.ModelSerializer):
                   "date_delivered_order", "qr_code", "order_status", "order_date")
 
 
+# For customer history orders
+class OrderWithDetailSimpleSerializer(serializers.ModelSerializer):
+    details = DetailOrderSerializer(many=True)
+    order_date = serializers.DateTimeField(source='created')
+    delivery_man = DeliveryManOrderSerializer(required=False)
+    service = serializers.StringRelatedField(read_only=True, source="station_service")
+
+    class Meta:
+        model = Order
+        fields = ("id", "service",
+                  "from_address", "to_address", "service_price",
+                  "indications", "approximate_price_order", 'reason_rejection',
+                  "order_date", "date_delivered_order", "qr_code", "order_status",
+                  "customer", "delivery_man", "station", 'details')
+        read_only_fields = fields
+
+
 class OrderWithDetailModelSerializer(serializers.ModelSerializer):
     station = serializers.StringRelatedField(read_only=True)
     customer = serializers.StringRelatedField()
