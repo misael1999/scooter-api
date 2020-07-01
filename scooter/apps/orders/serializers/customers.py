@@ -27,6 +27,7 @@ from string import ascii_uppercase, digits
 
 class CreateOrderSerializer(serializers.Serializer):
     """ Create new order for customer"""
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     details = DetailOrderSerializer(many=True)
     station_id = serializers.PrimaryKeyRelatedField(queryset=Station.objects.all(), source="station")
     service_id = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all(), source="service")
@@ -57,16 +58,17 @@ class CreateOrderSerializer(serializers.Serializer):
         try:
             details = data.pop('details', None)
             # Calculate price between two address
-            price_service = calculate_service_price(from_address=data['from_address'],
-                                                    to_address=data['to_address'],
-                                                    service=data['station_service'])
+            data_service = calculate_service_price(from_address=data['from_address'],
+                                                   to_address=data['to_address'],
+                                                   service=data['station_service'])
 
             maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=2.5)
             qr_code = generate_qr_code()
             order_status = OrderStatus.objects.get(slug_name="without_delivery")
             order = Order.objects.create(**data,
                                          qr_code=qr_code,
-                                         service_price=price_service,
+                                         service_price=data_service['price_service'],
+                                         distance=data_service['distance'],
                                          maximum_response_time=maximum_response_time,
                                          order_status=order_status)
 

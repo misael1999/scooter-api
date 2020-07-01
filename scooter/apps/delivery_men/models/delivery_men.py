@@ -15,7 +15,7 @@ class DeliveryMan(ScooterModel):
         message='El numero de telefono debe ser ingresado con el formato: +23856671672. Hasta 15 digitos permitidos'
     )
     phone_number = models.CharField(validators=[phone_regex], max_length=20, blank=True, null=True)
-    picture = models.ImageField(upload_to='customers/pictures/', blank=True, null=True)
+    picture = models.ImageField(upload_to='deliveryman/pictures/', blank=True, null=True)
     salary_per_order = models.FloatField(default=0)
 
     # stats

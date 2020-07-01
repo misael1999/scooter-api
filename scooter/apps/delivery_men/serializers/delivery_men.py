@@ -17,21 +17,39 @@ from asgiref.sync import async_to_sync
 
 
 class DeliveryManModelSerializer(ScooterModelSerializer):
-    picture = Base64ImageField(max_length=None, use_url=False, required=False)
+    picture = Base64ImageField(max_length=None, use_url=True, required=False)
 
     class Meta:
         model = DeliveryMan
         geo_field = 'location'
         fields = '__all__'
+        read_only_fields = (
+            'user', 'station', 'name', 'last_name',
+            'phone_number', 'total_orders', 'reputation', 'location',
+            'delivery_status'
+        )
+
+    def update(self, instance, data):
+        """ Before updating we have to delete the previous image """
+        try:
+            if data['picture']:
+                instance.picture.delete(save=True)
+        except Exception as ex:
+            print("Exception deleting image delivery man, please check it")
+            print(ex.args.__str__())
+        return super().update(instance, data)
 
 
 class DeliveryManOrderSerializer(serializers.ModelSerializer):
+
+    picture = Base64ImageField(use_url=True)
 
     class Meta:
         model = DeliveryMan
         fields = (
             'id',
             'station',
+            'picture',
             'name',
             'phone_number',
             'reputation')
@@ -40,6 +58,7 @@ class DeliveryManOrderSerializer(serializers.ModelSerializer):
 
 class DeliveryManUserModelSerializer(ScooterModelSerializer):
     user = UserModelSimpleSerializer()
+    picture = Base64ImageField(use_url=True)
 
     class Meta:
         model = DeliveryMan

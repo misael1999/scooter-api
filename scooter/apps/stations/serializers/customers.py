@@ -6,7 +6,6 @@ from scooter.apps.stations.models import MemberStation
 
 
 class MembersStationModelSerializer(serializers.ModelSerializer):
-
     customer = CustomerSimpleModelSerializer(read_only=True)
 
     class Meta:

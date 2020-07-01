@@ -21,7 +21,7 @@ from scooter.apps.common.serializers import Base64ImageField
 
 
 class StationSimpleModelSerializer(serializers.ModelSerializer):
-    picture = Base64ImageField(max_length=None, use_url=False, required=False)
+    picture = Base64ImageField(max_length=None, use_url=True, required=False)
 
     class Meta:
         model = Station
@@ -73,7 +73,7 @@ class PointSerializer(serializers.Serializer):
 
 # General information
 class GeneralInfoSerializer(serializers.Serializer):
-    picture = Base64ImageField(required=False)
+    picture = Base64ImageField(required=False, use_url=True)
 
 
 # Rates by service

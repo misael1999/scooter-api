@@ -139,7 +139,7 @@ class DeliveryMenOrderViewSet(ScooterViewSet, AddDeliveryManMixin,
         return [p() for p in permissions]
 
     def get_serializer_class(self):
-        if self.action == 'retrieve':
+        if self.action in ['retrieve', 'list']:
             return OrderWithDetailModelSerializer
         return self.serializer_class
 

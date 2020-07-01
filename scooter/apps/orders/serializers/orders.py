@@ -24,16 +24,17 @@ from scooter.apps.common.serializers.common import CustomerFilteredPrimaryKeyRel
 
 class DetailOrderSerializer(serializers.Serializer):
     product_name = serializers.CharField(max_length=60)
-    picture = Base64ImageField(required=False)
+    picture = Base64ImageField(required=False, use_url=True)
 
 
 # For requests we must put all the fields as read only
 class OrderModelSerializer(serializers.ModelSerializer):
     order_date = serializers.DateTimeField(source='created')
+    service = serializers.StringRelatedField(read_only=True, source="station_service")
 
     class Meta:
         model = Order
-        fields = ("id", "delivery_man", "station", "station_service",
+        fields = ("id", "delivery_man", "station", "service", "distance",
                   "from_address_id", "to_address_id", "service_price",
                   "indications", "approximate_price_order", 'maximum_response_time',
                   "date_delivered_order", "qr_code", "order_status", "order_date")
@@ -49,8 +50,9 @@ class OrderWithDetailSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ("id", "service",
-                  "from_address", "to_address", "service_price",
-                  "indications", "approximate_price_order", 'reason_rejection',
+                  "from_address", "to_address", "service_price", "distance"
+                                                                 "indications", "approximate_price_order",
+                  'reason_rejection',
                   "order_date", "date_delivered_order", "qr_code", "order_status",
                   "customer", "delivery_man", "station", 'details', 'maximum_response_time')
         read_only_fields = fields
@@ -71,7 +73,7 @@ class OrderWithDetailModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ("id", "service",
-                  "from_address", "to_address", "service_price",
+                  "from_address", "to_address", "service_price", "distance",
                   "indications", "approximate_price_order", 'reason_rejection',
                   "order_date", "date_delivered_order", "qr_code", "order_status",
                   "customer", "delivery_man", "station", 'details', 'maximum_response_time')
@@ -103,10 +105,10 @@ class CalculateServicePriceSerializer(serializers.Serializer):
 
     def create(self, data):
         try:
-            price_service = calculate_service_price(from_address=data['from_address'],
-                                                    to_address=data['to_address'],
-                                                    service=data['station_service'])
-            return price_service
+            data_service = calculate_service_price(from_address=data['from_address'],
+                                                   to_address=data['to_address'],
+                                                   service=data['station_service'])
+            return data_service['price_service']
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
         except Exception as ex:
@@ -126,7 +128,7 @@ def get_nearest_delivery_man(from_location, station, list_exclude, distance):
                location__distance_lte=(
                    from_location.point,
                    D(km=distance))) \
-        .annotate(distance=Distance('location', from_location.point))\
+        .annotate(distance=Distance('location', from_location.point)) \
         .order_by('distance').first()
     # delivery_man = DeliveryMan.objects.filter(station=station,
     #                                           location__distance_lte=(
@@ -164,7 +166,7 @@ def calculate_service_price(from_address, to_address, service):
             # Verify how to much kilometers left and after multiply for the price kilomers ans
             kilometers_left = distance_points - service.to_kilometer
             price_service = service.base_rate_price + (kilometers_left * service.price_kilometer)
-        return price_service
+        return {'price_service': price_service, 'distance': distance_points}
     except ValueError as e:
         print(e)
         raise ValueError('Error al consultar precio de la orden')

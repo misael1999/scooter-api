@@ -3,6 +3,7 @@
 import environ
 import os
 from .constants import *
+from google.oauth2 import service_account
 
 ROOT_DIR = environ.Path(__file__) - 3
 APPS_DIR_2 = ROOT_DIR.path('scooter/apps')
@@ -99,20 +100,20 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# Static files
-STATIC_ROOT = str(ROOT_DIR('static'))
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    str(APPS_DIR.path('static')),
-]
-STATICFILES_FINDERS = [
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-]
-
-# Media
-MEDIA_ROOT = str(APPS_DIR('media'))
-MEDIA_URL = '/media/'
+# # Static files
+# STATIC_ROOT = str(ROOT_DIR('static'))
+# STATIC_URL = '/static/'
+# STATICFILES_DIRS = [
+#     str(APPS_DIR.path('static')),
+# ]
+# STATICFILES_FINDERS = [
+#     'django.contrib.staticfiles.finders.FileSystemFinder',
+#     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+# ]
+#
+# # Media
+# MEDIA_ROOT = str(APPS_DIR('media'))
+# MEDIA_URL = '/media/'
 
 # Templates
 TEMPLATES = [
@@ -217,6 +218,33 @@ FCM_DJANGO_SETTINGS = {
     # default: False
     "DELETE_INACTIVE_DEVICES": False,
 }
+
+# STORAGE GOOGLE CLOUD
+DEFAULT_FILE_STORAGE = 'gcloud.GoogleCloudMediaFileStorage'
+STATICFILES_STORAGE = 'gcloud.GoogleCloudStaticFileStorage'
+
+GS_PROJECT_ID = 'scooter-277719'
+GS_STATIC_BUCKET_NAME = 'scooter_app'
+GS_MEDIA_BUCKET_NAME = 'scooter_app'  # same as STATIC BUCKET if using single bucket both for static and media
+
+STATICFILES_DIRS = [
+     str(APPS_DIR.path('static')),
+]
+STATIC_ROOT = str(ROOT_DIR('static'))
+STATIC_URL = '/static/'
+
+MEDIA_URL = 'https://storage.googleapis.com/{}/'.format(GS_MEDIA_BUCKET_NAME)
+MEDIA_ROOT = "media/"
+
+UPLOAD_ROOT = 'media/uploads/'
+
+DOWNLOAD_ROOT = os.path.join(ROOT_DIR, "static/media/downloads")
+DOWNLOAD_URL = STATIC_URL + "media/downloads"
+
+GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
+    "scooter-e52b9e8a6f26.json"
+)
+# END STORAGE
 
 # Swagger
 SWAGGER_YAML_FILE = str(APPS_DIR.path('swagger.yaml'))  # os.path.join(BASE_DIR, 'swagger.yaml')

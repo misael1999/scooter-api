@@ -11,6 +11,8 @@ from fcm_django.models import FCMDevice
 # Models
 from scooter.apps.orders.models import Order
 from django.db.models import Q
+# Functions
+from scooter.utils.functions import send_notification_push_order
 
 
 @task(name='send_email_task', max_retries=3)
@@ -39,11 +41,10 @@ def reject_orders():
         orders.update(order_status=order_status,
                       reason_rejection="Sin respuesta")
         for order in orders:
-            devices = FCMDevice.objects.filter(user_id=order.customer.user_id)
-            if devices:
-                devices.send_message(title='Pedido rechazado',
-                                     body='No hubo respuesta del pedido',
-                                     data={"type": "REJECT_ORDER",
-                                           "order_id": order.id,
-                                           "message": "No hubo respuesta del pedid",
-                                           'click_action': 'FLUTTER_NOTIFICATION_CLICK'})
+            # Function
+            send_notification_push_order(order.user_id, title='Pedido rechazado',
+                                         body='No hubo respuesta del pedido',
+                                         data={"type": "REJECT_ORDER",
+                                               "order_id": order.id,
+                                               "message": "No hubo respuesta del pedid",
+                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'})

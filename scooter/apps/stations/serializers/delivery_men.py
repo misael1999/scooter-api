@@ -22,6 +22,7 @@ from django.contrib.gis.db.models.functions import Distance
 
 class DeliveryManModelSerializer(ScooterModelSerializer):
     delivery_status = serializers.StringRelatedField(read_only=True)
+    picture = Base64ImageField(use_url=True)
 
     class Meta:
         model = DeliveryMan
@@ -56,6 +57,7 @@ class DeliveryManAddressSerializer(serializers.ModelSerializer):
 
 class DeliveryManWithAddressSerializer(serializers.ModelSerializer):
     address = DeliveryManAddressSerializer()
+    picture = Base64ImageField(use_url=True)
 
     class Meta:
         model = DeliveryMan

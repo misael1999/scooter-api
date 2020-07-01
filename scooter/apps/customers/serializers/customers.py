@@ -19,7 +19,7 @@ from scooter.apps.common.serializers import Base64ImageField
 
 
 class CustomerSimpleModelSerializer(serializers.ModelSerializer):
-    picture = Base64ImageField(max_length=None, required=False)
+    picture = Base64ImageField(max_length=None, required=False, use_url=True)
     user = UserModelSimpleSerializer()
 
     class Meta:
@@ -49,6 +49,7 @@ class CustomerSimpleModelSerializer(serializers.ModelSerializer):
 
 class CustomerUserModelSerializer(serializers.ModelSerializer):
     user = UserModelSimpleSerializer()
+    picture = Base64ImageField(use_url=True)
 
     class Meta:
         model = Customer

@@ -5,6 +5,7 @@ from scooter.utils.models.scooter import ScooterModel
 
 
 class Order(ScooterModel):
+    user = models.ForeignKey('users.User', on_delete=models.DO_NOTHING)
     customer = models.ForeignKey('customers.Customer', on_delete=models.DO_NOTHING)
     delivery_man = models.ForeignKey('delivery_men.DeliveryMan',
                                      on_delete=models.DO_NOTHING, related_name="delivery_man",
@@ -27,6 +28,7 @@ class Order(ScooterModel):
     reason_rejection = models.CharField(max_length=100, blank=True, null=True)
     maximum_response_time = models.DateTimeField()
     phone_number = models.CharField(max_length=15)
+    distance = models.FloatField()
 
 
 class OrderDetail(ScooterModel):

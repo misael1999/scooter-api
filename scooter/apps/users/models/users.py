@@ -15,6 +15,16 @@ from scooter.apps.users.managers.users import CustomUserManager
 
 class User(ScooterModel, AbstractBaseUser, PermissionsMixin):
     """ User models """
+    CUSTOMER = 1
+    STATION = 2
+    DELIVERY_MAN = 3
+    ADMIN = 4
+    ROLE_CHOICES = (
+        (CUSTOMER, _('Cliente')),
+        (STATION, _('Central')),
+        (DELIVERY_MAN, _('Repartidor')),
+        (ADMIN, _('Administrador'))
+    )
     username = models.CharField(
         unique=True,
         max_length=150,
@@ -48,6 +58,7 @@ class User(ScooterModel, AbstractBaseUser, PermissionsMixin):
     # The verification deadline is two days after those days, if the user is not verified so
     # the user must request the forwarding code
     verification_deadline = models.DateTimeField()
+    role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, default=CUSTOMER, null=True, blank=True)
 
     objects = CustomUserManager()
 
@@ -56,3 +67,15 @@ class User(ScooterModel, AbstractBaseUser, PermissionsMixin):
 
     def get_short_name(self):
         return self.username
+
+    def is_customer(self):
+        return self.role == self.CUSTOMER
+
+    def is_station(self):
+        return self.role == self.STATION
+
+    def is_delivery_man(self):
+        return self.role == self.DELIVERY_MAN
+
+    def isAdmin(self):
+        return self.role == self.ADMIN
