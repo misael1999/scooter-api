@@ -31,7 +31,7 @@ class DeliveryMenStationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
     station = None
     # Filters
     filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
-    search_fields = ('name', 'last_name', 'phone_number')
+    search_fields = ('name', 'last_name', 'phone_number', 'total_orders')
     ordering_fields = ('name', 'last_name', 'reputation')
     # Affect the default order
     # ordering = ('-created', 'passengers__count')
