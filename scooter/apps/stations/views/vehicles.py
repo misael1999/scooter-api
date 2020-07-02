@@ -13,6 +13,9 @@ from scooter.apps.common.mixins.stations import AddStationMixin
 # Permissions
 from rest_framework.permissions import IsAuthenticated
 from scooter.apps.stations.permissions import IsAccountOwnerStation
+# Filters
+from rest_framework.filters import SearchFilter, OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class VehiclesViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.CreateModelMixin,
@@ -24,6 +27,12 @@ class VehiclesViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.CreateModelM
     serializer_class = VehicleModelSerializer
     queryset = Vehicle.objects.all()
     permission_classes = (IsAuthenticated, IsAccountOwnerStation)
+    filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
+    search_fields = ('plate', 'model', 'alias')
+    ordering_fields = ('plate', 'model', 'year', 'alias')
+    # Affect the default order
+    ordering = ('-id', '-created')
+    filter_fields = ('plate',)
     """ Method dispatch in AddStationMixin """
     station = None
     vehicle_instance = None
