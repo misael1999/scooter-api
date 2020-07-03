@@ -2,7 +2,7 @@
 from datetime import timedelta
 from django.utils import timezone
 # Functions
-from scooter.apps.common.models import OrderStatus
+from scooter.apps.common.models import OrderStatus, Notification
 from scooter.utils.functions import send_mail_verification, generate_verification_token
 # Celery
 from celery.task import task, periodic_task

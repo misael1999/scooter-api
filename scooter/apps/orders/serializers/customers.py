@@ -62,7 +62,7 @@ class CreateOrderSerializer(serializers.Serializer):
                                                    to_address=data['to_address'],
                                                    service=data['station_service'])
 
-            maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=2.5)
+            maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=2)
             qr_code = generate_qr_code()
             order_status = OrderStatus.objects.get(slug_name="without_delivery")
             order = Order.objects.create(**data,

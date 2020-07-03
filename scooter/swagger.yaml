@@ -8,7 +8,7 @@ info:
   license:
     name: BSD License
   version: v1
-basePath: /
+basePath: /appback/
 consumes:
   - application/json
 produces:
@@ -79,6 +79,17 @@ paths:
       responses:
         '200':
           description: 'Listado de tipos de direcciones'
+      tags:
+        - Común
+    parameters: []
+  /api/v1/commons/type_vehicles/:
+    get:
+      operationId: type_vehicles_get
+      description: Listado de tipos de vehiculos.
+      parameters: []
+      responses:
+        '200':
+          description: 'Listado de tipos de vehiculos'
       tags:
         - Común
     parameters: []
