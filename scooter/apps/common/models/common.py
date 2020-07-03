@@ -32,7 +32,7 @@ class TypeAddress(ScooterModel):
         return self.name
 
 
-class TypeVehicle:
+class TypeVehicle(ScooterModel):
     name = models.CharField(max_length=30)
     slug_name = models.CharField(max_length=30)
 
