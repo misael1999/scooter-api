@@ -33,7 +33,7 @@ class Station(ScooterModel):
 
 class StationService(ScooterModel):
     service = models.ForeignKey('common.Service', on_delete=models.DO_NOTHING)
-    station = models.ForeignKey(Station, on_delete=models.CASCADE)
+    station = models.ForeignKey(Station, on_delete=models.CASCADE, related_name="services")
     base_rate_price = models.FloatField()
     price_kilometer = models.FloatField()
     from_kilometer = models.FloatField()
@@ -54,7 +54,7 @@ class StationPhoneNumbers(ScooterModel):
 
 
 class StationSchedule(ScooterModel):
-    station = models.ForeignKey(Station, on_delete=models.CASCADE)
+    station = models.ForeignKey(Station, on_delete=models.CASCADE, related_name="schedules")
     schedule = models.ForeignKey('common.Schedule', on_delete=models.DO_NOTHING)
     from_hour = models.TimeField()
     to_hour = models.TimeField()
@@ -64,7 +64,7 @@ class StationSchedule(ScooterModel):
 
 
 class StationAddress(ScooterModel):
-    station = models.OneToOneField(Station, on_delete=models.CASCADE)
+    station = models.OneToOneField(Station, on_delete=models.CASCADE, related_name="address")
     street = models.CharField(max_length=100)
     suburb = models.CharField(max_length=60)
     postal_code = models.CharField(max_length=10)

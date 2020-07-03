@@ -72,6 +72,9 @@ class DeliveryManTokenObtainPairSerializer(TokenObtainPairSerializer):
         except DeliveryMan.DoesNotExist:
             raise serializers.ValidationError({'detail': 'No tienes permisos para iniciar sesión'})
 
+        if delivery_man.status.slug_name == 'inactive':
+            raise serializers.ValidationError({'detail': 'Te han dado de baja en tu central'})
+
         data['delivery_man'] = DeliveryManUserModelSerializer(delivery_man).data
 
         # Add extra responses here

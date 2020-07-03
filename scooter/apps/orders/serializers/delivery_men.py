@@ -122,7 +122,7 @@ class ScanQrOrderSerializer(serializers.Serializer):
             instance.order_status = order_status
             instance.save()
 
-            send_notification_push_task.delay(instance.customer.user_id,
+            send_notification_push_task.delay(instance.user_id,
                                               'Califica a tu repartidor',
                                               'Gracias por utilizar scooter',
                                               {"type": "RATING_DELIVERY", "order_id": instance.id,

@@ -30,3 +30,11 @@ class TypeAddress(ScooterModel):
 
     def __str__(self):
         return self.name
+
+
+class TypeVehicle:
+    name = models.CharField(max_length=30)
+    slug_name = models.CharField(max_length=30)
+
+    def __str__(self):
+        return self.name

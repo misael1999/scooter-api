@@ -22,13 +22,14 @@ from django.contrib.gis.db.models.functions import Distance
 
 class DeliveryManModelSerializer(ScooterModelSerializer):
     delivery_status = serializers.StringRelatedField(read_only=True)
+    status = serializers.StringRelatedField()
     picture = Base64ImageField(use_url=True)
 
     class Meta:
         model = DeliveryMan
         geo_field = 'location'
         fields = (
-            'id', 'user', 'station',
+            'id', 'user', 'station','status',
             'name', 'last_name', 'phone_number',
             'picture', 'salary_per_order', 'total_orders', 'reputation',
             'location', 'delivery_status')
@@ -58,13 +59,14 @@ class DeliveryManAddressSerializer(serializers.ModelSerializer):
 class DeliveryManWithAddressSerializer(serializers.ModelSerializer):
     address = DeliveryManAddressSerializer()
     picture = Base64ImageField(use_url=True)
+    status = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         model = DeliveryMan
         geo_field = 'location'
         fields = (
             'id', 'user', 'station',
-            'name', 'last_name', 'phone_number',
+            'name', 'last_name', 'phone_number', 'status',
             'picture', 'salary_per_order', 'total_orders', 'reputation',
             'location', 'delivery_status', 'address')
         read_only_fields = fields
@@ -123,11 +125,13 @@ class GetDeliveryMenNearestSerializer(serializers.Serializer):
             request = self.context['request']
             is_all = request.query_params.get('all', None)
             filters = dict()
+            # Is a filter to show all or only are the available
             if is_all == 'false':
                 filters['delivery_status'] = 1
             from_location = order.from_address
             # List of delivery men nearest (from_location)
-            delivery_men = DeliveryMan.objects.filter(**filters, station=station,
+            delivery_men = DeliveryMan.objects.filter(**filters, status__slug_name="active",
+                                                      station=station,
                                                       location__distance_lte=(
                                                           from_location.point, D(km=data['distance']))
                                                       ).annotate(

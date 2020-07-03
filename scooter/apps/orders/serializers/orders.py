@@ -51,8 +51,7 @@ class OrderWithDetailSimpleSerializer(serializers.ModelSerializer):
         model = Order
         fields = ("id", "service",
                   "from_address", "to_address", "service_price", "distance",
-                  "indications", "approximate_price_order",
-                  'reason_rejection',
+                  "indications", "approximate_price_order", 'reason_rejection',
                   "order_date", "date_delivered_order", "qr_code", "order_status",
                   "customer", "delivery_man", "station", 'details', 'maximum_response_time')
         read_only_fields = fields
@@ -124,7 +123,7 @@ def get_nearest_delivery_man(from_location, station, list_exclude, distance):
     # List of delivery men nearest
     delivery_man = DeliveryMan.objects. \
         exclude(id__in=list_exclude). \
-        filter(station=station,
+        filter(status__slug_name="active", station=station,
                location__distance_lte=(
                    from_location.point,
                    D(km=distance))) \

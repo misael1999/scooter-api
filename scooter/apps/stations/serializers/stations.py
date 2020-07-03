@@ -117,6 +117,19 @@ class StationScheduleSerializer(serializers.ModelSerializer):
         return data
 
 
+class StationWithAllInfoSerializer(serializers.ModelSerializer):
+    user = UserModelSimpleSerializer()
+
+    class Meta:
+        model = Station
+        fields = (
+            'contact_person', 'picture', 'station_name',
+            "user", "services", "schedules", "address"
+        )
+        read_only_fields = fields
+        depth = 1
+
+
 # Other configurations
 class StationConfigSerializer(serializers.Serializer):
     assign_delivery_manually = serializers.BooleanField()

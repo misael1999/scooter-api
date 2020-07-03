@@ -11,8 +11,9 @@ from scooter.utils.viewsets import ScooterViewSet
 from scooter.apps.stations.models.stations import Station
 # Serializers
 from scooter.apps.stations.serializers import (StationSimpleModelSerializer,
-                                                        StationSignUpSerializer, StationUserModelSerializer,
-                                                        StationUpdateInfoSerializer, MembersStationModelSerializer)
+                                               StationSignUpSerializer, StationUserModelSerializer,
+                                               StationUpdateInfoSerializer, MembersStationModelSerializer,
+                                               StationWithAllInfoSerializer)
 from scooter.apps.users.serializers.users import UserModelSimpleSerializer
 # Filters
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -53,6 +54,8 @@ class StationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             serializer_class = StationSignUpSerializer
         if self.action == 'list':
             serializer_class = StationSimpleModelSerializer
+        if self.action == 'retrieve':
+            serializer_class = StationWithAllInfoSerializer
         return serializer_class
 
     def get_permissions(self):
