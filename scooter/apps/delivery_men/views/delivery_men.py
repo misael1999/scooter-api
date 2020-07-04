@@ -3,6 +3,7 @@ from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 # Models
+from scooter.apps.common.mixins import AddDeliveryManMixin
 from scooter.apps.delivery_men.models.delivery_men import DeliveryMan
 # Serializers
 from scooter.apps.delivery_men.serializers.delivery_men import (DeliveryManModelSerializer,
@@ -19,7 +20,7 @@ class DeliveryMenViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
                          mixins.UpdateModelMixin):
     serializer_class = DeliveryManModelSerializer
     queryset = DeliveryMan.objects.all()
-    permission_classes = (IsAuthenticated, IsAccountOwnerDeliveryMan)
+    permission_classes = (IsAuthenticated,)
 
     @action(detail=True, methods=('PATCH',))
     def update_location(self, request, *args, **kwargs):
