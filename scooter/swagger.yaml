@@ -1299,19 +1299,13 @@ definitions:
       alias:
         type: string
         description: Alias de la dirección
-      street:
+      full_address:
         type: string
-        description: Calle
-      suburb:
-        type: string
-        description: Colonia
+        description: Dirección completa
       type_address_id:
         type: number
         example: 1
         description: Tipo de direccion (Para entrega, Para compra)
-      postal_code:
-        type: string
-        description: Código postal
       exterior_number:
         type: string
         description: Número exterior

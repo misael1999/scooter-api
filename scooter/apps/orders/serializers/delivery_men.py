@@ -2,7 +2,7 @@
 from rest_framework import serializers
 # Serializers
 # Models
-from scooter.apps.common.models import DeliveryManStatus, OrderStatus
+from scooter.apps.common.models import DeliveryManStatus, OrderStatus, Notification
 from scooter.apps.orders.models.orders import HistoryRejectedOrders
 # Functions channels
 # Task Celery
@@ -123,12 +123,15 @@ class ScanQrOrderSerializer(serializers.Serializer):
             instance.save()
 
             send_notification_push_task.delay(instance.user_id,
-                                              'Califica a tu repartidor',
-                                              'Gracias por utilizar scooter',
+                                              'Califica tu pedido',
+                                              'Tu pedido ha sido entregado',
                                               {"type": "RATING_DELIVERY", "order_id": instance.id,
                                                "message": "Califica a tu repartidor",
                                                'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                })
+            Notification.objects.create(user_id=instance.user_id, title="Califica tu pedido",
+                                        type_notification_id=1,
+                                        body="Tu pedido ha sido entregado, deja una calificación")
             return instance
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})

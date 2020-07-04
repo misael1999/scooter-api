@@ -34,8 +34,7 @@ class CreateCustomerAddressSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomerAddress
-        fields = ("alias", "street", "suburb", "type_address_id",
-                  "postal_code", "exterior_number",
+        fields = ("alias", "full_address", "type_address_id", "exterior_number",
                   "inside_number", "references", "point")
 
     def validate(self, data):

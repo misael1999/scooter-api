@@ -4,6 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 # Permissions
 from rest_framework.permissions import AllowAny, IsAuthenticated
+
 from scooter.apps.users.permissions import IsAccountOwner
 # Utilities
 from scooter.utils.viewsets import ScooterViewSet

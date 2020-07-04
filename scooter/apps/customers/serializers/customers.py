@@ -3,18 +3,17 @@
 from django.conf import settings
 from django.utils import timezone
 from datetime import timedelta
-from django.core.exceptions import ValidationError as DjangoCoreValidationError
 # Django rest framework
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 # Models
+from scooter.apps.common.models import Notification
 from scooter.apps.users.models import User
 from scooter.apps.customers.models.customers import Customer
 # Utilities
 from scooter.utils.functions import send_mail_verification, generate_verification_token
 # Serializers
 from scooter.apps.users.serializers.users import UserModelSimpleSerializer
-from scooter.utils.serializers.scooter import ScooterModelSerializer
 from scooter.apps.common.serializers import Base64ImageField
 
 
@@ -85,6 +84,10 @@ class CustomerSignUpSerializer(serializers.Serializer):
                                            exp=user.verification_deadline,
                                            token_type='email_confirmation')
         subject = 'Bienvenido {name}, Verifica tu cuenta para comenzar'.format(name=customer.name)
+        # Create a notification
+        Notification.objects.create(user=user, title="Bienvenido",
+                                    type_notification_id=1,
+                                    body="Te enviamos un correo para validar tu cuenta")
         data = {
             'user': user,
             'token': code,
