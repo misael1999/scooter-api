@@ -16,7 +16,7 @@ class CustomerAddressModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomerAddress
         geo_field = 'point'
-        fields = ("id", "alias", "street", "suburb",
+        fields = ("id", "alias", "full_address", "street", "suburb",
                   "postal_code", "exterior_number", 'type_address',
                   "inside_number", "references", "status", "point",)
         read_only_fields = fields
