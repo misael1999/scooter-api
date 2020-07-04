@@ -1,11 +1,9 @@
 """ Customers serializers """
-# Django
 # Django rest framework
 from rest_framework import serializers
 # Models
 from scooter.apps.customers.models import CustomerAddress
 # Serializers
-from scooter.utils.serializers.scooter import ScooterModelSerializer
 from django.contrib.gis.geos import Point
 
 
@@ -16,9 +14,8 @@ class CustomerAddressModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomerAddress
         geo_field = 'point'
-        fields = ("id", "alias", "full_address", "street", "suburb",
-                  "postal_code", "exterior_number", 'type_address',
-                  "inside_number", "references", "status", "point",)
+        fields = ("id", "alias", "full_address", "exterior_number", 'type_address',
+                  "inside_number", "references", "status", "point")
         read_only_fields = fields
 
 

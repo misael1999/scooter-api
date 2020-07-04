@@ -8,7 +8,7 @@ class OrderStatus(models.Model):
     slug_name = models.CharField(max_length=40)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    type_service = models.ForeignKey('common.Service', on_delete=models.DO_NOTHING)
+    type_service = models.ForeignKey('common.Service', on_delete=models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
         db_table = 'common_order_status'

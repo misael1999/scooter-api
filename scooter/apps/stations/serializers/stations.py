@@ -110,7 +110,6 @@ class StationScheduleSerializer(serializers.ModelSerializer):
         fields = ("schedule_id", "from_hour", "to_hour")
 
     def validate(self, data):
-
         if data['from_hour'] > data['to_hour']:
             raise serializers.ValidationError('La hora de apertura debe ser mayor')
 
@@ -350,6 +349,7 @@ class StationSignUpSerializer(serializers.Serializer):
         try:
             user = User(username=data['username'],
                         is_verified=False,
+                        role=User.STATION,
                         is_client=False,
                         verification_deadline=timezone.localtime(timezone.now()) + timedelta(minutes=20))
             user.set_password(data['password'])

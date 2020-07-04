@@ -95,6 +95,7 @@ class CreateDeliveryManSerializer(serializers.Serializer):
             user = User(username=data['phone_number'],
                         is_client=False,
                         is_verified=True,
+                        role=User.DELIVERY_MAN,
                         verification_deadline=timezone.now())
 
             user.set_password(data['password'])
