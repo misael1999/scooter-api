@@ -10,7 +10,7 @@ router = DefaultRouter()
 router.register(r'api/v1/delivery_men',
                 delivery_view.DeliveryMenViewSet, basename='delivery-men')
 
-router.register(r'api/v1/stations/(?P<delivery_man_id>[a-zA-Z0-9_-]+)/notifications/',
+router.register(r'api/v1/delivery_men/(?P<delivery_man_id>[a-zA-Z0-9_-]+)/notifications',
                 delivery_view.NotificationDeliveryManViewSet, basename='notification-delivery_man')
 
 urlpatterns = [

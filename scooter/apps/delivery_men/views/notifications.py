@@ -10,7 +10,7 @@ from scooter.utils.viewsets.scooter import ScooterViewSet
 from scooter.apps.common.mixins import AddDeliveryManMixin
 # Permissions
 from rest_framework.permissions import IsAuthenticated
-from scooter.apps.stations.permissions import IsAccountOwnerStation
+from scooter.apps.delivery_men.permissions import IsAccountOwnerDeliveryMan
 # Filters
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
@@ -20,7 +20,7 @@ class NotificationDeliveryManViewSet(ScooterViewSet,
                                      mixins.ListModelMixin, AddDeliveryManMixin):
     serializer_class = NotificationModelSerializer
     queryset = Notification.objects.all()
-    permission_classes = (IsAuthenticated, IsAccountOwnerStation)
+    permission_classes = (IsAuthenticated, IsAccountOwnerDeliveryMan)
 
     """ Method dispatch in AddCustomerMixin """
     delivery_man = None
