@@ -368,7 +368,37 @@ paths:
           description: 'Información de la dirección'
       tags:
         - Clientes
-
+  /api/v1/customers/{customer_id}/notifications/:
+    # GET INFO CUSTUMER ADDRESS
+    parameters:
+      - name: customer_id
+        in: path
+        required: true
+        type: string
+    get:
+      operationId: get_customer_notifications
+      description: Obtener notificaciones del cliente
+      parameters:
+        - name: limit
+          in: query
+          description: Numero de resultados por pagina
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: El índice inicial desde el que devolver los resultados.
+          required: false
+          type: integer
+        - name: type_notifications
+          description: Tipo de notificaciones
+          required: false
+          in: query
+          type: integer
+      responses:
+        '201':
+          description: 'Listado de notificaciones'
+      tags:
+        - Clientes
   # ========== BEGIN STATIONS =================
   # STATION LOGIN
   /api/v1/stations/login/:
@@ -439,6 +469,37 @@ paths:
       tags:
         - Centrales
     parameters: []
+  /api/v1/stations/{station_id}/notifications/:
+    # GET INFO CUSTUMER ADDRESS
+    parameters:
+      - name: station_id
+        in: path
+        required: true
+        type: string
+    get:
+      operationId: get_station_notifications
+      description: Obtener notificaciones de la central
+      parameters:
+        - name: limit
+          in: query
+          description: Numero de resultados por pagina
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: El índice inicial desde el que devolver los resultados.
+          required: false
+          type: integer
+        - name: type_notifications
+          description: Tipo de notificaciones
+          required: false
+          in: query
+          type: integer
+      responses:
+        '201':
+          description: 'Listado de notificaciones'
+      tags:
+        - Centrales
   # UPDATE STATIONS
   /api/v1/stations/{station_id}/update_info/:
     parameters:
@@ -796,6 +857,37 @@ paths:
       responses:
         '200':
           description: 'Regresa información del repartidor y su access_token'
+      tags:
+        - Repartidores
+  /api/v1/delivery_men/{delivery_id}/notifications/:
+    # GET INFO CUSTUMER ADDRESS
+    parameters:
+      - name: delivery_id
+        in: path
+        required: true
+        type: string
+    get:
+      operationId: get_delivery_notifications
+      description: Obtener notificaciones del repartidor
+      parameters:
+        - name: limit
+          in: query
+          description: Numero de resultados por pagina
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: El índice inicial desde el que devolver los resultados.
+          required: false
+          type: integer
+        - name: type_notifications
+          description: Tipo de notificaciones
+          required: false
+          in: query
+          type: integer
+      responses:
+        '201':
+          description: 'Listado de notificaciones'
       tags:
         - Repartidores
   /api/v1/delivery_men/{delivery_man_id}/update_location/:

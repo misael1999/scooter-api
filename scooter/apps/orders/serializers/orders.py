@@ -92,7 +92,7 @@ class CalculateServicePriceSerializer(serializers.Serializer):
         # Check if the station has the requested service
         try:
             station = data['station']
-            exist_service = station.stationservice_set.get(service=data['service'])
+            exist_service = station.services.get(service=data['service'])
             # if not exist_service:
             #     raise serializers.ValidationError({'detail': 'La central no cuenta con el servicio solicitado'})
             data['station_service'] = exist_service

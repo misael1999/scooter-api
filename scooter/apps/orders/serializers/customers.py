@@ -7,7 +7,7 @@ from scooter.apps.orders.serializers import DetailOrderSerializer
 # Models
 from scooter.apps.orders.models.orders import (OrderDetail)
 from scooter.apps.stations.models import Station, StationService, MemberStation
-from scooter.apps.common.models import Service, OrderStatus
+from scooter.apps.common.models import Service, OrderStatus, Notification
 from scooter.apps.customers.models import CustomerAddress
 from scooter.apps.orders.models.orders import Order
 # Functions channels
@@ -41,7 +41,7 @@ class CreateOrderSerializer(serializers.Serializer):
 
         try:
             station = data['station']
-            exist_service = station.stationservice_set.get(service=data['service'])
+            exist_service = station.services.get(service=data['service'])
             # if not exist_service:
             #     raise serializers.ValidationError({'detail': 'La central no cuenta con el servicio solicitado'})
             data['station_service'] = exist_service
@@ -88,6 +88,9 @@ class CreateOrderSerializer(serializers.Serializer):
                                                    "message": "Ha recibido una nueva solicitud",
                                                    'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                    })
+                Notification.objects.create(user_id=station.user_id, title="Solicitud nueva",
+                                            type_notification_id=1,
+                                            body="Has recibido una solicitud nueva")
                 # Send message by django channel
                 async_to_sync(send_order_to_station_channel)(station.id, order.id)
             else:
