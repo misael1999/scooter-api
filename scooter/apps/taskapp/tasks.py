@@ -38,8 +38,6 @@ def reject_orders():
                                   order_status__slug_name="without_delivery")
     if orders:
         order_status = OrderStatus.objects.get(slug_name='rejected')
-        orders.update(order_status=order_status,
-                      reason_rejection="Sin respuesta")
         for order in orders:
             # Function
             send_notification_push_order(order.user_id, title='Pedido rechazado',
@@ -48,3 +46,5 @@ def reject_orders():
                                                "order_id": order.id,
                                                "message": "No hubo respuesta del pedid",
                                                'click_action': 'FLUTTER_NOTIFICATION_CLICK'})
+        orders.update(order_status=order_status,
+                      reason_rejection="Sin respuesta")

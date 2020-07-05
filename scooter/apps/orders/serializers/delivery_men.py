@@ -33,7 +33,10 @@ class AcceptOrderByDeliveryManSerializer(serializers.Serializer):
             delivery_man.delivery_status = delivery_status
             delivery_man.save()
             # Update status order
-            order_status = OrderStatus.objects.get(slug_name='process_money')
+            if instance.service.slug_name == 'pick_up':
+                order_status = OrderStatus.objects.get(slug_name='pick_up')
+            else:
+                order_status = OrderStatus.objects.get(slug_name='go_money')
             order.order_status = order_status
             # Assign order to delivery man
             order.delivery_man = delivery_man
@@ -101,6 +104,34 @@ class RejectOrderByDeliverySerializer(serializers.Serializer):
             print("Exception in reject order, please check it")
             print(ex.args.__str__())
             raise serializers.ValidationError({'detail': 'Error al rechazar el pedido'})
+
+
+# Serializer for change order status
+class OnWayTradeSerializer(serializers.Serializer):
+    """ On the way to the store to buy the products """
+
+    def update(self, instance, data):
+        try:
+            # Validate that status
+            if instance.order_status.slug_name == 'go_money':
+                pass
+
+            send_notification_push_task.delay(instance.user_id,
+                                              'En camino al comercio',
+                                              'El repartidor ya va en camino a comprar los productos',
+                                              {"type": "WAY_TRADE", "order_id": instance.id,
+                                               "message": "En camino al comercio",
+                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                               })
+            Notification.objects.create(user_id=instance.user_id, title="En camino al comercio",
+                                        type_notification_id=1,
+                                        body="Tu pedido ya esta en camino de ser comprado")
+        except ValueError as e:
+            raise serializers.ValidationError({'detail': str(e)})
+        except Exception as ex:
+            print("Exception in on way trader order, please check it")
+            print(ex.args.__str__())
+            raise serializers.ValidationError({'detail': 'Error al cambiar de estatus el pedido'})
 
 
 class ScanQrOrderSerializer(serializers.Serializer):

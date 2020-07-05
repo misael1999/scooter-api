@@ -45,7 +45,6 @@ class CreateOrderSerializer(serializers.Serializer):
             # if not exist_service:
             #     raise serializers.ValidationError({'detail': 'La central no cuenta con el servicio solicitado'})
             data['station_service'] = exist_service
-            data.pop('service')
         except StationService.DoesNotExist:
             raise serializers.ValidationError({'detail': 'La central no cuenta con el servicio solicitado'})
 
@@ -101,7 +100,9 @@ class CreateOrderSerializer(serializers.Serializer):
                 if not delivery_man:
                     raise ValueError('No se encuentran repartidores disponibles')
 
-                send_notification_push_task.delay(delivery_man.user.id,
+                user_id = delivery_man.user_id
+
+                send_notification_push_task.delay(user_id,
                                                   'Solicitud nueva',
                                                   'Pedido de nuevo',
                                                   {"type": "NEW_ORDER",
@@ -109,10 +110,18 @@ class CreateOrderSerializer(serializers.Serializer):
                                                    "message": "Pedido de nuevo",
                                                    'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                    })
+                Notification.objects.create(user_id=user_id, title="Nueva solicitud",
+                                            type_notification_id=1,
+                                            body="Has recibido una nueva solicitud")
 
             # Add client to station or update info
-            member = MemberStation.objects.get_or_create(customer=data['customer'],
-                                                         station=station)
+            member, created = MemberStation.objects.get_or_create(customer=data['customer'],
+                                                                  station=station)
+
+            if created:
+                Notification.objects.create(user_id=station.user_id, title="Nuevo cliente",
+                                            type_notification_id=1,
+                                            body="Se ha agregado un nuevo cliente")
             return order
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})

@@ -11,6 +11,7 @@ class Order(ScooterModel):
                                      on_delete=models.DO_NOTHING, related_name="delivery_man",
                                      null=True, blank=True)
     station = models.ForeignKey('stations.Station', on_delete=models.DO_NOTHING)
+    service = models.ForeignKey('common.Service', on_delete=models.DO_NOTHING)
     station_service = models.ForeignKey('stations.StationService', on_delete=models.DO_NOTHING,
                                         related_name="station_service")
     from_address = models.ForeignKey('customers.CustomerAddress', on_delete=models.DO_NOTHING,
