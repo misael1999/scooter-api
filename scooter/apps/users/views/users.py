@@ -9,6 +9,7 @@ from scooter.apps.users.permissions import IsAccountOwner
 # Models
 from scooter.apps.users.models.users import User
 # Serializers
+from scooter.apps.users.serializers.devices import DeleteDeviceSerializer
 from scooter.apps.users.serializers.users import (UserModelSimpleSerializer,
                                                   TestNotificationSerializer,
                                                   RecoverPasswordSerializer,
@@ -100,3 +101,17 @@ class UserViewSet(ScooterViewSet):
             "message": "Se ha enviado la notificación"
         }
         return Response(data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['delete'])
+    def delete_devices(self, request, *args, **kwargs):
+        """ Delete one device with token received """
+        serializer = DeleteDeviceSerializer(data=request.data, context=self.get_serializer_context())
+        serializer.is_valid()
+        delete = serializer.save()
+        data = {
+            'status': 'ok',
+            'data': {},
+            "message": "Dispositivo eliminado correctamente"
+        }
+        return Response(data, status=status.HTTP_200_OK)
+

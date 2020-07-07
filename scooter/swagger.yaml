@@ -110,6 +110,22 @@ paths:
       tags:
         - Usuarios general
     parameters: []
+  /api/v1/users/delete_devices/:
+    delete:
+      operationId: delete_device
+      description: Eliminar dispositivo registrado
+      parameters:
+        - name: body
+          in: body
+          description: Eliminar dispositivo registrado
+          schema:
+            $ref: '#/definitions/DeleteDevice'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Usuarios general
+    parameters: []
   /api/v1/users/test_notifications/:
     post:
       operationId: Test_notifications
@@ -1268,6 +1284,12 @@ definitions:
     required:
       - registration_id
       - type
+  DeleteDevice:
+    type: object
+    properties:
+      token:
+        type: string
+        description: Token del dispositivo
   TestNotificationUser:
     type: object
     properties:
