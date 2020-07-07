@@ -8,7 +8,7 @@ info:
   license:
     name: BSD License
   version: v1
-basePath: /
+basePath: /appback/
 consumes:
   - application/json
 produces:
@@ -1645,6 +1645,28 @@ definitions:
       password:
         type: string
         description: Contraseña para inicio de sesión
+      address:
+        type: object
+        description: Dirección del repartidor
+        properties:
+          street:
+            type: string
+            description: Calle
+          suburb:
+            type: string
+            description: Colonia
+          postal_code:
+            type: string
+            description: Código postal
+          exterior_number:
+            type: string
+            description: Número exterior
+          inside_number:
+            type: string
+            description: Número interior
+          references:
+            type: string
+            description: Referencias
   GetDeliveryMenNearest:
     type: object
     properties:

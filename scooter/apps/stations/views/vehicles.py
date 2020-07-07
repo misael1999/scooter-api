@@ -44,7 +44,7 @@ class VehiclesViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.CreateModelM
         return self.queryset
 
     def get_serializer_context(self):
-        """ Add merchant to serializer context """
+        """ Add instance of vehicle to serializer context """
         context = super(VehiclesViewSet, self).get_serializer_context()
         # Send instance of vehicle for validate of name not exist
         context['vehicle_instance'] = self.vehicle_instance

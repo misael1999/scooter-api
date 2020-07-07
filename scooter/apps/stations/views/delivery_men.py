@@ -32,6 +32,7 @@ class DeliveryMenStationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
     queryset = DeliveryMan.objects.all()
     permission_classes = (IsAuthenticated, IsAccountOwnerStation)
     station = None
+    delivery_instance = None
     # Filters
     filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
     search_fields = ('name', 'last_name', 'phone_number', 'total_orders')
@@ -47,15 +48,16 @@ class DeliveryMenStationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
 
         return self.queryset
 
-    def get_serializer(self, *args, **kwargs):
-        if self.action == 'update':
-            return CreateDeliveryManSerializer
-
-        return self.serializer_class
+    def get_serializer_context(self):
+        """ Add merchant to serializer context """
+        context = super(DeliveryMenStationViewSet, self).get_serializer_context()
+        # Send instance of vehicle for validate of name not exist
+        context['delivery_instance'] = self.delivery_instance
+        return context
 
     def get_serializer_class(self):
         serializer_class = self.serializer_class
-        if self.action == 'create':
+        if self.action in ['create', 'partial_update', 'update']:
             serializer_class = CreateDeliveryManSerializer
         if self.action == 'nearest':
             serializer_class = GetDeliveryMenNearestSerializer
@@ -70,6 +72,18 @@ class DeliveryMenStationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         data = self.set_response(status=True,
                                  data=DeliveryManModelSerializer(obj).data,
                                  message='Se ha registrado un nuevo repartidor')
+        return Response(data=data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, *args, **kwargs):
+        delivery_man = self.get_object()
+        # Send instance of vehicle for validate of name not exist
+        self.delivery_instance = delivery_man
+        serializer = self.get_serializer(delivery_man, data=request.data, partial=True,
+                                         context=self.get_serializer_context())
+        serializer.is_valid(raise_exception=True)
+        delivery = serializer.save()
+        # vehicle_created = CreateDeliveryManSerializer(vehicle).data
+        data = self.set_response(status=True, data={}, message="Repartidor actualizado correctamente")
         return Response(data=data, status=status.HTTP_201_CREATED)
 
     def perform_destroy(self, instance):

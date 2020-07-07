@@ -72,8 +72,8 @@ class DeliveryManWithAddressSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
-class CreateDeliveryManSerializer(serializers.Serializer):
-    picture = Base64ImageField(required=False)
+class CreateDeliveryManSerializer(serializers.ModelSerializer):
+    picture = Base64ImageField(required=False, use_url=True)
     password = serializers.CharField(max_length=50)
     name = serializers.CharField(max_length=60)
     last_name = serializers.CharField(max_length=60)
@@ -81,9 +81,21 @@ class CreateDeliveryManSerializer(serializers.Serializer):
     salary_per_order = serializers.FloatField(default=0)
     address = DeliveryManAddressSerializer()
 
+    class Meta:
+        model = DeliveryMan
+        fields = (
+            'picture', 'password', 'name',
+            'last_name', 'phone_number', 'salary_per_order', 'address',
+        )
+
     def validate(self, data):
-        user_exist = User.objects.filter(username=data['phone_number']).exists()
-        if user_exist:
+        phone_number = data.get('phone_number', None)
+        delivery_instance = self.context['delivery_instance']
+        user_exist = User.objects.filter(username=phone_number).exists()
+        if user_exist and not delivery_instance:
+            raise serializers.ValidationError({'detail': 'Ya se encuentra un repartidor con ese numero de telefono'},
+                                              code='delivery_exist')
+        if user_exist and delivery_instance.user.username != phone_number:
             raise serializers.ValidationError({'detail': 'Ya se encuentra un repartidor con ese numero de telefono'},
                                               code='delivery_exist')
         return data
@@ -113,6 +125,28 @@ class CreateDeliveryManSerializer(serializers.Serializer):
         except Exception as ex:
             print(ex.args.__str__())
             raise serializers.ValidationError({'detail': 'Ha ocurrido un problema al registrarse un repartidor'})
+
+    def update(self, instance, data):
+        try:
+            address = data.pop('address', None)
+            phone_number = data.get('phone_number', None)
+            super().update(instance, data)
+
+            if address:
+                # DeliveryManAddress.objects.create(**address, delivery_man=instance)
+                DeliveryManAddress.objects.filter(pk=instance.address.id).update(**address)
+
+            if phone_number:
+                instance.user.username = phone_number
+                instance.user.save()
+
+            return instance
+        except ValueError as e:
+            raise serializers.ValidationError({'detail': str(e)})
+        except Exception as ex:
+            print("Exception in update delivery man, please check it")
+            print(ex.args.__str__())
+            raise serializers.ValidationError({'detail': 'Error al actualizar el repartidor'})
 
 
 class GetDeliveryMenNearestSerializer(serializers.Serializer):
@@ -151,3 +185,4 @@ class GetDeliveryMenNearestSerializer(serializers.Serializer):
             print("Exception in get delivery man nearest, please check it")
             print(ex.args.__str__())
             raise serializers.ValidationError({'detail': 'Error al consultar los repartidores'})
+
