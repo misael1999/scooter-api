@@ -40,13 +40,18 @@ class DeliveryMenStationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
     # ordering = ('-created', 'passengers__count')
     filter_class = StationDeliveryManFilter
 
-
     def get_queryset(self):
         """ Personalized query when the action is a list so that it only returns active delivery men """
         if self.action in ['list', 'nearest', 'retrieve']:
             return self.station.deliveryman_set.all()
 
         return self.queryset
+
+    def get_serializer(self, *args, **kwargs):
+        if self.action == 'update':
+            return CreateDeliveryManSerializer
+
+        return self.serializer_class
 
     def get_serializer_class(self):
         serializer_class = self.serializer_class

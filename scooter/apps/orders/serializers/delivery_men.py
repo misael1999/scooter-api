@@ -107,14 +107,19 @@ class RejectOrderByDeliverySerializer(serializers.Serializer):
 
 
 # Serializer for change order status
-class OnWayTradeSerializer(serializers.Serializer):
-    """ On the way to the store to buy the products """
+class OnWayCommercePurchaseSerializer(serializers.Serializer):
+    """ On the way to the commerce to buy the products """
 
     def update(self, instance, data):
         try:
             # Validate that status
-            if instance.order_status.slug_name == 'go_money':
-                pass
+            if instance.service.slug_name != 'purchase':
+                raise ValueError('No es posible cambiar de estatus')
+
+            # Update order status
+            order_status = OrderStatus.objects.get(slug_name="way_commerce")
+            instance.order_status = order_status
+            instance.save()
 
             send_notification_push_task.delay(instance.user_id,
                                               'En camino al comercio',
@@ -123,9 +128,10 @@ class OnWayTradeSerializer(serializers.Serializer):
                                                "message": "En camino al comercio",
                                                'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                })
-            Notification.objects.create(user_id=instance.user_id, title="En camino al comercio",
-                                        type_notification_id=1,
-                                        body="Tu pedido ya esta en camino de ser comprado")
+            # Notification.objects.create(user_id=instance.user_id, title="En camino al comercio",
+            #                             type_notification_id=1,
+            #                             body="Tu pedido ya esta en camino de ser comprado")
+            return instance
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
         except Exception as ex:
