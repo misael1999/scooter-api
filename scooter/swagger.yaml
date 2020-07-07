@@ -620,6 +620,17 @@ paths:
     get:
       operationId: get_delivery_station
       description: Obtener datos de un repartidor
+      parameters:
+        - name: from_date
+          in: query
+          description: Desde la fecha YYYY-MM-DD
+          required: false
+          type: date
+        - name: to_date
+          in: query
+          description: Hasta la fecha YYYY-MM-DD
+          required: false
+          type: date
       responses:
         '200':
           description: 'Info del repartidor'

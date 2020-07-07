@@ -4,7 +4,6 @@ from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 # Models
-from scooter.apps.common.mixins import AddDeliveryManMixin
 from scooter.apps.delivery_men.models.delivery_men import DeliveryMan
 # Serializers
 from scooter.apps.delivery_men.serializers.delivery_men import (DeliveryManModelSerializer,

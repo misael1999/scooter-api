@@ -1,4 +1,5 @@
 # Django
+from datetime import datetime
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils import timezone
@@ -40,3 +41,12 @@ def send_notification_push_order(user_id, title, body, data):
     devices = FCMDevice.objects.filter(user_id=user_id)
     if devices:
         devices.send_message(title=title, body=body, data=data)
+
+
+def get_date_from_querystring(request, date_find, default_value=None):
+    if date_find in request.GET:
+        from_date_str = request.query_params.get(date_find,
+                                                 (timezone.localtime(timezone.now()).date()).strftime('%Y-%m-%d'))
+        return datetime.strptime(from_date_str, '%Y-%m-%d')
+    else:
+        return default_value
