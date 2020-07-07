@@ -6,6 +6,8 @@ from rest_framework import serializers
 from django.contrib.gis.geos import Point
 # Models
 from scooter.apps.orders.models import Order
+from scooter.apps.stations.models import Vehicle
+from scooter.apps.stations.serializers.vehicles import VehicleModelSerializer
 from scooter.apps.users.models import User
 from scooter.apps.delivery_men.models.delivery_men import DeliveryMan, DeliveryManAddress
 from scooter.apps.customers.models import CustomerAddress
@@ -24,12 +26,13 @@ class DeliveryManModelSerializer(ScooterModelSerializer):
     delivery_status = serializers.StringRelatedField(read_only=True)
     status = serializers.StringRelatedField()
     picture = Base64ImageField(use_url=True)
+    vehicle = VehicleModelSerializer()
 
     class Meta:
         model = DeliveryMan
         geo_field = 'location'
         fields = (
-            'id', 'user', 'station','status',
+            'id', 'user', 'station','status', 'vehicle',
             'name', 'last_name', 'phone_number',
             'picture', 'salary_per_order', 'total_orders', 'reputation',
             'location', 'delivery_status')
@@ -59,13 +62,14 @@ class DeliveryManAddressSerializer(serializers.ModelSerializer):
 class DeliveryManWithAddressSerializer(serializers.ModelSerializer):
     address = DeliveryManAddressSerializer()
     picture = Base64ImageField(use_url=True)
+    vehicle = VehicleModelSerializer()
     status = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         model = DeliveryMan
         geo_field = 'location'
         fields = (
-            'id', 'user', 'station',
+            'id', 'user', 'station', 'vehicle',
             'name', 'last_name', 'phone_number', 'status',
             'picture', 'salary_per_order', 'total_orders', 'reputation',
             'location', 'delivery_status', 'address')
@@ -80,12 +84,13 @@ class CreateDeliveryManSerializer(serializers.ModelSerializer):
     phone_number = serializers.CharField(max_length=15)
     salary_per_order = serializers.FloatField(default=0)
     address = DeliveryManAddressSerializer()
+    vehicle_id = StationFilteredPrimaryKeyRelatedField(queryset=Vehicle.objects, source="vehicle")
 
     class Meta:
         model = DeliveryMan
         fields = (
             'picture', 'password', 'name',
-            'last_name', 'phone_number', 'salary_per_order', 'address',
+            'last_name', 'phone_number', 'salary_per_order', 'address', 'vehicle_id'
         )
 
     def validate(self, data):
@@ -113,10 +118,18 @@ class CreateDeliveryManSerializer(serializers.ModelSerializer):
             user.set_password(data['password'])
             user.save()
 
+            # Verify that the vehicle is no assign the other delivery man and remove if exist one
+            delivery_man_vehicle = DeliveryMan.objects.filter(vehicle=data['vehicle']).first()
+
+            if delivery_man_vehicle:
+                delivery_man_vehicle.vehicle = None
+                delivery_man_vehicle.save()
+
             delivery_man = DeliveryMan.objects.create(name=data['name'],
                                                       last_name=data['last_name'],
                                                       phone_number=data['phone_number'],
                                                       user=user,
+                                                      vehicle=data['vehicle'],
                                                       station=station)
             DeliveryManAddress.objects.create(**address, delivery_man=delivery_man)
 
@@ -129,6 +142,15 @@ class CreateDeliveryManSerializer(serializers.ModelSerializer):
     def update(self, instance, data):
         try:
             address = data.pop('address', None)
+            vehicle = data.get('vehicle', None)
+
+            if vehicle:
+                delivery_man_vehicle = DeliveryMan.objects.filter(vehicle=vehicle).first()
+
+                if delivery_man_vehicle:
+                    delivery_man_vehicle.vehicle = None
+                    delivery_man_vehicle.save()
+
             phone_number = data.get('phone_number', None)
             super().update(instance, data)
 

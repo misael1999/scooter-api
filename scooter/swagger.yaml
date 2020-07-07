@@ -1605,6 +1605,10 @@ definitions:
       password:
         type: string
         description: Contraseña para inicio de sesión
+      vehicle_id:
+        type: number
+        example: 1
+        description: Id del vehiculo
       address:
         type: object
         description: Dirección del repartidor
@@ -1645,6 +1649,10 @@ definitions:
       password:
         type: string
         description: Contraseña para inicio de sesión
+      vehicle_id:
+        type: number
+        example: 1
+        description: Id del vehiculo
       address:
         type: object
         description: Dirección del repartidor

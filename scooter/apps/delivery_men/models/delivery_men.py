@@ -22,6 +22,7 @@ class DeliveryMan(ScooterModel):
     total_orders = models.PositiveIntegerField(default=0)
     reputation = models.FloatField(default=0)
     location = models.PointField(blank=True, null=True, geography=True)
+    vehicle = models.OneToOneField('stations.Vehicle', on_delete=models.DO_NOTHING, blank=True, null=True)
     delivery_status = models.ForeignKey('common.DeliveryManStatus', on_delete=models.DO_NOTHING, default=1)
 
     class Meta:
