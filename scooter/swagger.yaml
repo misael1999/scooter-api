@@ -1243,7 +1243,7 @@ paths:
           description: 'Pedido rechazado correctamente'
       tags:
         - Pedidos repartidor
-  /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/scan_qr/:
+  /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/purchase/on_go_money/:
     parameters:
       - name: delivery_man_id
         in: path
@@ -1254,20 +1254,91 @@ paths:
         required: true
         type: number
     put:
-      operationId: scan_qr_order
-      description: Escanear código QR de repartidor
+      operationId: purchase_on_go_money
+      description:
       parameters:
         - name: body
           in: body
-          description: Escanear código QR
+          description: Recoger dinero del cliente
           schema:
-            $ref: '#/definitions/ScanQRDeliveryMan'
+            $ref: '#/definitions/OnGoMoneyDeliveryMan'
       responses:
         '200':
           description: 'Código escaneado correctamente'
       tags:
         - Pedidos repartidor
-
+  /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/purchase/on_way_commerce/:
+    parameters:
+      - name: delivery_man_id
+        in: path
+        required: true
+        type: number
+      - name: order_id
+        in: path
+        required: true
+        type: number
+    put:
+      operationId: purchase_on_way_commerce
+      description:
+      parameters:
+        - name: body
+          in: body
+          description: En camino al comercio
+          schema:
+            $ref: '#/definitions/OnGoCommerceDeliveryMan'
+      responses:
+        '200':
+          description: 'En camino al comercio'
+      tags:
+        - Pedidos repartidor
+  /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/purchase/on_delivery_process/:
+    parameters:
+      - name: delivery_man_id
+        in: path
+        required: true
+        type: number
+      - name: order_id
+        in: path
+        required: true
+        type: number
+    put:
+      operationId: purchase_on_delivery_process
+      description:
+      parameters:
+        - name: body
+          in: body
+          description: En proceso de entrega
+          schema:
+            $ref: '#/definitions/OnDeliveryProcessDeliveryMan'
+      responses:
+        '200':
+          description: 'En proceso de entrega'
+      tags:
+        - Pedidos repartidor
+  /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/purchase/validate_qr/:
+    parameters:
+      - name: delivery_man_id
+        in: path
+        required: true
+        type: number
+      - name: order_id
+        in: path
+        required: true
+        type: number
+    put:
+      operationId: validate_qr_order
+      description: Validar código QR de la orden
+      parameters:
+        - name: body
+          in: body
+          description: Validar código QR
+          schema:
+            $ref: '#/definitions/ScanQRDeliveryMan'
+      responses:
+        '200':
+          description: 'Código validado correctamente'
+      tags:
+        - Pedidos repartidor
 # ======== DEFINITIONS ==============
 definitions:
   # LOGIN CUSTOMER
@@ -1805,6 +1876,15 @@ definitions:
       qr_code:
         type: string
         description: Codigo QR
+  OnGoMoneyDeliveryMan:
+    type: object
+    properties:
+  OnGoCommerceDeliveryMan:
+    type: object
+    properties:
+  OnDeliveryProcessDeliveryMan:
+    type: object
+    properties:
   AssignOrderDeliveryManStation:
     type: object
     properties:

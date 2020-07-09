@@ -1,5 +1,6 @@
 # Rest framework
 from rest_framework import serializers
+from django.utils import timezone
 # Serializers
 # Models
 from scooter.apps.common.models import DeliveryManStatus, OrderStatus, Notification
@@ -106,28 +107,46 @@ class RejectOrderByDeliverySerializer(serializers.Serializer):
             raise serializers.ValidationError({'detail': 'Error al rechazar el pedido'})
 
 
+class OnGoMoneyPurchaseSerializer(serializers.Serializer):
+    """ On the way to collect the purchase money """
+
+    def update(self, instance, data):
+        try:
+            data_notification = {
+                "title": 'Pedido aceptado',
+                "body": 'El repartidor ya va en camino recoger el dinero de la compra',
+                "type": "GO_MONEY"
+            }
+            instance = update_order_status(type_service="purchase",
+                                           order_status_slug="go_money",
+                                           instance=instance,
+                                           data=data_notification
+                                           )
+            return instance
+        except ValueError as e:
+            raise serializers.ValidationError({'detail': str(e)})
+        except Exception as ex:
+            print("Exception in on way trader order, please check it")
+            print(ex.args.__str__())
+            raise serializers.ValidationError({'detail': 'Error al cambiar de estatus el pedido'})
+
+
 # Serializer for change order status
 class OnWayCommercePurchaseSerializer(serializers.Serializer):
     """ On the way to the commerce to buy the products """
 
     def update(self, instance, data):
         try:
-            # Validate that status
-            if instance.service.slug_name != 'purchase':
-                raise ValueError('No es posible cambiar de estatus')
-
-            # Update order status
-            order_status = OrderStatus.objects.get(slug_name="way_commerce")
-            instance.order_status = order_status
-            instance.save()
-
-            send_notification_push_task.delay(instance.user_id,
-                                              'En camino al comercio',
-                                              'El repartidor ya va en camino a comprar los productos',
-                                              {"type": "WAY_TRADE", "order_id": instance.id,
-                                               "message": "En camino al comercio",
-                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'
-                                               })
+            data_notification = {
+                "title": 'En camino al comercio',
+                "body": 'El repartidor ya va en camino a comprar los productos',
+                "type": "WAY_COMMERCE"
+            }
+            instance = update_order_status(type_service="purchase",
+                                           order_status_slug="way_commerce",
+                                           instance=instance,
+                                           data=data_notification
+                                           )
             # Notification.objects.create(user_id=instance.user_id, title="En camino al comercio",
             #                             type_notification_id=1,
             #                             body="Tu pedido ya esta en camino de ser comprado")
@@ -136,6 +155,29 @@ class OnWayCommercePurchaseSerializer(serializers.Serializer):
             raise serializers.ValidationError({'detail': str(e)})
         except Exception as ex:
             print("Exception in on way trader order, please check it")
+            print(ex.args.__str__())
+            raise serializers.ValidationError({'detail': 'Error al cambiar de estatus el pedido'})
+
+
+class OnDeliveryProcessPurchaseSerializer(serializers.Serializer):
+
+    def update(self, instance, data):
+        try:
+            data_notification = {
+                "title": 'Ya tenemos tus productos',
+                "body": 'El repartidor ya va en camino a entregarlos',
+                "type": "DELIVERY_PROCESS"
+            }
+            instance = update_order_status(type_service="purchase",
+                                           order_status_slug="delivery_process",
+                                           instance=instance,
+                                           data=data_notification
+                                           )
+            return instance
+        except ValueError as e:
+            raise serializers.ValidationError({'detail': str(e)})
+        except Exception as ex:
+            print("Exception in on delivery process, please check it")
             print(ex.args.__str__())
             raise serializers.ValidationError({'detail': 'Error al cambiar de estatus el pedido'})
 
@@ -153,19 +195,19 @@ class ScanQrOrderSerializer(serializers.Serializer):
 
     def update(self, instance, data):
         try:
-            if instance.order_status.slug_name == 'delivered':
-                raise ValueError('El pedido ya ha sido entregado')
-            order_status = OrderStatus.objects.get(slug_name='delivered')
-            instance.order_status = order_status
+            data_notification = {
+                "title": 'Pedido entregado',
+                "body": 'Tu pedido ha sido entregado',
+                "type": "RATING_DELIVERY"
+            }
+            instance = update_order_status(type_service="purchase",
+                                           order_status_slug="delivered",
+                                           instance=instance,
+                                           data=data_notification
+                                           )
+            instance.date_delivered_order = timezone.localtime(timezone.now())
             instance.save()
 
-            send_notification_push_task.delay(instance.user_id,
-                                              'Califica tu pedido',
-                                              'Tu pedido ha sido entregado',
-                                              {"type": "RATING_DELIVERY", "order_id": instance.id,
-                                               "message": "Califica a tu repartidor",
-                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'
-                                               })
             Notification.objects.create(user_id=instance.user_id, title="Califica tu pedido",
                                         type_notification_id=1,
                                         body="Tu pedido ha sido entregado, deja una calificación")
@@ -175,4 +217,36 @@ class ScanQrOrderSerializer(serializers.Serializer):
         except Exception as ex:
             print("Exception in reject order, please check it")
             print(ex.args.__str__())
-            raise serializers.ValidationError({'detail': 'Error al escanear el códigp'})
+            raise serializers.ValidationError({'detail': 'Error al escanear el código'})
+
+
+def update_order_status(type_service, order_status_slug, instance, data):
+    try:
+        # Validate that status
+        if instance.service.slug_name != type_service:
+            raise ValueError('No es posible cambiar de estatus')
+
+        # Validate that status are not "order_status_slug"
+        if instance.order_status == order_status_slug:
+            raise ValueError('El estatus fue cambiado anteriormente')
+
+        # Update order status
+        order_status = OrderStatus.objects.get(slug_name=order_status_slug)
+        instance.order_status = order_status
+        instance.save()
+
+        send_notification_push_task.delay(instance.user_id,
+                                          data['title'],
+                                          data['body'],
+                                          {"type": data['type'], "order_id": instance.id,
+                                           "message": data['body'],
+                                           'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                           })
+        # Notification.objects.create(user_id=instance.user_id, title="En camino al comercio",
+        #                             type_notification_id=1,
+        #                             body="Tu pedido ya esta en camino de ser comprado")
+        return instance
+    except ValueError as e:
+        raise ValueError(e)
+    except Exception as ex:
+        raise ValueError(ex)
