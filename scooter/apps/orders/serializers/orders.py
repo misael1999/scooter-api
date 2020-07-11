@@ -117,7 +117,7 @@ class CalculateServicePriceSerializer(serializers.Serializer):
 
 
 # Methods helpers
-def get_nearest_delivery_man(from_location, station, list_exclude, distance):
+def get_nearest_delivery_man(location_selected, station, list_exclude, distance):
     """ Get nearest delivery man and exclude who are in the history of rejected orders """
 
     # List of delivery men nearest
@@ -125,13 +125,13 @@ def get_nearest_delivery_man(from_location, station, list_exclude, distance):
         exclude(id__in=list_exclude). \
         filter(status__slug_name="active", station=station,
                location__distance_lte=(
-                   from_location.point,
+                   location_selected.point,
                    D(km=distance))) \
-        .annotate(distance=Distance('location', from_location.point)) \
+        .annotate(distance=Distance('location', location_selected.point)) \
         .order_by('distance').first()
     # delivery_man = DeliveryMan.objects.filter(station=station,
     #                                           location__distance_lte=(
-    #                                               from_location.point, D(km=distance))
+    #                                               location_selected.point, D(km=distance))
     #                                           ).exclude(id__in=list_exclude).last()
 
     return delivery_man

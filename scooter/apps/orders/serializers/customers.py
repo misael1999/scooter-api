@@ -94,8 +94,8 @@ class CreateOrderSerializer(serializers.Serializer):
                 async_to_sync(send_order_to_station_channel)(station.id, order.id)
             else:
                 # Get nearest delivery man
-                delivery_man = get_nearest_delivery_man(from_location=data['from_address'], station=data['station'],
-                                                        list_exclude=[], distance=5)
+                delivery_man = get_nearest_delivery_man(location_selected=data['to_address'], station=data['station'],
+                                                        list_exclude=[], distance=6)
                 # Send push notification to delivery_man
                 if not delivery_man:
                     raise ValueError('No se encuentran repartidores disponibles')
