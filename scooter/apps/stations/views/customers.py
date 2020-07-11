@@ -27,7 +27,7 @@ class CustomerStationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
     # Filters
     filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
     search_fields = ('customer__name', 'customer__phone_number')
-    ordering_fields = ('total_orders', 'total_orders_cancelled', 'customer__reputation')
+    ordering_fields = ('total_orders', 'total_orders_cancelled', 'customer__reputation', 'customer__name', 'customer__phone_number')
     # Affect the default order
     ordering = ('-total_orders', '-created')
     filter_fields = ('total_orders',)

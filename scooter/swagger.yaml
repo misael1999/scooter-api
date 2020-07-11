@@ -616,7 +616,7 @@ paths:
           in: query
           required: false
           type: string
-          enum: ['checker_name', 'status', 'created_at']
+          enum: ['name', 'last_name', 'reputation', 'created']
       responses:
         '201':
           description: 'Información del repartidor'
@@ -824,7 +824,7 @@ paths:
           in: query
           required: false
           type: string
-          enum: ['checker_name', 'status', 'created_at']
+          enum: ['total_orders', 'total_orders_cancelled', 'customer__reputation', 'customer__name']
       responses:
         '201':
           description: 'Listado de centrales'

@@ -2,13 +2,14 @@
 # Django rest framework
 from rest_framework import serializers
 # Models
+from scooter.apps.common.serializers import TypeAddressModelSerializer
 from scooter.apps.customers.models import CustomerAddress
 # Serializers
 from django.contrib.gis.geos import Point
 
 
 class CustomerAddressModelSerializer(serializers.ModelSerializer):
-    type_address = serializers.StringRelatedField(read_only=True)
+    type_address = TypeAddressModelSerializer(read_only=True)
     status = serializers.StringRelatedField(read_only=True)
 
     class Meta:

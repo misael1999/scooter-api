@@ -102,7 +102,7 @@ class UserViewSet(ScooterViewSet):
         }
         return Response(data, status=status.HTTP_200_OK)
 
-    @action(detail=False, methods=['delete'])
+    @action(detail=False, methods=['put'])
     def delete_devices(self, request, *args, **kwargs):
         """ Delete one device with token received """
         serializer = DeleteDeviceSerializer(data=request.data, context=self.get_serializer_context())
