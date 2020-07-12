@@ -122,7 +122,7 @@ class CreateOrderSerializer(serializers.Serializer):
                 Notification.objects.create(user_id=station.user_id, title="Nuevo cliente",
                                             type_notification_id=1,
                                             body="Se ha agregado un nuevo cliente")
-            return order
+            return order.id
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
         except Exception as ex:

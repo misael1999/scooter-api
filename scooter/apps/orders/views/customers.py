@@ -61,7 +61,7 @@ class CustomerOrderViewSet(ScooterViewSet, mixins.CreateModelMixin, AddCustomerM
         serializer.is_valid(raise_exception=True)
         obj = serializer.save()
         data = self.set_response(status=True,
-                                 data={},
+                                 data={'order_id': obj},
                                  message='Solicitud de servicio enviada')
         return Response(data=data, status=status.HTTP_201_CREATED)
 
