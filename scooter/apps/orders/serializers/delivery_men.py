@@ -45,7 +45,7 @@ class AcceptOrderByDeliveryManSerializer(serializers.Serializer):
             # Send notification push to customer
             send_notification_push_task.delay(order.customer.user.id,
                                               'Repartidor en camino',
-                                              'Puedes ver el seguimiento de tu producto',
+                                              'El repartidor ya va en camino a recoger el dinero para la compra',
                                               {"type": "ACCEPTED_ORDER",
                                                "order_id": order.id,
                                                "message": "Puedes ver el seguimiento de tu producto",
@@ -86,7 +86,7 @@ class RejectOrderByDeliverySerializer(serializers.Serializer):
             ).values_list('delivery_man_id', flat=True)
 
             # Find the closest delivery man again, but exclude delivery men who are in the reject history
-            delivery_man = get_nearest_delivery_man(from_location=instance.from_address, station=instance.station,
+            delivery_man = get_nearest_delivery_man(location_selected=instance.from_address, station=instance.station,
                                                     list_exclude=list_exclude, distance=6)
             if not delivery_man:
                 raise ValueError('No se encuentran repartidores disponibles')

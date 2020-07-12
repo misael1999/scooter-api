@@ -1243,30 +1243,30 @@ paths:
           description: 'Pedido rechazado correctamente'
       tags:
         - Pedidos repartidor
-  /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/purchase/on_go_money/:
-    parameters:
-      - name: delivery_man_id
-        in: path
-        required: true
-        type: number
-      - name: order_id
-        in: path
-        required: true
-        type: number
-    put:
-      operationId: purchase_on_go_money
-      description:
-      parameters:
-        - name: body
-          in: body
-          description: Recoger dinero del cliente
-          schema:
-            $ref: '#/definitions/OnGoMoneyDeliveryMan'
-      responses:
-        '200':
-          description: 'Código escaneado correctamente'
-      tags:
-        - Pedidos repartidor
+#  /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/purchase/on_go_money/:
+#    parameters:
+#      - name: delivery_man_id
+#        in: path
+#        required: true
+#        type: number
+#      - name: order_id
+#        in: path
+#        required: true
+#        type: number
+#    put:
+#      operationId: purchase_on_go_money
+#      description:
+#      parameters:
+#        - name: body
+#          in: body
+#          description: Recoger dinero del cliente
+#          schema:
+#            $ref: '#/definitions/OnGoMoneyDeliveryMan'
+#      responses:
+#        '200':
+#          description: 'Código escaneado correctamente'
+#      tags:
+#        - Pedidos repartidor
   /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/purchase/on_way_commerce/:
     parameters:
       - name: delivery_man_id
@@ -1291,6 +1291,30 @@ paths:
           description: 'En camino al comercio'
       tags:
         - Pedidos repartidor
+  /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/purchase/already_in_commerce/:
+    parameters:
+      - name: delivery_man_id
+        in: path
+        required: true
+        type: number
+      - name: order_id
+        in: path
+        required: true
+        type: number
+    put:
+      operationId: purchase_already_in_commerce
+      description:
+      parameters:
+        - name: body
+          in: body
+          description: Ya estoy en el comercio
+          schema:
+            $ref: '#/definitions/OnGoCommerceDeliveryMan'
+      responses:
+        '200':
+          description: 'En camino al comercio'
+      tags:
+        - Pedidos repartidor
   /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/purchase/on_delivery_process/:
     parameters:
       - name: delivery_man_id
@@ -1307,12 +1331,36 @@ paths:
       parameters:
         - name: body
           in: body
-          description: En proceso de entrega
+          description: En proceso de entrega cuando ya se tiene los productos
           schema:
             $ref: '#/definitions/OnDeliveryProcessDeliveryMan'
       responses:
         '200':
           description: 'En proceso de entrega'
+      tags:
+        - Pedidos repartidor
+  /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/purchase/already_here/:
+    parameters:
+      - name: delivery_man_id
+        in: path
+        required: true
+        type: number
+      - name: order_id
+        in: path
+        required: true
+        type: number
+    put:
+      operationId: already_here_purcharse
+      description: Notificar al cliente que ya esta en el lugar de entrega
+      parameters:
+        - name: body
+          in: body
+          description: Notificar al cliente
+          schema:
+            $ref: '#/definitions/OnDeliveryProcessDeliveryMan'
+      responses:
+        '200':
+          description: 'Ya estoy aqui'
       tags:
         - Pedidos repartidor
   /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/purchase/validate_qr/:
