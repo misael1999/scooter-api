@@ -33,7 +33,6 @@ class CustomerSimpleModelSerializer(serializers.ModelSerializer):
             'phone_number',
             'reputation'
         )
-        read_only_fields = fields
 
     def update(self, instance, data):
         """ Before updating we have to delete the previous image """
