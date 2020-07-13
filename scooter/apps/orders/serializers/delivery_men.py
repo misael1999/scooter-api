@@ -17,6 +17,11 @@ class AcceptOrderByDeliveryManSerializer(serializers.Serializer):
     def validate(self, data):
         order = self.context['order']
         delivery_man = self.context['delivery_man']
+
+        if order.order_status.slug_name == 'rejected':
+            raise serializers.ValidationError({'detail': 'El pedido fue rechazado por falta de tiempo de espera'},
+                                              code='order_already_delivery_man')
+
         # Verify that the order does not have a delivery man assigned
         if order.delivery_man is not None:
             raise serializers.ValidationError({'detail': 'El pedido ya tiene un repartidor asignado'},
@@ -44,7 +49,7 @@ class AcceptOrderByDeliveryManSerializer(serializers.Serializer):
             order.in_process = True
             order.save()
             # Send notification push to customer
-            send_notification_push_task.delay(order.user_id,
+            send_notification_push_task.delay(instance.user_id,
                                               'Repartidor en camino',
                                               'El repartidor ya va en camino a recoger el dinero para la compra',
                                               {"type": "ACCEPTED_ORDER",
@@ -116,10 +121,10 @@ class AlreadyInCommerceSerializer(serializers.Serializer):
             data_notification = {
                 "title": 'Tu scooter ya esta en la tienda',
                 "body": 'Te avisaremos cuando ya tengamos tus productos',
-                "type": "GO_MONEY"
+                "type": "IN_THE_COMMERCE"
             }
             instance = update_order_status(type_service="purchase",
-                                           order_status_slug="go_money",
+                                           order_status_slug="in_the_commerce",
                                            instance=instance,
                                            data=data_notification
                                            )
