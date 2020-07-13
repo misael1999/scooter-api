@@ -67,7 +67,6 @@ class CreateOrderSerializer(serializers.Serializer):
             data['station_service'] = exist_service
         except StationService.DoesNotExist:
             raise serializers.ValidationError({'detail': 'La central no cuenta con el servicio solicitado'})
-
         return data
 
     def create(self, data):

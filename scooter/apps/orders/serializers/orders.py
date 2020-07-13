@@ -24,7 +24,7 @@ from scooter.apps.common.serializers.common import CustomerFilteredPrimaryKeyRel
 
 class DetailOrderSerializer(serializers.Serializer):
     product_name = serializers.CharField(max_length=60)
-    picture = Base64ImageField(required=False, use_url=True)
+    picture = Base64ImageField(required=False, use_url=True, allow_null=True, allow_empty_file=True, max_length=None)
 
 
 class OrderCurrentStatusSerializer(serializers.ModelSerializer):
