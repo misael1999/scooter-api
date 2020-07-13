@@ -41,9 +41,10 @@ class AcceptOrderByDeliveryManSerializer(serializers.Serializer):
             order.order_status = order_status
             # Assign order to delivery man
             order.delivery_man = delivery_man
+            order.in_process = True
             order.save()
             # Send notification push to customer
-            send_notification_push_task.delay(order.customer.user.id,
+            send_notification_push_task.delay(order.user_id,
                                               'Repartidor en camino',
                                               'El repartidor ya va en camino a recoger el dinero para la compra',
                                               {"type": "ACCEPTED_ORDER",
@@ -67,7 +68,7 @@ class RejectOrderByDeliverySerializer(serializers.Serializer):
 
     def validate(self, data):
         order = self.context['order']
-        delivery_man = self.context['delivery_man']
+        # delivery_man = self.context['delivery_man']
         # Verify that the order does not have a delivery man assigned
         if order.delivery_man is not None:
             raise serializers.ValidationError({'detail': 'El pedido ya tiene un repartidor asignado'},
@@ -107,14 +108,14 @@ class RejectOrderByDeliverySerializer(serializers.Serializer):
             raise serializers.ValidationError({'detail': 'Error al rechazar el pedido'})
 
 
-class OnGoMoneyPurchaseSerializer(serializers.Serializer):
-    """ On the way to collect the purchase money """
+class AlreadyInCommerceSerializer(serializers.Serializer):
+    """ It is already in the commerce to buy the products """
 
     def update(self, instance, data):
         try:
             data_notification = {
-                "title": 'Pedido aceptado',
-                "body": 'El repartidor ya va en camino recoger el dinero de la compra',
+                "title": 'Tu scooter ya esta en la tienda',
+                "body": 'Te avisaremos cuando ya tengamos tus productos',
                 "type": "GO_MONEY"
             }
             instance = update_order_status(type_service="purchase",
@@ -131,6 +132,30 @@ class OnGoMoneyPurchaseSerializer(serializers.Serializer):
             raise serializers.ValidationError({'detail': 'Error al cambiar de estatus el pedido'})
 
 
+class AlreadyHereSerializer(serializers.Serializer):
+    """ Ready to deliver the order """
+
+    def update(self, instance, data):
+        try:
+            data_notification = {
+                "title": 'Tu scooter llego',
+                "body": 'Tu scooter esta esperando afuera con tu pedido',
+                "type": "ALREADY_HERE"
+            }
+            instance = update_order_status(type_service="purchase",
+                                           order_status_slug="already_here",
+                                           instance=instance,
+                                           data=data_notification
+                                           )
+            return instance
+        except ValueError as e:
+            raise serializers.ValidationError({'detail': str(e)})
+        except Exception as ex:
+            print("Exception in already commerce, please check it")
+            print(ex.args.__str__())
+            raise serializers.ValidationError({'detail': 'Error al cambiar de estatus el pedido'})
+
+
 # Serializer for change order status
 class OnWayCommercePurchaseSerializer(serializers.Serializer):
     """ On the way to the commerce to buy the products """
@@ -139,7 +164,7 @@ class OnWayCommercePurchaseSerializer(serializers.Serializer):
         try:
             data_notification = {
                 "title": 'En camino al comercio',
-                "body": 'El repartidor ya va en camino a comprar los productos',
+                "body": 'Tu scooter ya va en camino a comprar los productos',
                 "type": "WAY_COMMERCE"
             }
             instance = update_order_status(type_service="purchase",
@@ -165,7 +190,7 @@ class OnDeliveryProcessPurchaseSerializer(serializers.Serializer):
         try:
             data_notification = {
                 "title": 'Ya tenemos tus productos',
-                "body": 'El repartidor ya va en camino a entregarlos',
+                "body": 'Tu scooter ya va en camino a entregarlos',
                 "type": "DELIVERY_PROCESS"
             }
             instance = update_order_status(type_service="purchase",
@@ -206,6 +231,7 @@ class ScanQrOrderSerializer(serializers.Serializer):
                                            data=data_notification
                                            )
             instance.date_delivered_order = timezone.localtime(timezone.now())
+            instance.in_process = False
             instance.save()
 
             Notification.objects.create(user_id=instance.user_id, title="Califica tu pedido",

@@ -14,8 +14,7 @@ from scooter.apps.customers.permissions.customers import IsAccountOwnerCustomer
 from scooter.apps.orders.serializers import (OrderModelSerializer,
                                              CreateOrderSerializer,
                                              CalculateServicePriceSerializer,
-                                             OrderWithDetailModelSerializer,
-                                             )
+                                             OrderWithDetailModelSerializer, OrderCurrentStatusSerializer)
 # Models
 from scooter.apps.orders.models.orders import Order
 # Mixin
@@ -75,3 +74,13 @@ class CustomerOrderViewSet(ScooterViewSet, mixins.CreateModelMixin, AddCustomerM
                                  data={'price_service': obj},
                                  message='Precio del servicio')
         return Response(data=data, status=status.HTTP_200_OK)
+
+    @action(methods=['GET'], detail=True)
+    def current_status(self, request, *args, **kwargs):
+        """ Get info the order status """
+        order = self.get_object()
+        data = self.set_response(status=True,
+                                 data=OrderCurrentStatusSerializer(order).data,
+                                 message='Estatus actual del pedido')
+        return Response(data=data, status=status.HTTP_200_OK)
+

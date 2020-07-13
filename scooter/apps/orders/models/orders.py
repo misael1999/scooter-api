@@ -23,6 +23,7 @@ class Order(ScooterModel):
     indications = models.TextField(blank=True, null=True)
     approximate_price_order = models.CharField(max_length=30)
     date_delivered_order = models.DateTimeField(null=True, blank=True)
+    order_date = models.DateTimeField()
     qr_code = models.CharField(max_length=15, blank=True, null=True)
     order_status = models.ForeignKey('common.OrderStatus', on_delete=models.DO_NOTHING, default=1)
     # For notice to user that not response his request
@@ -30,6 +31,7 @@ class Order(ScooterModel):
     maximum_response_time = models.DateTimeField()
     phone_number = models.CharField(max_length=15)
     distance = models.FloatField()
+    in_process = models.BooleanField(default=False)
 
 
 class OrderDetail(ScooterModel):

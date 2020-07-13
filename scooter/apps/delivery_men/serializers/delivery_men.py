@@ -46,13 +46,16 @@ class DeliveryManOrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DeliveryMan
+        geofield = 'location'
         fields = (
             'id',
             'station',
             'picture',
             'name',
             'phone_number',
-            'reputation')
+            'reputation',
+            'location',
+        )
         read_only_fields = fields
 
 

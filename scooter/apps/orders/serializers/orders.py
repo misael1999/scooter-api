@@ -27,9 +27,18 @@ class DetailOrderSerializer(serializers.Serializer):
     picture = Base64ImageField(required=False, use_url=True)
 
 
+class OrderCurrentStatusSerializer(serializers.ModelSerializer):
+    order_status = serializers.StringRelatedField()
+    delivery_man = DeliveryManOrderSerializer(read_only=True)
+
+    class Meta:
+        model = Order
+        fields = ('order_status', 'delivery_man')
+        read_only_fields = fields
+
+
 # For requests we must put all the fields as read only
 class OrderModelSerializer(serializers.ModelSerializer):
-    order_date = serializers.DateTimeField(source='created')
     service = serializers.StringRelatedField(read_only=True, source="station_service")
 
     class Meta:
@@ -43,7 +52,6 @@ class OrderModelSerializer(serializers.ModelSerializer):
 # For customer history orders
 class OrderWithDetailSimpleSerializer(serializers.ModelSerializer):
     details = DetailOrderSerializer(many=True)
-    order_date = serializers.DateTimeField(source='created')
     delivery_man = DeliveryManOrderSerializer(required=False)
     service = serializers.StringRelatedField(read_only=True, source="station_service")
 
@@ -60,7 +68,6 @@ class OrderWithDetailSimpleSerializer(serializers.ModelSerializer):
 class OrderWithDetailModelSerializer(serializers.ModelSerializer):
     station = serializers.StringRelatedField(read_only=True)
     customer = serializers.StringRelatedField()
-    order_date = serializers.DateTimeField(source='created')
     from_address = CustomerAddressModelSerializer()
     to_address = CustomerAddressModelSerializer()
     service = serializers.StringRelatedField(read_only=True, source="station_service")

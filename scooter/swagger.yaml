@@ -1013,6 +1013,25 @@ paths:
           description: 'Listado de pedidos'
       tags:
         - Pedidos clientes
+  /api/v1/customers/{customer_id}/orders/{order_id}/current_status/:
+    parameters:
+      - name: customer_id
+        in: path
+        required: true
+        type: number
+      - name: order_id
+        in: path
+        required: true
+        type: number
+    get:
+      operationId: get_order_status_customer
+      description: Obtener el estado actual de la orden
+      responses:
+        '200':
+          description: 'Estado actual del pedido'
+      tags:
+        - Pedidos clientes
+
   /api/v1/stations/{station_id}/orders/:
     parameters:
       - name: station_id

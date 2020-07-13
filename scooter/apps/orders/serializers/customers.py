@@ -1,5 +1,7 @@
 # Rest framework
 from datetime import timedelta
+
+from django.conf import settings
 from django.utils import timezone
 from rest_framework import serializers
 # Serializers
@@ -38,8 +40,26 @@ class CreateOrderSerializer(serializers.Serializer):
     phone_number = serializers.CharField(max_length=15)
 
     def validate(self, data):
-
         try:
+            # Add customer of the context in object data
+            data['customer'] = self.context['customer']
+            now = timezone.localtime(timezone.now())
+            offset = now - timedelta(minutes=4)
+            #
+            total_orders_range = Order.objects.filter(order_date__gte=offset).count()
+
+            if total_orders_range == settings.ORDER_PER_CUSTOMER:
+                raise serializers.ValidationError({'detail': 'Solo puedes hacer {} pedidos'
+                                                             ' a la vez, espera que termine uno'
+                                                  .format(settings.ORDER_PER_CUSTOMER)}, code="limit_orders")
+
+            total_orders_in_process = Order.objects.filter(in_process=True, customer=data['customer']).count()
+            # Validate that the orders in process are not greater than those allowed
+            if total_orders_in_process == settings.ORDER_PER_CUSTOMER or (total_orders_range + total_orders_in_process) == 2:
+                raise serializers.ValidationError({'detail': 'Solo puedes hacer {} pedidos'
+                                                             ' a la vez, espera que termine uno'
+                                                  .format(settings.ORDER_PER_CUSTOMER)}, code="limit_orders")
+
             station = data['station']
             exist_service = station.services.get(service=data['service'])
             # if not exist_service:
@@ -48,8 +68,6 @@ class CreateOrderSerializer(serializers.Serializer):
         except StationService.DoesNotExist:
             raise serializers.ValidationError({'detail': 'La central no cuenta con el servicio solicitado'})
 
-        # Add customer of the context in object data
-        data['customer'] = self.context['customer']
         return data
 
     def create(self, data):
@@ -66,6 +84,7 @@ class CreateOrderSerializer(serializers.Serializer):
             order_status = OrderStatus.objects.get(slug_name="without_delivery")
             order = Order.objects.create(**data,
                                          qr_code=qr_code,
+                                         order_date=timezone.localtime(timezone.now()),
                                          service_price=data_service['price_service'],
                                          distance=data_service['distance'],
                                          maximum_response_time=maximum_response_time,
@@ -133,7 +152,7 @@ class CreateOrderSerializer(serializers.Serializer):
 
 def generate_qr_code():
     try:
-        CODE_LENGTH = 6
+        CODE_LENGTH = 8
         """ Handle code creation """
         pool = ascii_uppercase + digits
         code = ''.join(random.choices(pool, k=CODE_LENGTH))
