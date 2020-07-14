@@ -45,6 +45,19 @@ class CustomerSimpleModelSerializer(serializers.ModelSerializer):
         return super().update(instance, data)
 
 
+class CustomerSimpleOrderSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Customer
+        fields = (
+            'id',
+            'name',
+            'phone_number',
+            'reputation'
+        )
+        read_only_fields = fields
+
+
 class CustomerUserModelSerializer(serializers.ModelSerializer):
     user = UserModelSimpleSerializer()
     picture = Base64ImageField(use_url=True)

@@ -4,7 +4,7 @@ from rest_framework import serializers
 # Serializers
 from scooter.apps.common.serializers import OrderStatusModelSerializer
 from scooter.apps.common.serializers.common import Base64ImageField
-from scooter.apps.customers.serializers import CustomerAddressModelSerializer
+from scooter.apps.customers.serializers import CustomerAddressModelSerializer, CustomerSimpleOrderSerializer
 # Models
 from scooter.apps.delivery_men.models import DeliveryMan
 from scooter.apps.delivery_men.serializers import DeliveryManOrderSerializer
@@ -67,7 +67,7 @@ class OrderWithDetailSimpleSerializer(serializers.ModelSerializer):
 
 class OrderWithDetailModelSerializer(serializers.ModelSerializer):
     station = serializers.StringRelatedField(read_only=True)
-    customer = serializers.StringRelatedField()
+    customer = CustomerSimpleOrderSerializer(read_only=True)
     from_address = CustomerAddressModelSerializer()
     to_address = CustomerAddressModelSerializer()
     service = serializers.StringRelatedField(read_only=True, source="station_service")
