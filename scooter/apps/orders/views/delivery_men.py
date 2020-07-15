@@ -25,6 +25,7 @@ from scooter.apps.orders.models.orders import Order
 # Mixin
 from scooter.apps.common.mixins import AddDeliveryManMixin
 
+
 class DeliveryMenOrderViewSet(ScooterViewSet, AddDeliveryManMixin,
                               mixins.RetrieveModelMixin, mixins.ListModelMixin):
     serializer_class = OrderModelSerializer

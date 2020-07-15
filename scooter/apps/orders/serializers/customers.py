@@ -46,16 +46,17 @@ class CreateOrderSerializer(serializers.Serializer):
             now = timezone.localtime(timezone.now())
             offset = now - timedelta(minutes=4)
             #
-            total_orders_range = Order.objects.filter(order_date__gte=offset).count()
+            total_orders_range = Order.objects.filter(order_date__gte=offset, order_date__lt=now()).count()
 
-            if total_orders_range == settings.ORDER_PER_CUSTOMER:
+            if total_orders_range >= settings.ORDER_PER_CUSTOMER:
                 raise serializers.ValidationError({'detail': 'Solo puedes hacer {} pedidos'
                                                              ' a la vez, espera que termine uno'
                                                   .format(settings.ORDER_PER_CUSTOMER)}, code="limit_orders")
 
             total_orders_in_process = Order.objects.filter(in_process=True, customer=data['customer']).count()
             # Validate that the orders in process are not greater than those allowed
-            if total_orders_in_process == settings.ORDER_PER_CUSTOMER or (total_orders_range + total_orders_in_process) == 2:
+            if total_orders_in_process >= settings.ORDER_PER_CUSTOMER \
+                    or (total_orders_range + total_orders_in_process) == settings.ORDER_PER_CUSTOMER:
                 raise serializers.ValidationError({'detail': 'Solo puedes hacer {} pedidos'
                                                              ' a la vez, espera que termine uno'
                                                   .format(settings.ORDER_PER_CUSTOMER)}, code="limit_orders")
