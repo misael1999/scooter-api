@@ -1008,6 +1008,12 @@ paths:
           required: false
           type: string
           enum: ['order_date', 'date_delivered_order', 'station']
+        - name: in_process
+          description: En proceso
+          in: query
+          required: false
+          type: string
+          enum: ['true', 'false']
       responses:
         '200':
           description: 'Listado de pedidos'
@@ -1057,6 +1063,12 @@ paths:
           required: false
           in: query
           type: string
+        - name: in_process
+          description: En proceso
+          in: query
+          required: false
+          type: string
+          enum: ['true', 'false']
         - name: search
           description: Buscar por (estación, dirección)
           in: query
@@ -1198,6 +1210,12 @@ paths:
           description: El índice inicial desde el que devolver los resultados.
           required: false
           type: integer
+        - name: in_process
+          description: En proceso
+          in: query
+          required: false
+          type: string
+          enum: ['true', 'false']
         - name: search
           description: Buscar por (nombre)
           in: query
