@@ -45,8 +45,8 @@ class CreateOrderSerializer(serializers.Serializer):
             data['customer'] = self.context['customer']
             now = timezone.localtime(timezone.now())
             offset = now - timedelta(minutes=4)
-            #
-            total_orders_range = Order.objects.filter(order_date__gte=offset, order_date__lt=now()).count()
+            # Total de ordenes que se hicieron en ese rango de tiempo
+            total_orders_range = Order.objects.filter(order_date__gte=offset, order_date__lt=now).count()
 
             if total_orders_range >= settings.ORDER_PER_CUSTOMER:
                 raise serializers.ValidationError({'detail': 'Solo puedes hacer {} pedidos'
