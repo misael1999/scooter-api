@@ -136,7 +136,7 @@ class StationWithAllInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Station
         fields = (
-            'contact_person', 'picture', 'station_name',
+            'contact_person', 'reputation', 'picture', 'station_name',
             "user", "services", "schedules", "address",
             "assign_delivery_manually",
             "cancellation_policies",
