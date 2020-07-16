@@ -32,7 +32,7 @@ class CustomerAddressesViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cre
     search_fields = ('alias', 'street')
     # ordering_fields = ('created',)
     # Affect the default order
-    # ordering = ('-created', 'passengers__count')
+    ordering = ('-created', 'alias')
     filter_fields = ('type_address',)
 
     """ Method dispatch in AddCustomerMixin """

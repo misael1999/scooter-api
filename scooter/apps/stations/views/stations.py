@@ -52,9 +52,7 @@ class StationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         serializer_class = self.serializer_class
         if self.action == 'create':
             serializer_class = StationSignUpSerializer
-        if self.action == 'list':
-            serializer_class = StationSimpleModelSerializer
-        if self.action == 'retrieve':
+        if self.action in ['list', 'retrieve']:
             serializer_class = StationWithAllInfoSerializer
         return serializer_class
 

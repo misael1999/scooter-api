@@ -83,11 +83,21 @@ class RatesServicesSerializer(serializers.Serializer):
     price_kilometer = serializers.FloatField()
     from_kilometer = serializers.FloatField()
     to_kilometer = serializers.FloatField()
+    service = serializers.StringRelatedField(read_only=True)
 
     def validate(self, data):
         if data['from_kilometer'] > 0:
             raise serializers.ValidationError('La tarifa base debe de empezar desde el km 0')
         return data
+
+
+class StationAddressModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StationAddress
+        geo_field = 'point'
+        fields = ("street", "suburb", "postal_code",
+                  "exterior_number", "inside_number", "references",
+                  "point")
 
 
 # Station address
@@ -104,10 +114,11 @@ class StationAddressSerializer(serializers.ModelSerializer):
 # Station Schedule
 class StationScheduleSerializer(serializers.ModelSerializer):
     schedule_id = serializers.PrimaryKeyRelatedField(queryset=Schedule.objects.all(), source="schedule")
+    schedule = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         model = StationSchedule
-        fields = ("schedule_id", "from_hour", "to_hour")
+        fields = ("schedule_id", "from_hour", "to_hour", "schedule")
 
     def validate(self, data):
         if data['from_hour'] > data['to_hour']:
@@ -118,15 +129,20 @@ class StationScheduleSerializer(serializers.ModelSerializer):
 
 class StationWithAllInfoSerializer(serializers.ModelSerializer):
     user = UserModelSimpleSerializer()
+    schedules = StationScheduleSerializer(many=True)
+    services = RatesServicesSerializer(many=True)
+    address = StationAddressModelSerializer(read_only=True)
 
     class Meta:
         model = Station
         fields = (
             'contact_person', 'picture', 'station_name',
-            "user", "services", "schedules", "address"
+            "user", "services", "schedules", "address",
+            "assign_delivery_manually",
+            "cancellation_policies",
+            "allow_cancellations",
         )
         read_only_fields = fields
-        depth = 1
 
 
 # Other configurations
