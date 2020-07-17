@@ -14,7 +14,8 @@ from scooter.apps.customers.permissions.customers import IsAccountOwnerCustomer
 from scooter.apps.orders.serializers import (OrderModelSerializer,
                                              CreateOrderSerializer,
                                              CalculateServicePriceSerializer,
-                                             OrderWithDetailModelSerializer, OrderCurrentStatusSerializer)
+                                             OrderWithDetailModelSerializer, OrderCurrentStatusSerializer,
+                                             UpdateOrderStatusSerializer, RantingOrderCustomerSerializer)
 # Models
 from scooter.apps.orders.models.orders import Order
 # Mixin
@@ -82,5 +83,20 @@ class CustomerOrderViewSet(ScooterViewSet, mixins.CreateModelMixin, AddCustomerM
         data = self.set_response(status=True,
                                  data=OrderCurrentStatusSerializer(order).data,
                                  message='Estatus actual del pedido')
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['POST'])
+    def rating(self, request, *args, **kwargs):
+        """ Rated order by customer """
+        order = self.get_object()
+        serializer = RantingOrderCustomerSerializer(
+            data=request.data,
+            context={'customer': self.customer, 'order': order},
+        )
+        serializer.is_valid(raise_exception=True)
+        order = serializer.save()
+        data = self.set_response(status=True,
+                                 data={},
+                                 message='Se ha valorado la orden correctamente')
         return Response(data=data, status=status.HTTP_200_OK)
 

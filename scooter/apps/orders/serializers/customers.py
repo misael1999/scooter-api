@@ -2,9 +2,11 @@
 from datetime import timedelta
 
 from django.conf import settings
+from django.db.models import Avg
 from django.utils import timezone
 from rest_framework import serializers
 # Serializers
+from scooter.apps.orders.models.ratings import RatingOrder
 from scooter.apps.orders.serializers import DetailOrderSerializer
 # Models
 from scooter.apps.orders.models.orders import (OrderDetail)
@@ -149,6 +151,75 @@ class CreateOrderSerializer(serializers.Serializer):
             print("Exception in create order, please check it")
             print(ex.args.__str__())
             raise serializers.ValidationError({'detail': 'Error al crear la orden'})
+
+
+class RantingOrderCustomerSerializer(serializers.Serializer):
+    """ Rated order by customer """
+    rating = serializers.IntegerField(min_value=1, max_value=5)
+    comments = serializers.CharField(required=False)
+
+    def validate(self, data):
+
+        order = self.context['order']
+        customer = self.context['customer']
+
+        rating_exist = RatingOrder.objects.filter(order=order, rating_customer=customer).exists()
+
+        if rating_exist:
+            raise serializers.ValidationError({'detail': 'Ya se califico esta orden'})
+
+        if order.in_process is True or order.date_delivered_order is None:
+            raise serializers.ValidationError({'detail': 'No es permitido valorar esta orden'})
+
+        data['rating_customer'] = customer
+        data['user'] = customer.user
+        data['station'] = order.station
+        data['delivery_man'] = order.delivery_man
+        data['order'] = order
+        return data
+
+    def create(self, data):
+        try:
+            station = data['station']
+            delivery_man = data['delivery_man']
+            # Create new rating order
+            rating_order = RatingOrder.objects.create(
+               **data
+            )
+
+            # Update reputation station
+            station_avg = round(
+                RatingOrder.objects.filter(
+                    station=data['station'],
+                ).aggregate(Avg('rating'))['rating__avg'],
+                1
+            )
+            station.reputation = station_avg
+            station.save()
+
+            # Update reputation delivery man
+            delivery_man_avg = round(
+                RatingOrder.objects.filter(
+                    delivery_man=delivery_man,
+                    station=data['station']
+                ).aggregate(Avg('rating'))['rating__avg'],
+                1
+            )
+
+            delivery_man.reputation = delivery_man_avg
+            delivery_man.save()
+
+            Notification.objects.create(user_id=station.user_id, title="Ha recibido una nueva valoración",
+                                        type_notification_id=1)
+
+
+            return data
+        except ValueError as e:
+            raise serializers.ValidationError({'detail': str(e)})
+        except Exception as ex:
+            print("Exception in rating order, please check it")
+            print(ex.args.__str__())
+            raise serializers.ValidationError({'detail': 'Error al calificar la orden'})
 
 
 def generate_qr_code():

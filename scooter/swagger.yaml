@@ -1038,6 +1038,30 @@ paths:
       tags:
         - Pedidos clientes
 
+  /api/v1/customers/{customer_id}/orders/{order_id}/rating/:
+    parameters:
+      - name: customer_id
+        in: path
+        required: true
+        type: number
+      - name: order_id
+        in: path
+        required: true
+        type: number
+    post:
+      operationId: rating_order_customer
+      description: Calificar pedido
+      parameters:
+        - name: body
+          in: body
+          description: Asignar orden a un repartidor
+          schema:
+            $ref: '#/definitions/RatingCustomerOrder'
+      responses:
+        '200':
+          description: 'Calificar pedido'
+      tags:
+        - Pedidos clientes
   /api/v1/stations/{station_id}/orders/:
     parameters:
       - name: station_id
@@ -1999,3 +2023,16 @@ definitions:
       - service_price
       - approximate_price_order
       - details
+  RatingCustomerOrder:
+    type: object
+    properties:
+      rating:
+        type: number
+        example: 3
+        description: Valoración
+      comments:
+        type: string
+        example: "Excelente scooter"
+        description: Comentarios
+
+
