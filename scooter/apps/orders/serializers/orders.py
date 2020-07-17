@@ -46,7 +46,7 @@ class OrderModelSerializer(serializers.ModelSerializer):
         fields = ("id", "delivery_man", "station", "service", "distance",
                   "from_address_id", "to_address_id", "service_price",
                   "indications", "approximate_price_order", 'maximum_response_time',
-                  "date_delivered_order", "qr_code", "order_status", "order_date")
+                  "date_delivered_order", "qr_code", "order_status", "order_date", 'validate_qr')
 
 
 # For customer history orders
@@ -61,7 +61,7 @@ class OrderWithDetailSimpleSerializer(serializers.ModelSerializer):
                   "from_address", "to_address", "service_price", "distance",
                   "indications", "approximate_price_order", 'reason_rejection',
                   "order_date", "date_delivered_order", "qr_code", "order_status",
-                  "customer", "delivery_man", "station", 'details', 'maximum_response_time')
+                  "customer", "delivery_man", "station", 'details', 'maximum_response_time', 'validate_qr')
         read_only_fields = fields
 
 
@@ -82,7 +82,7 @@ class OrderWithDetailModelSerializer(serializers.ModelSerializer):
                   "from_address", "to_address", "service_price", "distance",
                   "indications", "approximate_price_order", 'reason_rejection',
                   "order_date", "date_delivered_order", "qr_code", "order_status",
-                  "customer", "delivery_man", "station", 'details', 'maximum_response_time')
+                  "customer", "delivery_man", "station", 'details', 'maximum_response_time', 'validate_qr')
         read_only_fields = fields
 
 

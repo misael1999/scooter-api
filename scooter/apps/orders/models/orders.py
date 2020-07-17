@@ -32,6 +32,7 @@ class Order(ScooterModel):
     phone_number = models.CharField(max_length=15)
     distance = models.FloatField()
     in_process = models.BooleanField(default=False)
+    validate_qr = models.BooleanField(default=False)
 
 
 class OrderDetail(ScooterModel):

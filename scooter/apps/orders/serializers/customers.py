@@ -38,6 +38,7 @@ class CreateOrderSerializer(serializers.Serializer):
     indications = serializers.CharField(max_length=300, required=False)
     approximate_price_order = serializers.CharField(max_length=30)
     phone_number = serializers.CharField(max_length=15)
+    validate_qr = serializers.BooleanField(default=False)
 
     def validate(self, data):
         try:
