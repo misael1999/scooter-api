@@ -116,6 +116,7 @@ class ScanQrOrderSerializer(serializers.Serializer):
     """ Scan qr to mark the order as delivered """
 
     qr_code = serializers.CharField(max_length=10)
+    service = serializers.SlugRelatedField(slug_field="slug_name", queryset=Service.objects.all())
 
     def validate_qr_code(self, qr_code):
         order = self.context['order']
@@ -131,7 +132,7 @@ class ScanQrOrderSerializer(serializers.Serializer):
                 "type": "ORDER_DELIVERED"
             }
 
-            instance = update_order_status(service=Service.objects.get(slug_name="purchase"),
+            instance = update_order_status(service=data['service'],
                                            order_status=OrderStatus.objects.get(slug_name="delivered"),
                                            instance=instance,
                                            data=data_notification
