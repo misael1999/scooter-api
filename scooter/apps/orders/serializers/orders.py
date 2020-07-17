@@ -8,6 +8,7 @@ from scooter.apps.customers.serializers import CustomerAddressModelSerializer, C
 # Models
 from scooter.apps.delivery_men.models import DeliveryMan
 from scooter.apps.delivery_men.serializers import DeliveryManOrderSerializer
+from scooter.apps.orders.models.ratings import RatingOrder
 from scooter.apps.stations.models import Station, StationService
 from scooter.apps.common.models import Service
 from scooter.apps.customers.models import CustomerAddress
@@ -19,7 +20,13 @@ from django.contrib.gis.db.models.functions import Distance
 from scooter.apps.common.serializers.common import CustomerFilteredPrimaryKeyRelatedField
 
 
-# Task Celery
+class RatingOrderSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = RatingOrder
+        fields = ("order", "station", "delivery_man",
+                  "rating_customer", "comments", "rating")
+        read_only_fields = fields
 
 
 class DetailOrderSerializer(serializers.Serializer):
@@ -54,6 +61,7 @@ class OrderWithDetailSimpleSerializer(serializers.ModelSerializer):
     details = DetailOrderSerializer(many=True)
     delivery_man = DeliveryManOrderSerializer(required=False)
     service = serializers.StringRelatedField(read_only=True, source="station_service")
+    rated_order = RatingOrderSerializer(required=False, read_only=True)
 
     class Meta:
         model = Order
@@ -61,7 +69,8 @@ class OrderWithDetailSimpleSerializer(serializers.ModelSerializer):
                   "from_address", "to_address", "service_price", "distance",
                   "indications", "approximate_price_order", 'reason_rejection',
                   "order_date", "date_delivered_order", "qr_code", "order_status",
-                  "customer", "delivery_man", "station", 'details', 'maximum_response_time', 'validate_qr')
+                  "customer", "delivery_man", "station", 'details', 'maximum_response_time',
+                  'validate_qr', 'rated_order')
         read_only_fields = fields
 
 
@@ -75,6 +84,7 @@ class OrderWithDetailModelSerializer(serializers.ModelSerializer):
     details = DetailOrderSerializer(many=True)
     delivery_man = DeliveryManOrderSerializer(required=False)
     order_status = OrderStatusModelSerializer(read_only=True)
+    rated_order = RatingOrderSerializer(required=False, read_only=True)
 
     class Meta:
         model = Order
@@ -82,7 +92,8 @@ class OrderWithDetailModelSerializer(serializers.ModelSerializer):
                   "from_address", "to_address", "service_price", "distance",
                   "indications", "approximate_price_order", 'reason_rejection',
                   "order_date", "date_delivered_order", "qr_code", "order_status",
-                  "customer", "delivery_man", "station", 'details', 'maximum_response_time', 'validate_qr')
+                  "customer", "delivery_man", "station", 'details', 'maximum_response_time', 'validate_qr',
+                  'rated_order')
         read_only_fields = fields
 
 
