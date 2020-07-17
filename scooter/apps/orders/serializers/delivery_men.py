@@ -225,6 +225,11 @@ class ScanQrOrderSerializer(serializers.Serializer):
 
     def update(self, instance, data):
         try:
+            data_notification = {
+                "title": 'Pedido entregado',
+                "body": 'Tu pedido ha sido entregado',
+                "type": "ORDER_DELIVERED"
+            }
 
             instance = update_order_status(service=Service.objects.get(slug_name="purchase"),
                                            order_status=OrderStatus.objects.get(slug_name="delivered"),
@@ -235,9 +240,9 @@ class ScanQrOrderSerializer(serializers.Serializer):
             instance.in_process = False
             instance.save()
 
-            Notification.objects.create(user_id=instance.user_id, title="Califica tu pedido",
-                                        type_notification_id=1,
-                                        body="Tu pedido ha sido entregado, deja una calificación")
+            # Notification.objects.create(user_id=instance.user_id, title="Califica tu pedido",
+            #                             type_notification_id=1,
+            #                             body="Tu pedido ha sido entregado, deja una calificación")
             return instance
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
@@ -366,7 +371,7 @@ def update_order_status(service, order_status, instance, data):
     try:
         # Validate that status
         if instance.service.slug_name != service.slug_name:
-            raise ValueError('No es posible cambiar de estatus')
+            raise ValueError('No es posible cambiar de estatus esta orden, no corresponde el tipo del servicio')
 
         # Validate that status are not "order_status_slug"
         # if instance.order_status == order_status_slug:

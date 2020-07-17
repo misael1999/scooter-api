@@ -129,9 +129,9 @@ class CreateOrderSerializer(serializers.Serializer):
                                                    "message": "Pedido de nuevo",
                                                    'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                    })
-                Notification.objects.create(user_id=user_id, title="Nueva solicitud",
-                                            type_notification_id=1,
-                                            body="Has recibido una nueva solicitud")
+                # Notification.objects.create(user_id=user_id, title="Nueva solicitud",
+                #                             type_notification_id=1,
+                #                             body="Has recibido una nueva solicitud")
 
             # Add client to station or update info
             member, created = MemberStation.objects.get_or_create(customer=data['customer'],
