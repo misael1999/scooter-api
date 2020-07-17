@@ -17,9 +17,7 @@ from scooter.apps.orders.serializers import (OrderModelSerializer,
                                              RejectOrderByDeliverySerializer,
                                              AcceptOrderByDeliveryManSerializer,
                                              OrderWithDetailModelSerializer,
-                                             ScanQrOrderSerializer, OnWayCommercePurchaseSerializer,
-                                             AlreadyInCommerceSerializer, OnDeliveryProcessPurchaseSerializer,
-                                             AlreadyHereSerializer)
+                                             ScanQrOrderSerializer, UpdateOrderStatusSerializer)
 # Models
 from scooter.apps.orders.models.orders import Order
 # Mixin
@@ -112,10 +110,10 @@ class DeliveryMenOrderViewSet(ScooterViewSet, AddDeliveryManMixin,
                                  message='QR validado correctamente')
         return Response(data=data, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=['PUT'], url_path="purchase/already_in_commerce")
-    def already_in_commerce(self, request, *args, **kwargs):
+    @action(detail=True, methods=['PUT'])
+    def update_status(self, request, *args, **kwargs):
         order = self.get_object()
-        serializer = AlreadyInCommerceSerializer(
+        serializer = UpdateOrderStatusSerializer(
             order,
             data=request.data,
             context={'delivery_man': self.delivery_man, 'order': order},
@@ -125,54 +123,70 @@ class DeliveryMenOrderViewSet(ScooterViewSet, AddDeliveryManMixin,
         order = serializer.save()
         data = self.set_response(status=True,
                                  data={},
-                                 message='Estatus cambiado correctamente')
+                                 message='Estatus actualizado correctamente')
         return Response(data=data, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=['PUT'], url_path="purchase/already_here")
-    def already_here(self, request, *args, **kwargs):
-        order = self.get_object()
-        serializer = AlreadyHereSerializer(
-            order,
-            data=request.data,
-            context={'delivery_man': self.delivery_man, 'order': order},
-            partial=False
-        )
-        serializer.is_valid(raise_exception=True)
-        order = serializer.save()
-        data = self.set_response(status=True,
-                                 data={},
-                                 message='Estatus cambiado correctamente')
-        return Response(data=data, status=status.HTTP_200_OK)
-
-    @action(detail=True, methods=['PUT'], url_path="purchase/on_way_commerce")
-    def on_way_commerce(self, request, *args, **kwargs):
-        order = self.get_object()
-        serializer = OnWayCommercePurchaseSerializer(
-            order,
-            data=request.data,
-            context={'delivery_man': self.delivery_man, 'order': order},
-            partial=False
-        )
-        serializer.is_valid(raise_exception=True)
-        order = serializer.save()
-        data = self.set_response(status=True,
-                                 data={},
-                                 message='Estatus cambiado correctamente')
-        return Response(data=data, status=status.HTTP_200_OK)
-
-    @action(detail=True, methods=['PUT'], url_path="purchase/on_delivery_process")
-    def on_delivery_process(self, request, *args, **kwargs):
-        order = self.get_object()
-        serializer = OnDeliveryProcessPurchaseSerializer(
-            order,
-            data=request.data,
-            context={'delivery_man': self.delivery_man, 'order': order},
-            partial=False
-        )
-        serializer.is_valid(raise_exception=True)
-        order = serializer.save()
-        data = self.set_response(status=True,
-                                 data={},
-                                 message='Estatus cambiado correctamente')
-        return Response(data=data, status=status.HTTP_200_OK)
+    # @action(detail=True, methods=['PUT'], url_path="purchase/already_in_commerce")
+    # def already_in_commerce(self, request, *args, **kwargs):
+    #     order = self.get_object()
+    #     serializer = AlreadyInCommerceSerializer(
+    #         order,
+    #         data=request.data,
+    #         context={'delivery_man': self.delivery_man, 'order': order},
+    #         partial=False
+    #     )
+    #     serializer.is_valid(raise_exception=True)
+    #     order = serializer.save()
+    #     data = self.set_response(status=True,
+    #                              data={},
+    #                              message='Estatus cambiado correctamente')
+    #     return Response(data=data, status=status.HTTP_200_OK)
+    #
+    # @action(detail=True, methods=['PUT'], url_path="purchase/already_here")
+    # def already_here(self, request, *args, **kwargs):
+    #     order = self.get_object()
+    #     serializer = AlreadyHereSerializer(
+    #         order,
+    #         data=request.data,
+    #         context={'delivery_man': self.delivery_man, 'order': order},
+    #         partial=False
+    #     )
+    #     serializer.is_valid(raise_exception=True)
+    #     order = serializer.save()
+    #     data = self.set_response(status=True,
+    #                              data={},
+    #                              message='Estatus cambiado correctamente')
+    #     return Response(data=data, status=status.HTTP_200_OK)
+    #
+    # @action(detail=True, methods=['PUT'], url_path="purchase/on_way_commerce")
+    # def on_way_commerce(self, request, *args, **kwargs):
+    #     order = self.get_object()
+    #     serializer = OnWayCommercePurchaseSerializer(
+    #         order,
+    #         data=request.data,
+    #         context={'delivery_man': self.delivery_man, 'order': order},
+    #         partial=False
+    #     )
+    #     serializer.is_valid(raise_exception=True)
+    #     order = serializer.save()
+    #     data = self.set_response(status=True,
+    #                              data={},
+    #                              message='Estatus cambiado correctamente')
+    #     return Response(data=data, status=status.HTTP_200_OK)
+    #
+    # @action(detail=True, methods=['PUT'], url_path="purchase/on_delivery_process")
+    # def on_delivery_process(self, request, *args, **kwargs):
+    #     order = self.get_object()
+    #     serializer = OnDeliveryProcessPurchaseSerializer(
+    #         order,
+    #         data=request.data,
+    #         context={'delivery_man': self.delivery_man, 'order': order},
+    #         partial=False
+    #     )
+    #     serializer.is_valid(raise_exception=True)
+    #     order = serializer.save()
+    #     data = self.set_response(status=True,
+    #                              data={},
+    #                              message='Estatus cambiado correctamente')
+    #     return Response(data=data, status=status.HTTP_200_OK)
 

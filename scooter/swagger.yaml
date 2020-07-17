@@ -1304,7 +1304,7 @@ paths:
 #          description: 'Código escaneado correctamente'
 #      tags:
 #        - Pedidos repartidor
-  /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/purchase/on_way_commerce/:
+  /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/update_status/:
     parameters:
       - name: delivery_man_id
         in: path
@@ -1315,113 +1315,17 @@ paths:
         required: true
         type: number
     put:
-      operationId: purchase_on_way_commerce
+      operationId: update_order_status
       description:
       parameters:
         - name: body
           in: body
-          description: En camino al comercio
+          description: Actualizar estatus de la orden
           schema:
-            $ref: '#/definitions/OnGoCommerceDeliveryMan'
+            $ref: '#/definitions/UpdateOrderStatus'
       responses:
         '200':
-          description: 'En camino al comercio'
-      tags:
-        - Pedidos repartidor
-  /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/purchase/already_in_commerce/:
-    parameters:
-      - name: delivery_man_id
-        in: path
-        required: true
-        type: number
-      - name: order_id
-        in: path
-        required: true
-        type: number
-    put:
-      operationId: purchase_already_in_commerce
-      description:
-      parameters:
-        - name: body
-          in: body
-          description: Ya estoy en el comercio
-          schema:
-            $ref: '#/definitions/OnGoCommerceDeliveryMan'
-      responses:
-        '200':
-          description: 'En camino al comercio'
-      tags:
-        - Pedidos repartidor
-  /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/purchase/on_delivery_process/:
-    parameters:
-      - name: delivery_man_id
-        in: path
-        required: true
-        type: number
-      - name: order_id
-        in: path
-        required: true
-        type: number
-    put:
-      operationId: purchase_on_delivery_process
-      description:
-      parameters:
-        - name: body
-          in: body
-          description: En proceso de entrega cuando ya se tiene los productos
-          schema:
-            $ref: '#/definitions/OnDeliveryProcessDeliveryMan'
-      responses:
-        '200':
-          description: 'En proceso de entrega'
-      tags:
-        - Pedidos repartidor
-  /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/purchase/already_here/:
-    parameters:
-      - name: delivery_man_id
-        in: path
-        required: true
-        type: number
-      - name: order_id
-        in: path
-        required: true
-        type: number
-    put:
-      operationId: already_here_purcharse
-      description: Notificar al cliente que ya esta en el lugar de entrega
-      parameters:
-        - name: body
-          in: body
-          description: Notificar al cliente
-          schema:
-            $ref: '#/definitions/OnDeliveryProcessDeliveryMan'
-      responses:
-        '200':
-          description: 'Ya estoy aqui'
-      tags:
-        - Pedidos repartidor
-  /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/purchase/validate_qr/:
-    parameters:
-      - name: delivery_man_id
-        in: path
-        required: true
-        type: number
-      - name: order_id
-        in: path
-        required: true
-        type: number
-    put:
-      operationId: validate_qr_order
-      description: Validar código QR de la orden
-      parameters:
-        - name: body
-          in: body
-          description: Validar código QR
-          schema:
-            $ref: '#/definitions/ScanQRDeliveryMan'
-      responses:
-        '200':
-          description: 'Código validado correctamente'
+          description: 'Actualizar estatus de la orden'
       tags:
         - Pedidos repartidor
 # ======== DEFINITIONS ==============
@@ -1967,6 +1871,15 @@ definitions:
   OnGoCommerceDeliveryMan:
     type: object
     properties:
+  UpdateOrderStatus:
+    type: object
+    properties:
+      service:
+        type: string
+        description: Nombre del servicio
+      order_status:
+        type: string
+        description: Nombre del estatus
   OnDeliveryProcessDeliveryMan:
     type: object
     properties:

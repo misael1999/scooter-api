@@ -114,7 +114,7 @@ class StationAddressSerializer(serializers.ModelSerializer):
 # Station Schedule
 class StationScheduleSerializer(serializers.ModelSerializer):
     schedule_id = serializers.PrimaryKeyRelatedField(queryset=Schedule.objects.all(), source="schedule")
-    schedule = serializers.StringRelatedField(read_only=True)
+    schedule = serializers.StringRelatedField(read_only=True, required=False)
 
     class Meta:
         model = StationSchedule
@@ -131,7 +131,7 @@ class StationWithAllInfoSerializer(serializers.ModelSerializer):
     user = UserModelSimpleSerializer()
     schedules = StationScheduleSerializer(many=True)
     services = RatesServicesSerializer(many=True)
-    address = StationAddressModelSerializer(read_only=True)
+    address = StationAddressModelSerializer(read_only=True, required=False)
 
     class Meta:
         model = Station
