@@ -94,7 +94,7 @@ class DeliveryMenOrderViewSet(ScooterViewSet, AddDeliveryManMixin,
                                  message='Solicitud aceptada')
         return Response(data=data, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=['PUT'], url_path="purchase/validate_qr")
+    @action(detail=True, methods=['PUT'])
     def validate_qr(self, request, *args, **kwargs):
         order = self.get_object()
         serializer = ScanQrOrderSerializer(
