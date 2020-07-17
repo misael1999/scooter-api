@@ -8,7 +8,7 @@ info:
   license:
     name: BSD License
   version: v1
-basePath: /
+basePath: /appback/
 consumes:
   - application/json
 produces:
@@ -1304,6 +1304,31 @@ paths:
 #          description: 'Código escaneado correctamente'
 #      tags:
 #        - Pedidos repartidor
+  /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/qr_scan/:
+    parameters:
+      - name: delivery_man_id
+        in: path
+        required: true
+        type: number
+      - name: order_id
+        in: path
+        required: true
+        type: number
+    put:
+      operationId: qr_scan
+      description:
+      parameters:
+        - name: body
+          in: body
+          description: Escanear QR de la orden
+          schema:
+            $ref: '#/definitions/QRScanDeliveryMan'
+      responses:
+        '200':
+          description: 'Escanear QR de la orden'
+      tags:
+        - Pedidos repartidor
+
   /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/update_status/:
     parameters:
       - name: delivery_man_id
@@ -1859,7 +1884,7 @@ definitions:
         type: string
         description: Razón del rechazo
         example: 1
-  ScanQRDeliveryMan:
+  QRScanDeliveryMan:
     type: object
     properties:
       qr_code:
