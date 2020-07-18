@@ -86,6 +86,7 @@ class CreateOrderSerializer(serializers.Serializer):
             qr_code = generate_qr_code()
             order_status = OrderStatus.objects.get(slug_name="without_delivery")
             order = Order.objects.create(**data,
+                                         validate_qr=False if data['validate_qr'] is None else data['validate_qr'],
                                          qr_code=qr_code,
                                          order_date=timezone.localtime(timezone.now()),
                                          service_price=data_service['price_service'],
@@ -94,7 +95,7 @@ class CreateOrderSerializer(serializers.Serializer):
                                          order_status=order_status)
 
             # Save detail order
-            if details:
+            if details is not None:
                 details_to_save = [OrderDetail(**detail, order=order) for detail in details]
                 OrderDetail.objects.bulk_create(details_to_save)
 
