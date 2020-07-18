@@ -86,7 +86,6 @@ class CreateOrderSerializer(serializers.Serializer):
             qr_code = generate_qr_code()
             order_status = OrderStatus.objects.get(slug_name="without_delivery")
             order = Order.objects.create(**data,
-                                         validate_qr=False if data['validate_qr'] is None else data['validate_qr'],
                                          qr_code=qr_code,
                                          order_date=timezone.localtime(timezone.now()),
                                          service_price=data_service['price_service'],
