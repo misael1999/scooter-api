@@ -32,7 +32,7 @@ from string import ascii_uppercase, digits
 class CreateOrderSerializer(serializers.Serializer):
     """ Create new order for customer"""
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    details = DetailOrderSerializer(many=True)
+    details = DetailOrderSerializer(many=True, required=False)
     station_id = serializers.PrimaryKeyRelatedField(queryset=Station.objects.all(), source="station")
     service_id = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all(), source="service")
     from_address_id = CustomerFilteredPrimaryKeyRelatedField(queryset=CustomerAddress.objects, source="from_address")
@@ -94,8 +94,9 @@ class CreateOrderSerializer(serializers.Serializer):
                                          order_status=order_status)
 
             # Save detail order
-            details_to_save = [OrderDetail(**detail, order=order) for detail in details]
-            OrderDetail.objects.bulk_create(details_to_save)
+            if details:
+                details_to_save = [OrderDetail(**detail, order=order) for detail in details]
+                OrderDetail.objects.bulk_create(details_to_save)
 
             # Check if the station has manual assignment activated
             station = data['station']
@@ -109,9 +110,9 @@ class CreateOrderSerializer(serializers.Serializer):
                                                    "message": "Ha recibido una nueva solicitud",
                                                    'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                    })
-                Notification.objects.create(user_id=station.user_id, title="Solicitud nueva",
-                                            type_notification_id=1,
-                                            body="Has recibido una solicitud nueva")
+                # Notification.objects.create(user_id=station.user_id, title="Solicitud nueva",
+                #                             type_notification_id=1,
+                #                             body="Has recibido una solicitud nueva")
                 # Send message by django channel
                 async_to_sync(send_order_to_station_channel)(station.id, order.id)
             else:

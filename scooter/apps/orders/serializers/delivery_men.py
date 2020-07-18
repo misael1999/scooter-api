@@ -112,6 +112,7 @@ class RejectOrderByDeliverySerializer(serializers.Serializer):
             print(ex.args.__str__())
             raise serializers.ValidationError({'detail': 'Error al rechazar el pedido'})
 
+
 class ScanQrOrderSerializer(serializers.Serializer):
     """ Scan qr to mark the order as delivered """
 
