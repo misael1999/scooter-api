@@ -32,7 +32,7 @@ from string import ascii_uppercase, digits
 class CreateOrderSerializer(serializers.Serializer):
     """ Create new order for customer"""
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    details = DetailOrderSerializer(many=True, required=False)
+    details = DetailOrderSerializer(many=True, required=False, allow_null=True)
     station_id = serializers.PrimaryKeyRelatedField(queryset=Station.objects.all(), source="station")
     service_id = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all(), source="service")
     from_address_id = CustomerFilteredPrimaryKeyRelatedField(queryset=CustomerAddress.objects, source="from_address")
