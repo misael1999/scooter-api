@@ -22,11 +22,21 @@ from django.contrib.gis.measure import D
 from django.contrib.gis.db.models.functions import Distance
 
 
+class DeliveryManAddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DeliveryManAddress
+        fields = (
+            'street', 'suburb', 'postal_code',
+            'exterior_number', 'inside_number', 'references'
+        )
+
+
 class DeliveryManModelSerializer(ScooterModelSerializer):
     delivery_status = serializers.StringRelatedField(read_only=True)
     status = serializers.StringRelatedField()
     picture = Base64ImageField(use_url=True)
     vehicle = VehicleModelSerializer()
+    address = DeliveryManAddressSerializer()
 
     class Meta:
         model = DeliveryMan
@@ -35,7 +45,7 @@ class DeliveryManModelSerializer(ScooterModelSerializer):
             'id', 'user', 'station','status', 'vehicle',
             'name', 'last_name', 'phone_number',
             'picture', 'salary_per_order', 'total_orders', 'reputation',
-            'location', 'delivery_status')
+            'location', 'delivery_status', 'address')
         read_only_fields = fields
 
 
@@ -48,16 +58,6 @@ class DeliveryManUserModelSerializer(ScooterModelSerializer):
         read_only_fields = (
             'reputation',
         )
-
-
-class DeliveryManAddressSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = DeliveryManAddress
-        fields = (
-            'street', 'suburb', 'postal_code',
-            'exterior_number', 'inside_number', 'references'
-        )
-
 
 class DeliveryManWithAddressSerializer(serializers.ModelSerializer):
     address = DeliveryManAddressSerializer()
