@@ -37,7 +37,7 @@ class CreateOrderSerializer(serializers.Serializer):
     service_id = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all(), source="service")
     from_address_id = CustomerFilteredPrimaryKeyRelatedField(queryset=CustomerAddress.objects, source="from_address")
     to_address_id = CustomerFilteredPrimaryKeyRelatedField(queryset=CustomerAddress.objects, source="to_address")
-    indications = serializers.CharField(max_length=300, required=False)
+    indications = serializers.CharField(max_length=500, required=False)
     approximate_price_order = serializers.CharField(max_length=30)
     phone_number = serializers.CharField(max_length=15)
     validate_qr = serializers.BooleanField(default=False, allow_null=True)
@@ -156,7 +156,7 @@ class CreateOrderSerializer(serializers.Serializer):
 
 class RantingOrderCustomerSerializer(serializers.Serializer):
     """ Rated order by customer """
-    rating = serializers.IntegerField(min_value=1, max_value=5)
+    rating = serializers.FloatField(min_value=1, max_value=5)
     comments = serializers.CharField(required=False)
 
     def validate(self, data):
