@@ -48,4 +48,10 @@ class DeliveryMenViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         return Response(self.set_response(status='ok', data={'status': status_availability},
                                           message='Cambio de disponibilidad correctamente'))
 
+    @action(detail=True, methods=('GET',))
+    def status(self, request, *args, **kwargs):
+        delivery_man = self.get_object()
+        return Response(self.set_response(status='ok', data={'status': delivery_man.delivery_status.__str__()},
+                                          message='Estatus del repartidor'))
+
 

@@ -24,8 +24,8 @@ class CustomerAddress(ScooterModel):
 
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     alias = models.CharField(max_length=30)
-    full_address = models.CharField(max_length=250)
-    exterior_number = models.CharField(max_length=10)
+    full_address = models.CharField(max_length=350)
+    exterior_number = models.CharField(max_length=10, blank=True, null=True)
     inside_number = models.CharField(max_length=10, blank=True, null=True, )
     references = models.CharField(max_length=150, blank=True, null=True)
     point = models.PointField(blank=True, null=True)

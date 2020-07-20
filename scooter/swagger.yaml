@@ -957,6 +957,34 @@ paths:
           description: 'Ubicación actualizada'
       tags:
         - Repartidores
+  /api/v1/delivery_men/{delivery_man_id}/:
+    parameters:
+      - name: delivery_man_id
+        in: path
+        required: true
+        type: string
+    get:
+      operationId: delivery_man_get_info
+      description: Obtener información de la empresa
+      responses:
+        '200':
+          description: 'Información del repartidor'
+      tags:
+        - Repartidores
+  /api/v1/delivery_men/{delivery_man_id}/status/:
+    parameters:
+      - name: delivery_man_id
+        in: path
+        required: true
+        type: string
+    get:
+      operationId: delivery_man_get_status
+      description: Estatus del repartidor
+      responses:
+        '200':
+          description: 'Consultar estatus'
+      tags:
+        - Repartidores
   # ==== ORDERS =====
   /api/v1/customers/{customer_id}/orders/:
     parameters:
@@ -1900,6 +1928,9 @@ definitions:
       - longitude
   UpdateAvailabilityDeliveryMan:
     type: object
+    properties:
+      status:
+        type: string
   # ==== ORDERS
   RejectOrderDeliveryMan:
     type: object
