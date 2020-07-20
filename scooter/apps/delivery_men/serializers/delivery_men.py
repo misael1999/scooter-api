@@ -91,16 +91,19 @@ class AvailabilityDeliverySerializer(serializers.Serializer):
 
     def update(self, instance, data):
         try:
+            status_availability = False
             if instance.delivery_status.slug_name == 'available':
                 status = DeliveryManStatus.objects.get(slug_name='out_service')
+                status_availability = False
             else:
                 status = DeliveryManStatus.objects.get(slug_name='available')
+                status_availability = True
 
             instance.delivery_status = status
             instance.save()
             # send data through django channels
             async_to_sync(send_notify_change_location)(instance.station.id, instance.id, 'UPDATE_AVAILABILITY')
-            return instance
+            return status_availability
         except Exception as ex:
             raise serializers.ValidationError({'detail': 'Ha ocurrido un error al cambiar la disponibilidad'})
 

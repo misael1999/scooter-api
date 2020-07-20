@@ -44,8 +44,8 @@ class DeliveryMenViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         partial = request.method == 'PATCH'
         serializer = AvailabilityDeliverySerializer(delivery_man, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(self.set_response(status='ok', data={},
+        status_availability = serializer.save()
+        return Response(self.set_response(status='ok', data={'status': status_availability},
                                           message='Cambio de disponibilidad correctamente'))
 
 
