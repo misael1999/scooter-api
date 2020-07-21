@@ -30,7 +30,7 @@ class RatingOrderSerializer(serializers.ModelSerializer):
 
 
 class DetailOrderSerializer(serializers.Serializer):
-    product_name = serializers.CharField(max_length=60)
+    product_name = serializers.CharField(max_length=201)
     picture = Base64ImageField(required=False, use_url=True, allow_null=True, allow_empty_file=True, max_length=None)
 
 
@@ -62,6 +62,9 @@ class OrderWithDetailSimpleSerializer(serializers.ModelSerializer):
     delivery_man = DeliveryManOrderSerializer(required=False)
     service = serializers.StringRelatedField(read_only=True, source="station_service")
     rated_order = RatingOrderSerializer(required=False, read_only=True)
+    to_address = serializers.StringRelatedField(read_only=True)
+    from_address = serializers.StringRelatedField(read_only=True)
+    delivery_man = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         model = Order

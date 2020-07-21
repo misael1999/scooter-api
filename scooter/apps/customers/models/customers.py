@@ -36,7 +36,7 @@ class CustomerAddress(ScooterModel):
         db_table = 'customers_customer_address'
 
     def __str__(self):
-        return self.alias
+        return self.full_address
 
 
 
