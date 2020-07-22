@@ -110,6 +110,21 @@ paths:
       tags:
         - Usuarios general
     parameters: []
+  /api/v1/users/contact/:
+    post:
+      operationId: form_contact
+      description: Formulario de contacto
+      parameters:
+        - name: body
+          in: body
+          description: Formulario de contacto
+          schema:
+            $ref: '#/definitions/ContactUser'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Usuarios general
   /api/v1/users/delete_devices/:
     delete:
       operationId: delete_device
@@ -1421,6 +1436,17 @@ definitions:
     required:
       - registration_id
       - type
+  ContactUser:
+    type: object
+    properties:
+      name:
+        type: string
+      email:
+        type: string
+      identify:
+        type: string
+      comments:
+        type: string
   DeleteDevice:
     type: object
     properties:

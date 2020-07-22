@@ -7,7 +7,7 @@ from django.conf import settings
 # Django rest framework
 from rest_framework import serializers
 # Models
-from scooter.apps.users.models.users import User
+from scooter.apps.users.models.users import User, Contact
 # JWT
 import jwt
 # Functions
@@ -157,3 +157,10 @@ class TestNotificationSerializer(serializers.Serializer):
             print("Exception in create order, please check it")
             print(ex.args.__str__())
             raise serializers.ValidationError({'detail': 'Error al enviar notificación'})
+
+
+class ContactSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Contact
+        fields = '__all__'

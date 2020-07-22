@@ -1,4 +1,7 @@
 # Django rest
+from datetime import timedelta
+
+from django.utils import timezone
 from rest_framework import mixins, status
 # Models
 # Serializers
@@ -6,6 +9,7 @@ from scooter.apps.orders.models import Order
 from scooter.apps.orders.serializers import OrderWithDetailModelSerializer, OrderWithDetailSimpleSerializer
 from scooter.apps.stations.serializers import MembersStationModelSerializer
 # Viewset
+from scooter.utils.functions import get_date_from_querystring
 from scooter.utils.viewsets.scooter import ScooterViewSet
 # Mixins
 from scooter.apps.common.mixins.stations import AddStationMixin
@@ -38,6 +42,9 @@ class CustomerStationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
 
     def retrieve(self, request, *args, **kwargs):
         response = super().retrieve(request, *args, **kwargs)
+        from_date = get_date_from_querystring(self.request, 'from_date', timezone.localtime(timezone.now()))
+        to_date = get_date_from_querystring(self.request, 'to_date',
+                                            timezone.localtime(timezone.now()) + timedelta(days=1))
         history_orders = Order.objects.filter(order_status__slug_name='delivered',
                                               station=self.station,
                                               customer_id=response.data['customer']['id'])

@@ -15,7 +15,7 @@ from scooter.apps.users.serializers.users import (UserModelSimpleSerializer,
                                                   RecoverPasswordSerializer,
                                                   RecoverPasswordVerificationSerializer,
                                                   AccountVerificationSerializer,
-                                                  ResendCodeAccountVerificationSerializer)
+                                                  ResendCodeAccountVerificationSerializer, ContactSerializer)
 # Utilities
 from scooter.utils.viewsets import ScooterViewSet
 
@@ -32,6 +32,8 @@ class UserViewSet(ScooterViewSet):
             permission_classes = [AllowAny]
         elif self.action in ['retrieve', 'client', 'merchant', 'test_notifications']:
             permission_classes = [IsAuthenticated, IsAccountOwner]
+        elif self.action == 'contact':
+            permission_classes = [AllowAny]
         else:
             permission_classes = [IsAuthenticated]
 
@@ -115,3 +117,15 @@ class UserViewSet(ScooterViewSet):
         }
         return Response(data, status=status.HTTP_200_OK)
 
+    @action(detail=False, methods=['POST'])
+    def contact(self, request, *args, **kwargs):
+        """  """
+        serializer = ContactSerializer(data=request.data)
+        serializer.is_valid()
+        contact_true = serializer.save()
+        data = {
+            'status': 'ok',
+            'data': {},
+            "message": "Formulario enviado"
+        }
+        return Response(data, status=status.HTTP_201_CREATED)

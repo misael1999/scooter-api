@@ -79,3 +79,13 @@ class User(ScooterModel, AbstractBaseUser, PermissionsMixin):
 
     def isAdmin(self):
         return self.role == self.ADMIN
+
+
+class Contact(ScooterModel):
+    name = models.CharField(max_length=60)
+    email = models.EmailField()
+    identify = models.CharField(max_length=50)
+    comments = models.TextField()
+
+    def __str__(self):
+        return self.name
