@@ -7,6 +7,12 @@ from scooter.utils.models.scooter import ScooterModel
 class Order(ScooterModel):
     user = models.ForeignKey('users.User', on_delete=models.DO_NOTHING)
     customer = models.ForeignKey('customers.Customer', on_delete=models.DO_NOTHING)
+    member_station = models.ForeignKey('stations.MemberStation',
+                                       on_delete=models.DO_NOTHING,
+                                       help_text="For update statistics member station",
+                                       related_name="member_station",
+                                       blank=True,
+                                       null=True)
     delivery_man = models.ForeignKey('delivery_men.DeliveryMan',
                                      on_delete=models.DO_NOTHING, related_name="delivery_man",
                                      null=True, blank=True)
@@ -33,6 +39,9 @@ class Order(ScooterModel):
     distance = models.FloatField()
     in_process = models.BooleanField(default=False)
     validate_qr = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.qr_code
 
 
 class OrderDetail(ScooterModel):

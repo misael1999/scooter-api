@@ -9,7 +9,7 @@ from rest_framework import serializers
 from scooter.apps.orders.models.ratings import RatingOrder
 from scooter.apps.orders.serializers import DetailOrderSerializer
 # Models
-from scooter.apps.orders.models.orders import (OrderDetail)
+from scooter.apps.orders.models.orders import (OrderDetail, HistoryRejectedOrders)
 from scooter.apps.stations.models import Station, StationService, MemberStation
 from scooter.apps.common.models import Service, OrderStatus, Notification
 from scooter.apps.customers.models import CustomerAddress
@@ -77,6 +77,9 @@ class CreateOrderSerializer(serializers.Serializer):
         """ Create a new order and send message socket """
         try:
             details = data.pop('details', None)
+
+            # Check if the station has manual assignment activated
+            station = data['station']
             # Calculate price between two address
             data_service = calculate_service_price(from_address=data['from_address'],
                                                    to_address=data['to_address'],
@@ -85,7 +88,18 @@ class CreateOrderSerializer(serializers.Serializer):
             maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=2)
             qr_code = generate_qr_code()
             order_status = OrderStatus.objects.get(slug_name="without_delivery")
+
+            # Add client to station or update info
+            member, created = MemberStation.objects.get_or_create(customer=data['customer'],
+                                                                  station=station)
+
+            if created:
+                Notification.objects.create(user_id=station.user_id, title="Nuevo cliente",
+                                            type_notification_id=1,
+                                            body="Se ha agregado un nuevo cliente")
+
             order = Order.objects.create(**data,
+                                         member_station=member,
                                          qr_code=qr_code,
                                          order_date=timezone.localtime(timezone.now()),
                                          service_price=data_service['price_service'],
@@ -98,8 +112,6 @@ class CreateOrderSerializer(serializers.Serializer):
                 details_to_save = [OrderDetail(**detail, order=order) for detail in details]
                 OrderDetail.objects.bulk_create(details_to_save)
 
-            # Check if the station has manual assignment activated
-            station = data['station']
             # Is assign delivery manually is true, then send notification
             if station.assign_delivery_manually:
                 send_notification_push_task.delay(station.user.id,
@@ -116,14 +128,22 @@ class CreateOrderSerializer(serializers.Serializer):
                 # Send message by django channel
                 async_to_sync(send_order_to_station_channel)(station.id, order.id)
             else:
+                location_selected = None
+                if order.order_status.slug_name == "pick_up":
+                    location_selected = order.from_address
+                else:
+                    location_selected = order.to_address
+
                 # Get nearest delivery man
-                delivery_man = get_nearest_delivery_man(location_selected=data['to_address'], station=data['station'],
+                delivery_man = get_nearest_delivery_man(location_selected=location_selected, station=data['station'],
                                                         list_exclude=[], distance=6)
                 # Send push notification to delivery_man
                 if not delivery_man:
                     raise ValueError('No se encuentran repartidores disponibles')
 
                 user_id = delivery_man.user_id
+                # Save delivery man in history rejected for not find again
+                HistoryRejectedOrders.objects.get_or_create(delivery_man=delivery_man, order=order)
 
                 send_notification_push_task.delay(user_id,
                                                   'Solicitud nueva',
@@ -137,14 +157,6 @@ class CreateOrderSerializer(serializers.Serializer):
                 #                             type_notification_id=1,
                 #                             body="Has recibido una nueva solicitud")
 
-            # Add client to station or update info
-            member, created = MemberStation.objects.get_or_create(customer=data['customer'],
-                                                                  station=station)
-
-            if created:
-                Notification.objects.create(user_id=station.user_id, title="Nuevo cliente",
-                                            type_notification_id=1,
-                                            body="Se ha agregado un nuevo cliente")
             return order.id
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
@@ -152,6 +164,50 @@ class CreateOrderSerializer(serializers.Serializer):
             print("Exception in create order, please check it")
             print(ex.args.__str__())
             raise serializers.ValidationError({'detail': 'Error al crear la orden'})
+
+
+class RetryOrderSerializer(serializers.Serializer):
+
+    station_id = serializers.PrimaryKeyRelatedField(queryset=Station.objects.all(), source="station")
+
+    def update(self, order, data):
+        try:
+            order.station = data['station']
+            order.save()
+
+            location_selected = None
+
+            if order.order_status.slug_name == "pick_up":
+                location_selected = order.from_address
+            else:
+                location_selected = order.to_address
+
+            # Get list that excludes delivery men that are in the history of rejected orders
+            list_exclude = HistoryRejectedOrders.objects.filter(
+                order=order
+            ).values_list('delivery_man_id', flat=True)
+
+            delivery_man = get_nearest_delivery_man(location_selected=location_selected, station=data['station'],
+                                                    list_exclude=list_exclude, distance=6)
+
+            if not delivery_man:
+                raise ValueError('No se encuentran repartidores disponibles, intente con otra central')
+
+            send_notification_push_task.delay(delivery_man.user_id,
+                                              'Solicitud nueva',
+                                              'Ha recibido una nueva solicitud',
+                                              {"type": "NEW_ORDER", "order_id": order.id,
+                                               "message": "Ha recibido una nueva solicitud",
+                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                               })
+
+            return order
+        except ValueError as e:
+            raise serializers.ValidationError({'detail': str(e)})
+        except Exception as ex:
+            print("Exception in rating order, please check it")
+            print(ex.args.__str__())
+            raise serializers.ValidationError({'detail': 'Error al calificar la orden'})
 
 
 class RantingOrderCustomerSerializer(serializers.Serializer):

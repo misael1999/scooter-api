@@ -92,12 +92,12 @@ class RejectOrderByDeliverySerializer(serializers.Serializer):
             ).values_list('delivery_man_id', flat=True)
 
             # Find the closest delivery man again, but exclude delivery men who are in the reject history
-            delivery_man = get_nearest_delivery_man(location_selected=instance.from_address, station=instance.station,
+            delivery_man = get_nearest_delivery_man(location_selected=instance.to_address, station=instance.station,
                                                     list_exclude=list_exclude, distance=6)
             if not delivery_man:
                 raise ValueError('No se encuentran repartidores disponibles')
 
-            send_notification_push_task.delay(delivery_man.user.id,
+            send_notification_push_task.delay(delivery_man.user_id,
                                               'Solicitud nueva',
                                               'Pedido de compra',
                                               {"type": "NEW_ORDER", "order_id": instance.id,
@@ -138,6 +138,13 @@ class ScanQrOrderSerializer(serializers.Serializer):
                                            instance=instance,
                                            data=data_notification
                                            )
+
+            # Update member station
+            member_station = instance.member_station
+            if member_station:
+                member_station.total_orders = member_station.total_orders + 1
+                member_station.save()
+
             instance.date_delivered_order = timezone.localtime(timezone.now())
             instance.in_process = False
             instance.save()

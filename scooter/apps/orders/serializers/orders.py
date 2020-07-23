@@ -59,7 +59,6 @@ class OrderModelSerializer(serializers.ModelSerializer):
 # For customer history orders
 class OrderWithDetailSimpleSerializer(serializers.ModelSerializer):
     details = DetailOrderSerializer(many=True)
-    delivery_man = DeliveryManOrderSerializer(required=False)
     service = serializers.StringRelatedField(read_only=True, source="station_service")
     rated_order = RatingOrderSerializer(required=False, read_only=True)
     to_address = serializers.StringRelatedField(read_only=True)
@@ -142,12 +141,14 @@ def get_nearest_delivery_man(location_selected, station, list_exclude, distance)
     """ Get nearest delivery man and exclude who are in the history of rejected orders """
 
     # List of delivery men nearest
+
+    # location__distance_lte = (
+    #     location_selected.point,
+    #     D(km=distance))
+
     delivery_man = DeliveryMan.objects. \
         exclude(id__in=list_exclude). \
-        filter(status__slug_name="active", station=station,
-               location__distance_lte=(
-                   location_selected.point,
-                   D(km=distance))) \
+        filter(status__slug_name="active", delivery_status__slug_name="available", station=station) \
         .annotate(distance=Distance('location', location_selected.point)) \
         .order_by('distance').first()
     # delivery_man = DeliveryMan.objects.filter(station=station,
