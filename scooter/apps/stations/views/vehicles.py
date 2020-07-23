@@ -74,7 +74,7 @@ class VehiclesViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.CreateModelM
 
     def perform_destroy(self, instance):
         try:
-            sts = Status.objects.get(slug_name='deleted')
+            sts = Status.objects.get(slug_name='inactive')
             instance.status_id = sts
             instance.save()
         except Status.DoesNotExist:

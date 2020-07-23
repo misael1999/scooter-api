@@ -201,7 +201,7 @@ class RetryOrderSerializer(serializers.Serializer):
                                                'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                })
 
-            return order
+            return order.id
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
         except Exception as ex:

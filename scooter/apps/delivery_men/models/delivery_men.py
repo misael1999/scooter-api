@@ -39,7 +39,7 @@ class DeliveryManAddress(ScooterModel):
     postal_code = models.CharField(max_length=10)
     exterior_number = models.CharField(max_length=10)
     inside_number = models.CharField(max_length=10, blank=True, null=True)
-    references = models.CharField(max_length=150)
+    references = models.CharField(max_length=150, blank=True, null=True)
 
     class Meta:
         db_table = 'delivery_man_address'

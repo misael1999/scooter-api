@@ -1105,6 +1105,31 @@ paths:
           description: 'Calificar pedido'
       tags:
         - Pedidos clientes
+
+  /api/v1/customers/{customer_id}/orders/{order_id}/retry/:
+    parameters:
+      - name: customer_id
+        in: path
+        required: true
+        type: number
+      - name: order_id
+        in: path
+        required: true
+        type: number
+    put:
+      operationId: retry_order_customer
+      description: Reintentar pedido
+      parameters:
+        - name: body
+          in: body
+          description: Reintentar pedido
+          schema:
+            $ref: '#/definitions/RetryCustomerOrder'
+      responses:
+        '200':
+          description: 'Pedido enviado nuevamente'
+      tags:
+        - Pedidos clientes
   /api/v1/stations/{station_id}/orders/:
     parameters:
       - name: station_id
@@ -1849,6 +1874,10 @@ definitions:
         type: number
         example: 1
         description: Id del vehiculo
+      status_id:
+        type: number
+        example: 1
+        description: Id del estatus
       address:
         type: object
         description: Dirección del repartidor
@@ -2091,5 +2120,11 @@ definitions:
         type: string
         example: "Excelente scooter"
         description: Comentarios
-
+  RetryCustomerOrder:
+    type: object
+    properties:
+      station_id:
+        type: number
+        example: 1
+        description: Id de la central
 

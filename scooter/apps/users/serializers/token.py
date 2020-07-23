@@ -51,8 +51,11 @@ class CustomerTokenObtainPairSerializer(TokenObtainPairSerializer):
             raise serializers.ValidationError({'detail': 'No tienes permisos para iniciar sesión'})
 
         # Check the maximum time to validate
-        if timezone.localtime(timezone.now()) > self.user.verification_deadline and not self.user.is_verified:
-            raise serializers.ValidationError({'detail': 'Ha expirado su tiempo de verificación'})
+        # if timezone.localtime(timezone.now()) > self.user.verification_deadline and not self.user.is_verified:
+        #     raise serializers.ValidationError({'detail': 'Ha expirado su tiempo de verificación'})
+        if not self.user.is_verified:
+            raise serializers.ValidationError({'detail': 'Es necesario que verifique su correo electronico {email}'.
+                                              format(email=self.user.username)})
 
         data['customer'] = CustomerUserModelSerializer(customer).data
 

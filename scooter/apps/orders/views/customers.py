@@ -15,7 +15,8 @@ from scooter.apps.orders.serializers import (OrderModelSerializer,
                                              CreateOrderSerializer,
                                              CalculateServicePriceSerializer,
                                              OrderWithDetailModelSerializer, OrderCurrentStatusSerializer,
-                                             UpdateOrderStatusSerializer, RantingOrderCustomerSerializer)
+                                             UpdateOrderStatusSerializer, RantingOrderCustomerSerializer,
+                                             RetryOrderSerializer)
 # Models
 from scooter.apps.orders.models.orders import Order
 # Mixin
@@ -99,4 +100,24 @@ class CustomerOrderViewSet(ScooterViewSet, mixins.CreateModelMixin, AddCustomerM
                                  data={},
                                  message='Se ha valorado la orden correctamente')
         return Response(data=data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['PUT'])
+    def retry(self, request, *args, **kwargs):
+        """ Retry order when is rejected or there are not delivery men """
+
+        order = self.get_object()
+        serializer = RetryOrderSerializer(
+            order,
+            data=request.data,
+            context={'customer': self.customer, 'order': order},
+            partial=False
+        )
+        serializer.is_valid(raise_exception=True)
+        order = serializer.save()
+        data = self.set_response(status=True,
+                                 data={'order_id': order},
+                                 message='Se ha enviado el pedido nuevamente')
+        return Response(data=data, status=status.HTTP_200_OK)
+
+
 

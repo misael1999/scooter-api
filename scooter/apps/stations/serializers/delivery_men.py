@@ -5,6 +5,7 @@ from django.utils import timezone
 from rest_framework import serializers
 from django.contrib.gis.geos import Point
 # Models
+from scooter.apps.common.models import Service, Status
 from scooter.apps.orders.models import Order
 from scooter.apps.stations.models import Vehicle
 from scooter.apps.stations.serializers.vehicles import VehicleModelSerializer
@@ -59,6 +60,7 @@ class DeliveryManUserModelSerializer(ScooterModelSerializer):
             'reputation',
         )
 
+
 class DeliveryManWithAddressSerializer(serializers.ModelSerializer):
     address = DeliveryManAddressSerializer()
     picture = Base64ImageField(use_url=True)
@@ -85,12 +87,13 @@ class CreateDeliveryManSerializer(serializers.ModelSerializer):
     salary_per_order = serializers.FloatField(default=0)
     address = DeliveryManAddressSerializer()
     vehicle_id = StationFilteredPrimaryKeyRelatedField(queryset=Vehicle.objects, source="vehicle")
+    status_id = serializers.PrimaryKeyRelatedField(queryset=Status.objects.all(), source="status", required=False)
 
     class Meta:
         model = DeliveryMan
         fields = (
             'picture', 'password', 'name',
-            'last_name', 'phone_number', 'salary_per_order', 'address', 'vehicle_id'
+            'last_name', 'phone_number', 'salary_per_order', 'address', 'vehicle_id', 'status_id'
         )
 
     def validate(self, data):
@@ -174,25 +177,32 @@ class CreateDeliveryManSerializer(serializers.ModelSerializer):
 class GetDeliveryMenNearestSerializer(serializers.Serializer):
     order_id = StationFilteredPrimaryKeyRelatedField(queryset=Order.objects, source="order")
     distance = serializers.IntegerField(default=5)
+    type_service = serializers.SlugRelatedField(slug_field="slug_name", queryset=Service.objects.all())
 
     def create(self, data):
         try:
             station = self.context['station']
-            order = data['order']
             request = self.context['request']
-            is_all = request.query_params.get('all', None)
+            type_service = data['type_service']
+            order = data['order']
+
             filters = dict()
+            is_all = request.query_params.get('all', None)
             # Is a filter to show all or only are the available
             if is_all == 'false':
                 filters['delivery_status'] = 1
-            from_location = order.from_address
+
+            location_selected = None
+            if type_service.slug_name == 'pick_up':
+                location_selected = order.from_address
+            else:
+                location_selected = order.to_address
+
             # List of delivery men nearest (from_location)
             delivery_men = DeliveryMan.objects.filter(**filters, status__slug_name="active",
-                                                      station=station,
-                                                      location__distance_lte=(
-                                                          from_location.point, D(km=data['distance']))
+                                                      station=station
                                                       ).annotate(
-                distance=Distance("location", from_location.point)).order_by("distance")
+                distance=Distance("location", location_selected.point)).order_by("distance")
             # delivery_men = DeliveryMan.objects.filter(station=station).annotate(
             #     distance=Distance('location', from_location.point)
             # ).order_by('distance')
