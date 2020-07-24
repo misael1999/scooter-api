@@ -2,7 +2,7 @@
 from django.contrib.gis.geos import fromstr
 from rest_framework import serializers
 # Serializers
-from scooter.apps.common.serializers import OrderStatusModelSerializer
+from scooter.apps.common.serializers import OrderStatusModelSerializer, ServiceModelSerializer
 from scooter.apps.common.serializers.common import Base64ImageField
 from scooter.apps.customers.serializers import CustomerAddressModelSerializer, CustomerSimpleOrderSerializer
 # Models
@@ -95,7 +95,7 @@ class OrderWithDetailModelSerializer(serializers.ModelSerializer):
                   "indications", "approximate_price_order", 'reason_rejection',
                   "order_date", "date_delivered_order", "qr_code", "order_status",
                   "customer", "delivery_man", "station", 'details', 'maximum_response_time', 'validate_qr',
-                  'rated_order', 'in_process')
+                  'rated_order', 'in_process', 'service_id')
         read_only_fields = fields
 
 

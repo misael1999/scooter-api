@@ -149,6 +149,11 @@ class ScanQrOrderSerializer(serializers.Serializer):
             instance.in_process = False
             instance.save()
 
+            delivery_status = DeliveryManStatus.objects.get(slug_name="available")
+            delivery_man = instance.delivery_man
+            delivery_man.delivery_status = delivery_status
+            delivery_man.save()
+
             # Notification.objects.create(user_id=instance.user_id, title="Califica tu pedido",
             #                             type_notification_id=1,
             #                             body="Tu pedido ha sido entregado, deja una calificación")

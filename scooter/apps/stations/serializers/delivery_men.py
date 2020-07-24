@@ -177,7 +177,7 @@ class CreateDeliveryManSerializer(serializers.ModelSerializer):
 class GetDeliveryMenNearestSerializer(serializers.Serializer):
     order_id = StationFilteredPrimaryKeyRelatedField(queryset=Order.objects, source="order")
     distance = serializers.IntegerField(default=5)
-    type_service = serializers.SlugRelatedField(slug_field="slug_name", queryset=Service.objects.all())
+    type_service_id = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all(), source="type_service")
 
     def create(self, data):
         try:

@@ -45,10 +45,13 @@ class CustomerStationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         from_date = get_date_from_querystring(self.request, 'from_date', timezone.localtime(timezone.now()))
         to_date = get_date_from_querystring(self.request, 'to_date',
                                             timezone.localtime(timezone.now()) + timedelta(days=1))
-        history_orders = Order.objects.filter(order_status__slug_name='delivered',
+
+        history_orders = Order.objects.filter(order_date__range=(from_date, to_date),
+                                              order_status__slug_name='delivered',
                                               station=self.station,
                                               customer_id=response.data['customer']['id'])
-        history_orders_rejected = Order.objects.filter(order_status__slug_name__in=['canceled', 'rejected'],
+        history_orders_rejected = Order.objects.filter(order_date__range=(from_date, to_date),
+                                                       order_status__slug_name__in=['cancelled', 'rejected'],
                                                        station=self.station,
                                                        customer_id=response.data['customer']['id'])
         response.data['history_orders_delivered'] = OrderWithDetailSimpleSerializer(history_orders, many=True).data

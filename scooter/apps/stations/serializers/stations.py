@@ -74,6 +74,7 @@ class PointSerializer(serializers.Serializer):
 # General information
 class GeneralInfoSerializer(serializers.Serializer):
     picture = Base64ImageField(required=False, use_url=True)
+    phone_number = serializers.CharField(max_length=15, required=False)
 
 
 # Rates by service
@@ -136,9 +137,9 @@ class StationWithAllInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Station
         fields = (
-            'id','contact_person', 'reputation', 'picture', 'station_name',
+            'id', 'contact_person', 'reputation', 'picture', 'station_name',
             "user", "services", "schedules", "address",
-            "assign_delivery_manually",
+            "assign_delivery_manually", 'phone_number',
             "cancellation_policies",
             "allow_cancellations",
         )

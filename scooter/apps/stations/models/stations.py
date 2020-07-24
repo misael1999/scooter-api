@@ -11,6 +11,7 @@ class Station(ScooterModel):
     station_name = models.CharField(max_length=100)
     station_verified = models.BooleanField(default=False)
     document_verified = models.FileField(upload_to='stations/documents/')
+    phone_number = models.CharField(max_length=15)
 
     # Config
     assign_delivery_manually = models.BooleanField(default=False)
