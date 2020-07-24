@@ -8,7 +8,7 @@ info:
   license:
     name: BSD License
   version: v1
-basePath: /
+basePath: /appback/
 consumes:
   - application/json
 produces:
@@ -1011,6 +1011,26 @@ paths:
           description: 'Consultar estatus'
       tags:
         - Repartidores
+  /api/v1/delivery_men/{delivery_man_id}/change_password/:
+    parameters:
+      - name: delivery_man_id
+        in: path
+        required: true
+        type: string
+    patch:
+      operationId: change_password_customer
+      description: Actualizar contraseña del repartidor
+      parameters:
+        - name: body
+          in: body
+          description: Actualizar contraseña del repartidor
+          schema:
+            $ref: '#/definitions/ChangePassword'
+      responses:
+        '201':
+          description: 'Información del cliente'
+      tags:
+        - Clientes
   # ==== ORDERS =====
   /api/v1/customers/{customer_id}/orders/:
     parameters:
