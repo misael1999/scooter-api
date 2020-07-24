@@ -4,6 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 # Models
+from scooter.apps.customers.serializers import ChangePasswordCustomerSerializer
 from scooter.apps.delivery_men.models.delivery_men import DeliveryMan
 # Serializers
 from scooter.apps.delivery_men.serializers.delivery_men import (DeliveryManModelSerializer,
@@ -53,5 +54,15 @@ class DeliveryMenViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         delivery_man = self.get_object()
         return Response(self.set_response(status='ok', data={'status': delivery_man.delivery_status.__str__()},
                                           message='Estatus del repartidor'))
+
+    @action(detail=True, methods=('PATCH', ))
+    def change_password(self, request, *args, **kwargs):
+        customer = self.get_object()
+        partial = request.method == 'PATCH'
+        serializer = ChangePasswordCustomerSerializer(customer, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(self.set_response(status='ok', data={},
+                                          message='Contraseña actualizada correctamente'))
 
 

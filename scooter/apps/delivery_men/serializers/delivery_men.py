@@ -108,4 +108,3 @@ class AvailabilityDeliverySerializer(serializers.Serializer):
         except Exception as ex:
             print(ex.args)
             raise serializers.ValidationError({'detail': 'Ha ocurrido un error al cambiar la disponibilidad'})
-
