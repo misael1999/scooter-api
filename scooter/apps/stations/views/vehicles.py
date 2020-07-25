@@ -1,5 +1,6 @@
 # Django rest
 from rest_framework import mixins, status
+from rest_framework.decorators import action
 from rest_framework.response import Response
 # Models
 from scooter.apps.stations.models.vehicles import Vehicle
@@ -32,7 +33,7 @@ class VehiclesViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.CreateModelM
     ordering_fields = ('plate', 'model', 'year', 'alias')
     # Affect the default order
     ordering = ('-id', '-created')
-    filter_fields = ('plate',)
+    filter_fields = ('status',)
     """ Method dispatch in AddStationMixin """
     station = None
     vehicle_instance = None
@@ -40,7 +41,7 @@ class VehiclesViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.CreateModelM
     def get_queryset(self):
         """ Personalized query when the action is a list so that it only returns active vehicles """
         if self.action == 'list':
-            return self.station.vehicle_set.filter(status__slug_name='active')
+            return self.station.vehicle_set.all()
         return self.queryset
 
     def get_serializer_context(self):
@@ -75,10 +76,21 @@ class VehiclesViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.CreateModelM
     def perform_destroy(self, instance):
         try:
             sts = Status.objects.get(slug_name='inactive')
-            instance.status_id = sts
+            instance.status = sts
             instance.save()
         except Status.DoesNotExist:
             error = self.set_error_response(status=False, field='status',
                                             message='Ha ocurrido un error al borrar el vehiculo')
             return Response(data=error, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=True, methods=['PATCH'])
+    def unlock(self, request, *args, **kwargs):
+        vehicle = self.get_object()
+        sts = Status.objects.get(slug_name='active')
+        # Send instance of vehicle for validate of name not exist
+        vehicle.status = sts
+        vehicle.save()
+        data = self.set_response(status=True, data={}, message="Vehiculo desbloqueado correctamente")
+        return Response(data=data, status=status.HTTP_200_OK)
+
 

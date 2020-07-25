@@ -73,8 +73,9 @@ class PointSerializer(serializers.Serializer):
 
 # General information
 class GeneralInfoSerializer(serializers.Serializer):
-    picture = Base64ImageField(required=False, use_url=True)
-    phone_number = serializers.CharField(max_length=15, required=False)
+    picture = Base64ImageField(required=False, use_url=True, allow_null=True)
+    phone_number = serializers.CharField(max_length=15, required=False, allow_null=True)
+    contact_person = serializers.CharField(max_length=60, required=False, allow_null=True)
 
 
 # Rates by service
@@ -151,7 +152,6 @@ class StationConfigSerializer(serializers.Serializer):
     assign_delivery_manually = serializers.BooleanField()
     cancellation_policies = serializers.CharField(max_length=400)
     allow_cancellations = serializers.BooleanField()
-    schedules = StationScheduleSerializer(many=True)
 
 
 # Update configuration of station
@@ -160,6 +160,7 @@ class StationUpdateInfoSerializer(serializers.Serializer):
     config = StationConfigSerializer()
     services = RatesServicesSerializer(many=True)
     address = StationAddressSerializer()
+    schedules = StationScheduleSerializer(many=True)
 
     def update(self, instance, data):
         """ Update station info"""
@@ -179,10 +180,10 @@ class StationUpdateInfoSerializer(serializers.Serializer):
 
             # Save config
             config = data.pop('config', None)
-            schedules = None
+            schedules = data.pop('schedules', None)
+
             if config:
                 instance = self.save_config(instance=instance, config=config)
-                schedules = config.pop('schedules', None)
 
             if schedules:
                 schedules_dict = self.save_schedules(instance, schedules)
@@ -219,9 +220,11 @@ class StationUpdateInfoSerializer(serializers.Serializer):
         """ Before updating we have to delete the previous image """
         try:
             # import pdb; pdb.set_trace()
-            if general['picture']:
+            if general.get('picture', None) is not None:
                 instance.picture.delete()
                 instance.picture = general['picture']
+            instance.phone_number = general['phone_number']
+            instance.contact_person = general['contact_person']
             return instance
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})

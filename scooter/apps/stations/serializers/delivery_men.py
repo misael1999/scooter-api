@@ -3,7 +3,6 @@
 from django.utils import timezone
 # Django rest framework
 from rest_framework import serializers
-from django.contrib.gis.geos import Point
 # Models
 from scooter.apps.common.models import Service, Status
 from scooter.apps.orders.models import Order
@@ -11,7 +10,6 @@ from scooter.apps.stations.models import Vehicle
 from scooter.apps.stations.serializers.vehicles import VehicleModelSerializer
 from scooter.apps.users.models import User
 from scooter.apps.delivery_men.models.delivery_men import DeliveryMan, DeliveryManAddress
-from scooter.apps.customers.models import CustomerAddress
 # Utilities
 from scooter.utils.serializers.scooter import ScooterModelSerializer
 from scooter.apps.common.serializers.common import StationFilteredPrimaryKeyRelatedField
@@ -19,7 +17,6 @@ from scooter.apps.common.serializers.common import StationFilteredPrimaryKeyRela
 from scooter.apps.common.serializers import Base64ImageField
 from scooter.apps.users.serializers.users import UserModelSimpleSerializer
 # Django Geo
-from django.contrib.gis.measure import D
 from django.contrib.gis.db.models.functions import Distance
 
 

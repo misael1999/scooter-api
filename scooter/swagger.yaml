@@ -808,6 +808,33 @@ paths:
           description: 'Información del vehiculo'
       tags:
         - Centrales
+
+
+  /api/v1/stations/{station_id}/vehicles/{vehicle_id}/unlock/:
+    parameters:
+      - name: station_id
+        in: path
+        required: true
+        type: string
+      - name: vehicle_id
+        in: path
+        required: true
+        type: string
+  # UPDATE VEHICLE BY STATION
+    patch:
+      operationId: update_vehicle_unlock
+      description: Desbloquear vehiculo
+      parameters:
+        - name: body
+          in: body
+          description: Desbloquear vehiculo
+          schema:
+            $ref: '#/definitions/UnlockVehicle'
+      responses:
+        '201':
+          description: 'Información del vehiculo'
+      tags:
+        - Centrales
   # STATION CUSTOMERS
   /api/v1/stations/{station_id}/customers/:
     parameters:
@@ -1743,6 +1770,12 @@ definitions:
           picture:
             type: string
             example: 'data:image/png;base64,....'
+          contact_person:
+            type: string
+            example: 'Misael ivan'
+          phone_number:
+            type: string
+            exmaple: '2384080578'
       config:
         type: object
         properties:
@@ -1985,6 +2018,8 @@ definitions:
         description: Placa del vehiculo
     required:
       - alias
+  UnlockVehicle:
+    type: object
   # DELIVERY MAN
   LoginDeliveryMan:
     type: object
