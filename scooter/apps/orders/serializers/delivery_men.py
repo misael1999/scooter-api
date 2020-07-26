@@ -10,6 +10,9 @@ from scooter.apps.orders.models.orders import HistoryRejectedOrders
 from scooter.apps.taskapp.tasks import send_notification_push_task
 # Functions
 from scooter.apps.orders.serializers.orders import get_nearest_delivery_man
+# Functions channels
+from scooter.apps.orders.utils.orders import notify_station_accept
+from asgiref.sync import async_to_sync
 
 
 class AcceptOrderByDeliveryManSerializer(serializers.Serializer):
@@ -57,6 +60,7 @@ class AcceptOrderByDeliveryManSerializer(serializers.Serializer):
                                                "message": "Puedes ver el seguimiento de tu producto",
                                                'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                })
+            async_to_sync(notify_station_accept)(order.station_id, order.id)
             return data
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
