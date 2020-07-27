@@ -87,7 +87,6 @@ class CreateOrderSerializer(serializers.Serializer):
 
             maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=2)
             qr_code = generate_qr_code()
-            order_status = OrderStatus.objects.get(slug_name="without_delivery")
 
             # Add client to station for update info
             member, created = MemberStation.objects.get_or_create(customer=data['customer'],
@@ -98,11 +97,15 @@ class CreateOrderSerializer(serializers.Serializer):
                                             type_notification_id=1,
                                             body="Se ha agregado un nuevo cliente")
 
+            order_status = OrderStatus.objects.get(slug_name="await_delivery_man")
             QUANTITY_SAFE_ORDER = station.quantity_safe_order
             is_safe_order = False
 
             if member.total_orders >= QUANTITY_SAFE_ORDER:
                 is_safe_order = True
+
+            if station.assign_delivery_manually:
+                order_status = OrderStatus.objects.get(slug_name="without_delivery")
 
             order = Order.objects.create(**data,
                                          member_station=member,
@@ -121,7 +124,7 @@ class CreateOrderSerializer(serializers.Serializer):
 
             # Is assign delivery manually is true, then send notification
             if station.assign_delivery_manually:
-                send_notification_push_task.delay(station.user.id,
+                send_notification_push_task.delay(station.user_id,
                                                   'Solicitud nueva',
                                                   'Ha recibido una nueva solicitud',
                                                   {"type": "NEW_ORDER",
@@ -129,17 +132,11 @@ class CreateOrderSerializer(serializers.Serializer):
                                                    "message": "Ha recibido una nueva solicitud",
                                                    'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                    })
-                # Notification.objects.create(user_id=station.user_id, title="Solicitud nueva",
-                #                             type_notification_id=1,
-                #                             body="Has recibido una solicitud nueva")
                 # Send message by django channel
                 async_to_sync(send_order_to_station_channel)(station.id, order.id)
             else:
                 location_selected = None
-                if order.order_status.slug_name == "pick_up":
-                    location_selected = order.from_address
-                else:
-                    location_selected = order.to_address
+                location_selected = get_ref_location(order)
 
                 # Get nearest delivery man
                 delivery_man = get_nearest_delivery_man(location_selected=location_selected, station=data['station'],
@@ -187,7 +184,7 @@ class RetryOrderSerializer(serializers.Serializer):
             if order.order_status.slug_name == "pick_up":
                 location_selected = order.from_address
             else:
-                location_selected = order.to_address
+                location_selected = get_ref_location(order)
 
             # Get list that excludes delivery men that are in the history of rejected orders
             list_exclude = HistoryRejectedOrders.objects.filter(
@@ -198,7 +195,7 @@ class RetryOrderSerializer(serializers.Serializer):
                                                     list_exclude=list_exclude, distance=6)
 
             if not delivery_man:
-                raise ValueError('No se encuentran repartidores disponibles, intente con otra central')
+                raise ValueError('No se encuentran repartidores disponibles')
 
             order.order_status_id = 1
             order.save()
@@ -301,3 +298,16 @@ def generate_qr_code():
         return code
     except Exception as ex:
         raise ValueError('Error al generar el codigo qr')
+
+
+# Check if the order is safe and get location
+def get_ref_location(order):
+    if order.order_status.slug_name == "pick_up":
+        location_selected = order.from_address
+    else:
+        # If safe order, then find delivery man nearest from purchase place
+        if order.is_safe_order:
+            location_selected = order.from_address
+        else:
+            location_selected = order.to_address
+    return location_selected

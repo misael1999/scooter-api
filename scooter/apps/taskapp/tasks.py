@@ -35,7 +35,7 @@ def reject_orders():
     now = timezone.localtime(timezone.now())
     offset = now + timedelta(seconds=15)
     orders = Order.objects.filter(maximum_response_time__lte=offset,
-                                  order_status__slug_name="await_delivery_man")
+                                  order_status__slug_name__in=["await_delivery_man", "without_delivery"])
     if orders:
         order_status = OrderStatus.objects.get(slug_name='rejected')
         for order in orders:
