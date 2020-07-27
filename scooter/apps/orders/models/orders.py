@@ -39,6 +39,7 @@ class Order(ScooterModel):
     distance = models.FloatField()
     in_process = models.BooleanField(default=False)
     validate_qr = models.BooleanField(default=False)
+    is_safe_order = models.BooleanField(default=False)
 
     def __str__(self):
         return self.qr_code

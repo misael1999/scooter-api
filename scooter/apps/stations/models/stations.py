@@ -12,15 +12,13 @@ class Station(ScooterModel):
     station_verified = models.BooleanField(default=False)
     document_verified = models.FileField(upload_to='stations/documents/')
     phone_number = models.CharField(max_length=15)
-
     # Config
     assign_delivery_manually = models.BooleanField(default=False)
     cancellation_policies = models.TextField(blank=True, null=True)
     allow_cancellations = models.BooleanField(default=True)
-
+    quantity_safe_order = models.PositiveIntegerField(default=3)
     # Help
     information_is_complete = models.BooleanField(default=False)
-
     # stats
     reputation = models.FloatField(default=0)
     total_orders = models.PositiveIntegerField(default=0)

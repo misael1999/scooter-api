@@ -89,7 +89,7 @@ class CreateOrderSerializer(serializers.Serializer):
             qr_code = generate_qr_code()
             order_status = OrderStatus.objects.get(slug_name="without_delivery")
 
-            # Add client to station or update info
+            # Add client to station for update info
             member, created = MemberStation.objects.get_or_create(customer=data['customer'],
                                                                   station=station)
 
@@ -98,12 +98,19 @@ class CreateOrderSerializer(serializers.Serializer):
                                             type_notification_id=1,
                                             body="Se ha agregado un nuevo cliente")
 
+            QUANTITY_SAFE_ORDER = station.quantity_safe_order
+            is_safe_order = False
+
+            if member.total_orders >= QUANTITY_SAFE_ORDER:
+                is_safe_order = True
+
             order = Order.objects.create(**data,
                                          member_station=member,
                                          qr_code=qr_code,
                                          order_date=timezone.localtime(timezone.now()),
                                          service_price=data_service['price_service'],
                                          distance=data_service['distance'],
+                                         is_safe_order=is_safe_order,
                                          maximum_response_time=maximum_response_time,
                                          order_status=order_status)
 
@@ -192,6 +199,9 @@ class RetryOrderSerializer(serializers.Serializer):
 
             if not delivery_man:
                 raise ValueError('No se encuentran repartidores disponibles, intente con otra central')
+
+            order.order_status_id = 1
+            order.save()
 
             send_notification_push_task.delay(delivery_man.user_id,
                                               'Solicitud nueva',

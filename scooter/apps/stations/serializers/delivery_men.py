@@ -129,6 +129,7 @@ class CreateDeliveryManSerializer(serializers.ModelSerializer):
                                                       last_name=data['last_name'],
                                                       phone_number=data['phone_number'],
                                                       user=user,
+                                                      delivery_status_id=3,
                                                       vehicle=data['vehicle'],
                                                       station=station)
             DeliveryManAddress.objects.create(**address, delivery_man=delivery_man)

@@ -33,18 +33,18 @@ def send_notification_push_task(user_id, title, body, data):
 def reject_orders():
     """ Verify orders and reject when nobody responds """
     now = timezone.localtime(timezone.now())
-    offset = now + timedelta(seconds=30)
+    offset = now + timedelta(seconds=15)
     orders = Order.objects.filter(maximum_response_time__lte=offset,
-                                  order_status__slug_name="without_delivery")
+                                  order_status__slug_name="await_delivery_man")
     if orders:
         order_status = OrderStatus.objects.get(slug_name='rejected')
         for order in orders:
             # Function
             send_notification_push_order(order.user_id, title='Pedido rechazado',
-                                         body='No hubo respuesta del pedido',
+                                         body='No hubo respuesta por parte de los repartidores',
                                          data={"type": "REJECT_ORDER",
                                                "order_id": order.id,
                                                "message": "No hubo respuesta del pedid",
                                                'click_action': 'FLUTTER_NOTIFICATION_CLICK'})
         orders.update(order_status=order_status,
-                      reason_rejection="Sin respuesta")
+                      reason_rejection="Sin respuesta del repartidor")

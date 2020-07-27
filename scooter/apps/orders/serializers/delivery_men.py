@@ -41,11 +41,19 @@ class AcceptOrderByDeliveryManSerializer(serializers.Serializer):
             delivery_status = DeliveryManStatus.objects.get(slug_name='busy')
             delivery_man.delivery_status = delivery_status
             delivery_man.save()
+
             # Update status order
-            if instance.service.slug_name == 'pick_up':
+            if order.service.slug_name == 'pick_up':
                 order_status = OrderStatus.objects.get(slug_name='pick_up')
+                data_message = {
+                    'title': "Repartidor en camino",
+                    'body': "Tu scooter ya va en camino a recolectar tu pedido"
+                }
             else:
-                order_status = OrderStatus.objects.get(slug_name='go_money')
+                # Check if it is a safe order
+                data_message = get_message_accept(order)
+                order_status = OrderStatus.objects.get(slug_name=data_message['status_slug'])
+
             order.order_status = order_status
             # Assign order to delivery man
             order.delivery_man = delivery_man
@@ -53,11 +61,11 @@ class AcceptOrderByDeliveryManSerializer(serializers.Serializer):
             order.save()
             # Send notification push to customer
             send_notification_push_task.delay(instance.user_id,
-                                              'Repartidor en camino',
-                                              'El repartidor ya va en camino a recoger el dinero para la compra',
+                                              data_message['title'],
+                                              data_message['body'],
                                               {"type": "ACCEPTED_ORDER",
                                                "order_id": order.id,
-                                               "message": "Puedes ver el seguimiento de tu producto",
+                                               "message": "Puedes ver el seguimiento de tu pedido",
                                                'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                })
             async_to_sync(notify_station_accept)(order.station_id, order.id)
@@ -261,3 +269,19 @@ def get_data_notification(status_slug_name):
     }
 
     return sw_purchase.get(status_slug_name, 'default')
+
+
+def get_message_accept(order):
+
+    if order.is_safe_order:
+        return {
+            'title': 'En camino al comercio',
+            'body': 'Tu scooter ya va en camino al comercio',
+            'status_slug': 'way_commerce'
+        }
+    else:
+        return {
+            'title': 'Repartidor en camino',
+            'body': 'El repartidor ya va en camino a recoger el dinero para la compra',
+            'status_slug': 'go_money'
+        }
