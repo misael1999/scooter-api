@@ -208,6 +208,17 @@ paths:
       tags:
         - Usuarios general
     parameters: []
+  /api/v1/users/check_version/:
+    get:
+      operationId: get_current_version_app
+      description: Version reciente de la app.
+      parameters: []
+      responses:
+        '200':
+          description: 'Regresa la ultima version de la app'
+      tags:
+        - Usuarios general
+    parameters: []
   # LOGIN CUSTOMER
   /api/v1/customers/login/:
     post:
@@ -808,8 +819,6 @@ paths:
           description: 'Información del vehiculo'
       tags:
         - Centrales
-
-
   /api/v1/stations/{station_id}/vehicles/{vehicle_id}/unlock/:
     parameters:
       - name: station_id

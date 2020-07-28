@@ -38,3 +38,14 @@ class TypeVehicle(ScooterModel):
 
     def __str__(self):
         return self.name
+
+
+class AppVersion(ScooterModel):
+    alias = models.CharField(max_length=30)
+    comments = models.CharField(max_length=40)
+    version_number = models.CharField(max_length=5)
+    priority = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.alias
+

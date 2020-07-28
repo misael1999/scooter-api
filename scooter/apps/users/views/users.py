@@ -5,6 +5,8 @@ from rest_framework.response import Response
 # Mixins
 # Permissions
 from rest_framework.permissions import AllowAny, IsAuthenticated
+
+from scooter.apps.common.models import AppVersion
 from scooter.apps.users.permissions import IsAccountOwner
 # Models
 from scooter.apps.users.models.users import User
@@ -15,7 +17,8 @@ from scooter.apps.users.serializers.users import (UserModelSimpleSerializer,
                                                   RecoverPasswordSerializer,
                                                   RecoverPasswordVerificationSerializer,
                                                   AccountVerificationSerializer,
-                                                  ResendCodeAccountVerificationSerializer, ContactSerializer)
+                                                  ResendCodeAccountVerificationSerializer, ContactSerializer,
+                                                  AppVersionSerializer)
 # Utilities
 from scooter.utils.viewsets import ScooterViewSet
 
@@ -32,7 +35,7 @@ class UserViewSet(ScooterViewSet):
             permission_classes = [AllowAny]
         elif self.action in ['retrieve', 'client', 'merchant', 'test_notifications']:
             permission_classes = [IsAuthenticated, IsAccountOwner]
-        elif self.action == 'contact':
+        elif self.action in ['contact', 'check_version']:
             permission_classes = [AllowAny]
         else:
             permission_classes = [IsAuthenticated]
@@ -129,3 +132,9 @@ class UserViewSet(ScooterViewSet):
             "message": "Formulario enviado"
         }
         return Response(data, status=status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=['GET'])
+    def check_version(self, request, *argsm, **kwargs):
+        """ Last number version of app """
+        version = AppVersion.objects.last()
+        return Response(data=AppVersionSerializer(version).data, status=status.HTTP_200_OK)

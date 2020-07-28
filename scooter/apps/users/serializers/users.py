@@ -7,6 +7,7 @@ from django.conf import settings
 # Django rest framework
 from rest_framework import serializers
 # Models
+from scooter.apps.common.models import AppVersion
 from scooter.apps.users.models.users import User, Contact
 # JWT
 import jwt
@@ -163,4 +164,11 @@ class ContactSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Contact
+        fields = '__all__'
+
+
+class AppVersionSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = AppVersion
         fields = '__all__'
