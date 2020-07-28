@@ -43,12 +43,11 @@ class DeliveryMenOrderViewSet(ScooterViewSet, AddDeliveryManMixin,
     def get_permissions(self):
         """Assign permission based on action."""
         permissions = [IsAuthenticated, IsActiveDeliveryMan, IsAccountOwnerDeliveryMan]
-        if self.action in ['reject_order', 'accept_order', 'retrieve']:
+        if self.action in ['reject_order', 'accept_order', 'retrieve', 'is_owner']:
             permissions.append(IsOrderDeliveryManStationOwner)
         elif self.action == 'list':
             pass
         else:
-            # if self.action not in ['reject_order', 'accept_order', 'retrieve']:
             permissions.append(IsOrderDeliveryManOwner)
         return [p() for p in permissions]
 
@@ -90,12 +89,12 @@ class DeliveryMenOrderViewSet(ScooterViewSet, AddDeliveryManMixin,
         )
         serializer.is_valid(raise_exception=True)
         order_save = serializer.save()
-        # Check if the order is the delivery
-        order_check = Order.objects.get(pk=order.id)
-        if order_check.delivery_man is not delivery_man:
-            return Response(data=self.set_error_response(status=False, field="detail",
-                                                         message="El pedido fue aceptagdo por otro repartidor"),
-                            status=status.HTTP_400_BAD_REQUEST)
+        # # Check if the order is the owner delivery men
+        # order_check = Order.objects.get(pk=order.id)
+        # if order_check.delivery_man is not delivery_man:
+        #     return Response(data=self.set_error_response(status=False, field="detail",
+        #                                                  message="El pedido fue aceptagdo por otro repartidor"),
+        #                     status=status.HTTP_400_BAD_REQUEST)
 
         data = self.set_response(status=True,
                                  data={},
@@ -133,6 +132,18 @@ class DeliveryMenOrderViewSet(ScooterViewSet, AddDeliveryManMixin,
                                  data={},
                                  message='Estatus actualizado correctamente')
         return Response(data=data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['GET'])
+    def is_owner(self, request, *args, **kwargs):
+        # Check if the order is the owner delivery men
+        delivery_man = self.delivery_man
+        order = self.get_object()
+        is_owner = False
+        if order.delivery_man_id is delivery_man.id:
+            is_owner = True
+
+        return Response(data={'is_owner': is_owner},
+                        status=status.HTTP_400_BAD_REQUEST)
 
     # @action(detail=True, methods=['PUT'], url_path="purchase/already_in_commerce")
     # def already_in_commerce(self, request, *args, **kwargs):

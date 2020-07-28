@@ -1329,6 +1329,24 @@ paths:
           description: 'Información del pedido'
       tags:
         - Pedidos repartidor
+  /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/is_owner/:
+    parameters:
+      - name: delivery_man_id
+        in: path
+        required: true
+        type: string
+      - name: order_id
+        in: path
+        required: true
+        type: string
+    get:
+      operationId: get_is_owner
+      description: Obtener información si el repartidor esta asignado al pedido
+      responses:
+        '200':
+          description: 'Información del pedido'
+      tags:
+        - Pedidos repartidor
   /api/v1/customers/{customer_id}/orders/service_price/:
     parameters:
       - name: customer_id
