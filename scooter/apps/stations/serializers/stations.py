@@ -20,6 +20,13 @@ from scooter.apps.users.serializers.users import UserModelSimpleSerializer
 from scooter.apps.common.serializers import Base64ImageField
 
 
+class StationSimpleOrderSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Station
+        fields = ('id', 'name', 'phone_number')
+
+
 class StationSimpleModelSerializer(serializers.ModelSerializer):
     picture = Base64ImageField(max_length=None, use_url=True, required=False)
 

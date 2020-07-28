@@ -19,6 +19,7 @@ from django.contrib.gis.measure import D
 from django.contrib.gis.db.models.functions import Distance
 # Serializers primary field
 from scooter.apps.common.serializers.common import CustomerFilteredPrimaryKeyRelatedField
+from scooter.apps.stations.serializers import StationSimpleOrderSerializer
 
 
 class RatingOrderSerializer(serializers.ModelSerializer):
@@ -79,6 +80,7 @@ class OrderWithDetailSimpleSerializer(serializers.ModelSerializer):
 
 class OrderWithDetailModelSerializer(serializers.ModelSerializer):
     station = serializers.StringRelatedField(read_only=True)
+    station_obj = StationSimpleOrderSerializer(read_only=True)
     customer = CustomerSimpleOrderSerializer(read_only=True)
     from_address = CustomerAddressModelSerializer()
     to_address = CustomerAddressModelSerializer()
@@ -96,7 +98,7 @@ class OrderWithDetailModelSerializer(serializers.ModelSerializer):
                   "indications", "approximate_price_order", 'reason_rejection',
                   "order_date", "date_delivered_order", "qr_code", "order_status",
                   "customer", "delivery_man", "station", 'details', 'maximum_response_time', 'validate_qr',
-                  'rated_order', 'in_process', 'service_id', 'is_safe_order')
+                  'rated_order', 'in_process', 'service_id', 'is_safe_order', 'station_obj')
         read_only_fields = fields
 
 
