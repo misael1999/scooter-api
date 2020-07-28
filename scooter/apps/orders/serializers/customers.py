@@ -139,24 +139,12 @@ class CreateOrderSerializer(serializers.Serializer):
                 location_selected = get_ref_location(order)
 
                 # Get nearest delivery man
-                delivery_man = get_nearest_delivery_man(location_selected=location_selected, station=data['station'],
-                                                        list_exclude=[], distance=6)
-                # Send push notification to delivery_man
-                if not delivery_man:
-                    raise ValueError('No se encuentran repartidores disponibles')
+                send_order_delivery(location_selected=location_selected, station=data['station'], order=order)
 
-                user_id = delivery_man.user_id
+                # user_id = delivery_man.user_id
                 # Save delivery man in history rejected for not find again
-                HistoryRejectedOrders.objects.get_or_create(delivery_man=delivery_man, order=order)
+                # HistoryRejectedOrders.objects.get_or_create(delivery_man=delivery_man, order=order)
 
-                send_notification_push_task.delay(user_id,
-                                                  'Solicitud nueva',
-                                                  'Pedido de nuevo',
-                                                  {"type": "NEW_ORDER",
-                                                   "order_id": order.id,
-                                                   "message": "Pedido de nuevo",
-                                                   'click_action': 'FLUTTER_NOTIFICATION_CLICK'
-                                                   })
                 # Notification.objects.create(user_id=user_id, title="Nueva solicitud",
                 #                             type_notification_id=1,
                 #                             body="Has recibido una nueva solicitud")
@@ -191,22 +179,8 @@ class RetryOrderSerializer(serializers.Serializer):
                 order=order
             ).values_list('delivery_man_id', flat=True)
 
-            delivery_man = get_nearest_delivery_man(location_selected=location_selected, station=data['station'],
-                                                    list_exclude=list_exclude, distance=6)
-
-            if not delivery_man:
-                raise ValueError('No se encuentran repartidores disponibles')
-
-            order.order_status_id = 1
-            order.save()
-
-            send_notification_push_task.delay(delivery_man.user_id,
-                                              'Solicitud nueva',
-                                              'Ha recibido una nueva solicitud',
-                                              {"type": "NEW_ORDER", "order_id": order.id,
-                                               "message": "Ha recibido una nueva solicitud",
-                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'
-                                               })
+            # Get nearest delivery man
+            send_order_delivery(location_selected=location_selected, station=data['station'], order=order)
 
             return order.id
         except ValueError as e:
@@ -284,6 +258,32 @@ class RantingOrderCustomerSerializer(serializers.Serializer):
             print("Exception in rating order, please check it")
             print(ex.args.__str__())
             raise serializers.ValidationError({'detail': 'Error al calificar la orden'})
+
+
+def send_order_delivery(location_selected, station, order):
+    try:
+        # Get nearest delivery man
+        delivery_men = get_nearest_delivery_man(location_selected=location_selected, station=station,
+                                                list_exclude=[], distance=settings.RANGE_DISTANCE)
+
+        # Send push notification to delivery_man
+        if delivery_men.count() == 0:
+            raise ValueError('No se encuentran repartidores disponibles')
+
+        for delivery_man in delivery_men:
+            user_id = delivery_man.user_id
+            send_notification_push_task.delay(user_id,
+                                              'Solicitud nueva',
+                                              'Ha recibido un nuevo pedido',
+                                              {"type": "NEW_ORDER",
+                                               "order_id": order.id,
+                                               "message": "Pedido de nuevo",
+                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                               })
+    except ValueError as e:
+        raise ValueError(e)
+    except Exception as ex:
+        raise ValueError('Error al mandar notificaciones')
 
 
 def generate_qr_code():

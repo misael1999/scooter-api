@@ -22,7 +22,7 @@ class AcceptOrderByDeliveryManSerializer(serializers.Serializer):
         delivery_man = self.context['delivery_man']
 
         if order.order_status.slug_name == 'rejected':
-            raise serializers.ValidationError({'detail': 'El pedido fue rechazado por falta de tiempo de espera'},
+            raise serializers.ValidationError({'detail': 'El pedido fue rechazado, el tiempo de espera culmino'},
                                               code='order_already_delivery_man')
 
         # Verify that the order does not have a delivery man assigned
@@ -94,6 +94,8 @@ class RejectOrderByDeliverySerializer(serializers.Serializer):
 
     def update(self, instance, data):
         try:
+            raise ValueError('Metodo no implementado')
+
             delivery_man = self.context['delivery_man']
             # Save delivery man in history rejected orders for not find again and reported to station
             HistoryRejectedOrders.objects.get_or_create(delivery_man=delivery_man, order=instance)

@@ -1,4 +1,5 @@
 # Rest framework
+from django.conf import settings
 from django.contrib.gis.geos import fromstr
 from rest_framework import serializers
 # Serializers
@@ -146,11 +147,12 @@ def get_nearest_delivery_man(location_selected, station, list_exclude, distance)
     #     location_selected.point,
     #     D(km=distance))
 
+    SEARCH_NUMBER_DELIVERY = settings.SEARCH_NUMBER_DELIVERY
     delivery_man = DeliveryMan.objects. \
         exclude(id__in=list_exclude). \
         filter(status__slug_name="active", delivery_status__slug_name="available", station=station) \
         .annotate(distance=Distance('location', location_selected.point)) \
-        .order_by('distance').first()
+        .order_by('distance')[:SEARCH_NUMBER_DELIVERY]
     # delivery_man = DeliveryMan.objects.filter(station=station,
     #                                           location__distance_lte=(
     #                                               location_selected.point, D(km=distance))
