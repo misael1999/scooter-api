@@ -85,7 +85,7 @@ class CreateOrderSerializer(serializers.Serializer):
                                                    to_address=data['to_address'],
                                                    service=data['station_service'])
 
-            maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=2)
+            maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=3)
             qr_code = generate_qr_code()
 
             # Add client to station for update info
@@ -165,8 +165,8 @@ class RetryOrderSerializer(serializers.Serializer):
     def update(self, order, data):
         try:
             order.station = data['station']
+            order.maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=3)
             order.save()
-
             location_selected = None
 
             if order.order_status.slug_name == "pick_up":
