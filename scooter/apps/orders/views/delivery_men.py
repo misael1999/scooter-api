@@ -88,14 +88,14 @@ class DeliveryMenOrderViewSet(ScooterViewSet, AddDeliveryManMixin,
             partial=False
         )
         serializer.is_valid(raise_exception=True)
-        order = serializer.save()
+        order_save = serializer.save()
         # Check if the order is the delivery
         order_check = Order.objects.get(pk=order.id)
         if order_check.delivery_man != self.delivery_man:
             return Response(data=self.set_error_response(status=False, field="detail",
                                                          message="El pedido fue rechazado, el tiempo de espera culmino"),
                             status=status.HTTP_400_BAD_REQUEST)
-        
+
         data = self.set_response(status=True,
                                  data={},
                                  message='Solicitud aceptada')
