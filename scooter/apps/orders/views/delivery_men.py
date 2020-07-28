@@ -81,19 +81,20 @@ class DeliveryMenOrderViewSet(ScooterViewSet, AddDeliveryManMixin,
     @action(methods=['put'], detail=True)
     def accept_order(self, request, *args, **kwargs):
         order = self.get_object()
+        delivery_man = self.delivery_man
         serializer = AcceptOrderByDeliveryManSerializer(
             order,
             data=request.data,
-            context={'delivery_man': self.delivery_man, 'order': order},
+            context={'delivery_man': delivery_man, 'order': order},
             partial=False
         )
         serializer.is_valid(raise_exception=True)
         order_save = serializer.save()
         # Check if the order is the delivery
         order_check = Order.objects.get(pk=order.id)
-        if order_check.delivery_man is not self.delivery_man:
+        if order_check.delivery_man is not delivery_man:
             return Response(data=self.set_error_response(status=False, field="detail",
-                                                         message="El pedido fue rechazado, el tiempo de espera culmino"),
+                                                         message="El pedido fue aceptagdo por otro repartidor"),
                             status=status.HTTP_400_BAD_REQUEST)
 
         data = self.set_response(status=True,
