@@ -235,9 +235,8 @@ class StationUpdateInfoSerializer(serializers.Serializer):
             # import pdb; pdb.set_trace()
             if general.get('picture', None) is not None:
                 instance.picture.delete()
-                instance.picture = general['picture']
-            instance.phone_number = general['phone_number']
-            instance.contact_person = general['contact_person']
+            for field, value in general.items():
+                setattr(instance, field, value)
             return instance
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
