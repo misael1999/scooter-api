@@ -1,6 +1,7 @@
 # Rest framework
 from django.conf import settings
 from django.contrib.gis.geos import fromstr
+from django.utils import timezone
 from rest_framework import serializers
 # Serializers
 from scooter.apps.common.serializers import OrderStatusModelSerializer, ServiceModelSerializer
@@ -127,6 +128,11 @@ class CalculateServicePriceSerializer(serializers.Serializer):
 
     def create(self, data):
         try:
+            station = data['station']
+
+            if is_free_order(station):
+                return 0.0
+
             data_service = calculate_service_price(from_address=data['from_address'],
                                                    to_address=data['to_address'],
                                                    service=data['station_service'])
@@ -139,8 +145,19 @@ class CalculateServicePriceSerializer(serializers.Serializer):
             raise serializers.ValidationError({'detail': 'Error al consultar precio de la orden'})
 
 
+def is_free_order(station):
+    is_free = False
+    if station.free_orders_activated:
+        current_hour = timezone.localtime(timezone.now()).strftime('%H:%M:%S')
+        # import pdb; pdb.set_trace()
+        if current_hour >= str(station.from_hour_free_order) and current_hour <= str(station.to_hour_free_order):
+            is_free = True
+
+    return is_free
+
+
 # Methods helpers
-def get_nearest_delivery_man(location_selected, station, list_exclude, distance):
+def get_nearest_delivery_man(location_selected, station, list_exclude, distance, status):
     """ Get nearest delivery man and exclude who are in the history of rejected orders """
 
     # List of delivery men nearest
@@ -152,7 +169,7 @@ def get_nearest_delivery_man(location_selected, station, list_exclude, distance)
     SEARCH_NUMBER_DELIVERY = settings.SEARCH_NUMBER_DELIVERY
     delivery_man = DeliveryMan.objects. \
         exclude(id__in=list_exclude). \
-        filter(status__slug_name="active", delivery_status__slug_name="available", station=station) \
+        filter(status__slug_name="active", delivery_status__slug_name__in=status, station=station) \
         .annotate(distance=Distance('location', location_selected.point)) \
         .order_by('distance')[:SEARCH_NUMBER_DELIVERY]
     # delivery_man = DeliveryMan.objects.filter(station=station,

@@ -23,7 +23,7 @@ from scooter.apps.common.serializers.common import CustomerFilteredPrimaryKeyRel
 from scooter.apps.taskapp.tasks import send_notification_push_task
 # Methods helpers
 from scooter.apps.orders.serializers.orders import (calculate_service_price,
-                                                    get_nearest_delivery_man)
+                                                    get_nearest_delivery_man, is_free_order)
 # Utilities
 import random
 from string import ascii_uppercase, digits
@@ -81,9 +81,14 @@ class CreateOrderSerializer(serializers.Serializer):
             # Check if the station has manual assignment activated
             station = data['station']
             # Calculate price between two address
+
             data_service = calculate_service_price(from_address=data['from_address'],
                                                    to_address=data['to_address'],
                                                    service=data['station_service'])
+            price = 0.0
+
+            if not is_free_order(station):
+                price = data_service['price_service']
 
             maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=3)
             qr_code = generate_qr_code()
@@ -111,7 +116,7 @@ class CreateOrderSerializer(serializers.Serializer):
                                          member_station=member,
                                          qr_code=qr_code,
                                          order_date=timezone.localtime(timezone.now()),
-                                         service_price=data_service['price_service'],
+                                         service_price=price,
                                          distance=data_service['distance'],
                                          is_safe_order=is_safe_order,
                                          maximum_response_time=maximum_response_time,
@@ -180,7 +185,8 @@ class RetryOrderSerializer(serializers.Serializer):
             ).values_list('delivery_man_id', flat=True)
 
             # Get nearest delivery man
-            send_order_delivery(location_selected=location_selected, station=data['station'], order=order)
+            send_order_delivery(location_selected=location_selected, station=data['station'],
+                                order=order)
 
             return order.id
         except ValueError as e:
@@ -264,11 +270,17 @@ def send_order_delivery(location_selected, station, order):
     try:
         # Get nearest delivery man
         delivery_men = get_nearest_delivery_man(location_selected=location_selected, station=station,
-                                                list_exclude=[], distance=settings.RANGE_DISTANCE)
+                                                list_exclude=[], distance=settings.RANGE_DISTANCE,
+                                                status=['available'])
 
         # Send push notification to delivery_man
         if delivery_men.count() == 0:
-            raise ValueError('No se encuentran repartidores disponibles')
+            delivery_men = get_nearest_delivery_man(location_selected=location_selected, station=station,
+                                                    list_exclude=[], distance=settings.RANGE_DISTANCE,
+                                                    status=['available', 'busy'])
+
+            if delivery_men.count() == 0:
+                raise ValueError('No se encuentran repartidores disponibles')
 
         for delivery_man in delivery_men:
             user_id = delivery_man.user_id
