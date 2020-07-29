@@ -73,7 +73,7 @@ class StationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         data = self.set_response(status='ok',
-                                 data=UserModelSimpleSerializer(user).data,
+                                 data={},
                                  message='Gracias por registrarse, en breve recibira un correo para confirmar su cuenta')
         return Response(data, status=status.HTTP_201_CREATED)
 
