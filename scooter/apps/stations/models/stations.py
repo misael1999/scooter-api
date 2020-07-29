@@ -17,7 +17,10 @@ class Station(ScooterModel):
     cancellation_policies = models.TextField(blank=True, null=True)
     allow_cancellations = models.BooleanField(default=True)
     quantity_safe_order = models.PositiveIntegerField(default=3)
+    # Free orders
     free_orders_activated = models.BooleanField(default=False)
+    from_hour_free_order = models.TimeField(blank=True, null=True)
+    to_hour_free_order = models.TimeField(blank=True, null=True)
     # Help
     information_is_complete = models.BooleanField(default=False)
     # stats

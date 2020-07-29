@@ -34,10 +34,10 @@ class DeliveryMan(ScooterModel):
 
 class DeliveryManAddress(ScooterModel):
     delivery_man = models.OneToOneField(DeliveryMan, on_delete=models.CASCADE, related_name='address')
-    street = models.CharField(max_length=100)
-    suburb = models.CharField(max_length=60)
-    postal_code = models.CharField(max_length=10)
-    exterior_number = models.CharField(max_length=10)
+    street = models.CharField(max_length=100, blank=True, null=True)
+    suburb = models.CharField(max_length=60, blank=True, null=True)
+    postal_code = models.CharField(max_length=10, blank=True, null=True)
+    exterior_number = models.CharField(max_length=10, blank=True)
     inside_number = models.CharField(max_length=10, blank=True, null=True)
     references = models.CharField(max_length=150, blank=True, null=True)
 

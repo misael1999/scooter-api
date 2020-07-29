@@ -150,7 +150,8 @@ class StationWithAllInfoSerializer(serializers.ModelSerializer):
             "user", "services", "schedules", "address",
             "assign_delivery_manually", 'phone_number',
             "cancellation_policies",
-            "allow_cancellations",
+            "allow_cancellations", 'quantity_safe_order', 'free_orders_activated',
+            'from_hour_free_order', 'to_hour_free_order'
         )
         read_only_fields = fields
 
@@ -160,6 +161,10 @@ class StationConfigSerializer(serializers.Serializer):
     assign_delivery_manually = serializers.BooleanField()
     cancellation_policies = serializers.CharField(max_length=400)
     allow_cancellations = serializers.BooleanField()
+    quantity_safe_order = serializers.IntegerField(required=False)
+    free_orders_activated = serializers.BooleanField(required=False)
+    from_hour_free_order = serializers.TimeField(required=False)
+    to_hour_free_order = serializers.TimeField(required=False)
 
 
 # Update configuration of station
@@ -244,9 +249,11 @@ class StationUpdateInfoSerializer(serializers.Serializer):
     def save_config(self, instance, config):
         """ Save station config """
         try:
-            instance.assign_delivery_manually = config['assign_delivery_manually']
-            instance.cancellation_policies = config['cancellation_policies']
-            instance.allow_cancellations = config['allow_cancellations']
+            for field, value in config.items():
+                setattr(instance, field, value)
+            # instance.assign_delivery_manually = config['assign_delivery_manually']
+            # instance.cancellation_policies = config['cancellation_policies']
+            # instance.allow_cancellations = config['allow_cancellations']
             return instance
         except ValueError as e:
             raise ValueError(str(e))
