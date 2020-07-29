@@ -24,7 +24,7 @@ class StationSimpleOrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Station
-        fields = ('id', 'name', 'phone_number')
+        fields = ('id', 'station_name', 'phone_number')
         read_only_fields = fields
 
 
