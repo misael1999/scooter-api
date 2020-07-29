@@ -79,8 +79,8 @@ class OrderWithDetailSimpleSerializer(serializers.ModelSerializer):
 
 
 class OrderWithDetailModelSerializer(serializers.ModelSerializer):
-    station = serializers.StringRelatedField(read_only=True)
-    station_obj = StationSimpleOrderSerializer(read_only=True)
+    # station = serializers.StringRelatedField(read_only=True)
+    station = StationSimpleOrderSerializer(read_only=True)
     customer = CustomerSimpleOrderSerializer(read_only=True)
     from_address = CustomerAddressModelSerializer()
     to_address = CustomerAddressModelSerializer()
@@ -98,7 +98,7 @@ class OrderWithDetailModelSerializer(serializers.ModelSerializer):
                   "indications", "approximate_price_order", 'reason_rejection',
                   "order_date", "date_delivered_order", "qr_code", "order_status",
                   "customer", "delivery_man", "station", 'details', 'maximum_response_time', 'validate_qr',
-                  'rated_order', 'in_process', 'service_id', 'is_safe_order', 'station_obj')
+                  'rated_order', 'in_process', 'service_id', 'station_obj', 'is_safe_order')
         read_only_fields = fields
 
 
