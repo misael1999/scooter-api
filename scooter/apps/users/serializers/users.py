@@ -160,6 +160,26 @@ class TestNotificationSerializer(serializers.Serializer):
             raise serializers.ValidationError({'detail': 'Error al enviar notificación'})
 
 
+# class SendNotificationDeliverySerializer(serializers.Serializer):
+#     title = serializers.CharField(max_length=30)
+#     message = serializers.CharField(max_length=30)
+#     data = serializers.JSONField()
+#
+#     def create(self, data):
+#         try:
+#             devices = FCMDevice.objects.filter(user=data['user'])
+#             if not devices:
+#                 raise ValueError('No se encontraron dispositivos registrados')
+#             devices.send_message(title=data['title'], body=data['message'], data=data['data'])
+#             return data
+#         except ValueError as e:
+#             raise serializers.ValidationError({'detail': str(e)})
+#         except Exception as ex:
+#             print("Exception in create order, please check it")
+#             print(ex.args.__str__())
+#             raise serializers.ValidationError({'detail': 'Error al enviar notificación'})
+
+
 class ContactSerializer(serializers.ModelSerializer):
 
     class Meta:

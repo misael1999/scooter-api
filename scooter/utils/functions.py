@@ -40,7 +40,7 @@ def generate_verification_token(user, exp, token_type):
 def send_notification_push_order(user_id, title, body, data):
     devices = FCMDevice.objects.filter(user_id=user_id)
     if devices:
-        devices.send_message(title=title, body=body, data=data)
+        devices.send_message(title=title, body=body, data=data, sound="default")
 
 
 def get_date_from_querystring(request, date_find, default_value=None):
