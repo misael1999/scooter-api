@@ -1,5 +1,6 @@
 """ Users serializers """
 # Django rest framework
+from django.utils import timezone
 from rest_framework import serializers
 from django.contrib.gis.geos import Point
 # Models
@@ -79,9 +80,10 @@ class UpdateLocationDeliverySerializer(serializers.Serializer):
         try:
             location = Point(x=data['longitude'], y=data['latitude'])
             instance.location = location
+            instance.last_time_update_location = timezone.localtime(timezone.now())
             instance.save()
             # send data through django channels
-            async_to_sync(send_notify_change_location)(instance.station.id, instance.id, 'UPDATE_LOCATION')
+            # async_to_sync(send_notify_change_location)(instance.station.id, instance.id, 'UPDATE_LOCATION')
             return instance
         except Exception as ex:
             raise serializers.ValidationError({'detail': 'Ha ocurrido un error al guardar la ubicación'})

@@ -28,6 +28,8 @@ from scooter.apps.orders.serializers.orders import (calculate_service_price,
 import random
 from string import ascii_uppercase, digits
 
+from scooter.utils.functions import send_notification_push_order
+
 
 class CreateOrderSerializer(serializers.Serializer):
     """ Create new order for customer"""
@@ -164,13 +166,13 @@ class CreateOrderSerializer(serializers.Serializer):
 
 
 class RetryOrderSerializer(serializers.Serializer):
-
     station_id = serializers.PrimaryKeyRelatedField(queryset=Station.objects.all(), source="station")
 
     def update(self, order, data):
         try:
             order.station = data['station']
             order.maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=3)
+            order.order_status = OrderStatus.objects.get(slug_name="await_delivery_man")
             order.save()
             location_selected = None
 
@@ -228,7 +230,7 @@ class RantingOrderCustomerSerializer(serializers.Serializer):
             delivery_man = data['delivery_man']
             # Create new rating order
             rating_order = RatingOrder.objects.create(
-               **data
+                **data
             )
 
             # Update reputation station
@@ -255,7 +257,6 @@ class RantingOrderCustomerSerializer(serializers.Serializer):
 
             Notification.objects.create(user_id=station.user_id, title="Ha recibido una nueva valoración",
                                         type_notification_id=1)
-
 
             return data
         except ValueError as e:
@@ -284,10 +285,10 @@ def send_order_delivery(location_selected, station, order):
 
         for delivery_man in delivery_men:
             user_id = delivery_man.user_id
-            send_notification_push_task.delay(user_id,
-                                              'Solicitud nueva',
-                                              'Ha recibido un nuevo pedido',
-                                              {"type": "NEW_ORDER",
+            send_notification_push_order(user_id=user_id,
+                                         title='Solicitud nueva',
+                                         body='Ha recibido un nuevo pedido',
+                                         data={"type": "NEW_ORDER",
                                                "order_id": order.id,
                                                "message": "Pedido de nuevo",
                                                'click_action': 'FLUTTER_NOTIFICATION_CLICK'

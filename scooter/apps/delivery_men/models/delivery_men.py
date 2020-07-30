@@ -24,6 +24,7 @@ class DeliveryMan(ScooterModel):
     location = models.PointField(blank=True, null=True, geography=True)
     vehicle = models.OneToOneField('stations.Vehicle', on_delete=models.DO_NOTHING, blank=True, null=True)
     delivery_status = models.ForeignKey('common.DeliveryManStatus', on_delete=models.DO_NOTHING, default=1)
+    last_time_update_location = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = 'delivery_men_delivery_man'
