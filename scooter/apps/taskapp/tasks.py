@@ -56,7 +56,7 @@ def location_notice_not_enabled():
     """ Notice when the location is not enabled """
     now = timezone.localtime(timezone.now())
     offset = now - timedelta(minutes=7)
-    delivery_men = DeliveryMan.objects.filter(delivery_status_slug_name__in=['available', 'busy'],
+    delivery_men = DeliveryMan.objects.filter(delivery_status__slug_name__in=['available', 'busy'],
                                               last_time_update_location__lte=offset)
     for delivery_man in delivery_men:
         send_notification_push_order(delivery_man.user_id, title='¡¡¡¡ Aviso !!!!!',
@@ -72,7 +72,7 @@ def disabled_location():
     """ Disabled location when are available and not send location in several minutes """
     now = timezone.localtime(timezone.now())
     offset = now - timedelta(minutes=50)
-    delivery_men = DeliveryMan.objects.filter(delivery_status_slug_name__in=['available', 'busy'],
+    delivery_men = DeliveryMan.objects.filter(delivery_status__slug_name__in=['available', 'busy'],
                                               last_time_update_location__lte=offset)
     for delivery_man in delivery_men:
         send_notification_push_order(delivery_man.user_id, title='¡¡¡¡ Importante !!!!!',
@@ -83,5 +83,5 @@ def disabled_location():
                                            "message": "No estamos recibiendo tu ubicación",
                                            'click_action': 'FLUTTER_NOTIFICATION_CLICK'})
 
-    delivery_men.update(elivery_status_id=3)
+    delivery_men.update(delivery_status_id=3)
 
