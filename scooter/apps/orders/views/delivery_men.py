@@ -143,7 +143,7 @@ class DeliveryMenOrderViewSet(ScooterViewSet, AddDeliveryManMixin,
             is_owner = True
 
         return Response(data={'is_owner': is_owner},
-                        status=status.HTTP_400_BAD_REQUEST)
+                        status=status.HTTP_200_OK)
 
     # @action(detail=True, methods=['PUT'], url_path="purchase/already_in_commerce")
     # def already_in_commerce(self, request, *args, **kwargs):
