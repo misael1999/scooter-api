@@ -92,7 +92,7 @@ class CreateOrderSerializer(serializers.Serializer):
             if not is_free_order(station):
                 price = data_service['price_service']
 
-            maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=3)
+            maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=settings.TIME_RESPONSE)
             qr_code = generate_qr_code()
 
             # Add client to station for update info
@@ -171,7 +171,7 @@ class RetryOrderSerializer(serializers.Serializer):
     def update(self, order, data):
         try:
             order.station = data['station']
-            order.maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=3)
+            order.maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=settings.TIME_RESPONSE)
             order.order_status = OrderStatus.objects.get(slug_name="await_delivery_man")
             order.save()
             location_selected = None

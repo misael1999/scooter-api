@@ -17,7 +17,8 @@ ALLOWED_HOSTS = [
     '127.0.0.1:4200',
     'localhost:4200',
     'scooter-app.team',
-    'www.scooter-app.team'
+    'www.scooter-app.team',
+    '192.168.0.6'
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True

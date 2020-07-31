@@ -12,6 +12,7 @@ class Customer(ScooterModel):
     picture = models.ImageField(upload_to='customers/pictures/', blank=True, null=True)
     picture_url = models.CharField(max_length=300, blank=True, null=True)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
+    is_safe_user = models.BooleanField(default=False)
 
     # stats
     reputation = models.FloatField(default=0)

@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 # Utilities
+from scooter.apps.delivery_men.models import DeliveryMan
 from scooter.apps.orders.models import Order
 from scooter.apps.orders.utils.filters import OrderFilter
 from scooter.utils.viewsets.scooter import ScooterViewSet
@@ -145,6 +146,19 @@ class DeliveryMenOrderViewSet(ScooterViewSet, AddDeliveryManMixin,
         return Response(data={'is_owner': is_owner},
                         status=status.HTTP_200_OK)
 
+    @action(detail=False, methods=['GET'])
+    def current_orders(self, request, *args, **kwargs):
+        #
+        order_in_process = Order.objects.filter(delivery_man=self.delivery_man, in_process=True)
+        order_await_confirmation = Order.objects.filter(station=self.delivery_man.station,
+                                                        order_status__slug_name__in=['await_delivery_man'])
+        data = {
+            'in_process': OrderWithDetailModelSerializer(order_in_process, many=True).data,
+            'await_confirmation': OrderWithDetailModelSerializer(order_await_confirmation, many=True).data
+        }
+        return Response(data=data,
+                        status=status.HTTP_200_OK)
+
     # @action(detail=True, methods=['PUT'], url_path="purchase/already_in_commerce")
     # def already_in_commerce(self, request, *args, **kwargs):
     #     order = self.get_object()
@@ -208,4 +222,3 @@ class DeliveryMenOrderViewSet(ScooterViewSet, AddDeliveryManMixin,
     #                              data={},
     #                              message='Estatus cambiado correctamente')
     #     return Response(data=data, status=status.HTTP_200_OK)
-

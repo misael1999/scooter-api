@@ -57,17 +57,17 @@ class GeneralDeliveryConsumer(AsyncJsonWebsocketConsumer):
             raise DenyConnection("Invalid User")
 
         user = self.scope['user']
-        station_id = self.scope['url_route']['kwargs']['station_id']
+        delivery_man_id = self.scope['url_route']['kwargs']['delivery_man_id']
 
         if user.station is None:
             self.scope['user'] = AnonymousUser()
             raise DenyConnection("Invalid User")
 
-        if user.station.id != int(station_id):
+        if user.deliveryman.id != int(delivery_man_id):
             self.scope['user'] = AnonymousUser()
             raise DenyConnection("Invalid User")
 
-        self.room_group_name = '{room}-{id}'.format(room=self.room_name, id=station_id)
+        self.room_group_name = '{room}-{id}'.format(room=self.room_name, id=delivery_man_id)
         # Join room group
         await self.channel_layer.group_add(
             self.room_group_name,

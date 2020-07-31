@@ -8,7 +8,7 @@ info:
   license:
     name: BSD License
   version: v1
-basePath: /appback/
+basePath: /dev/
 consumes:
   - application/json
 produces:
@@ -1243,6 +1243,52 @@ paths:
         '200':
           description: 'Listado de pedidos por central'
       tags:
+        - Pedidos centrales  /api/v1/stations/{station_id}/orders/:
+    parameters:
+      - name: station_id
+        in: path
+        required: true
+        type: string
+    get:
+      operationId: get_orders_customer
+      description: Obtener todas las ordenes
+      parameters:
+        - name: limit
+          in: query
+          description: Numero de resultados por pagina
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: El índice inicial desde el que devolver los resultados.
+          required: false
+          type: integer
+        - name: order_status
+          description: ID del status de la orden
+          required: false
+          in: query
+          type: string
+        - name: in_process
+          description: En proceso
+          in: query
+          required: false
+          type: string
+          enum: ['true', 'false']
+        - name: search
+          description: Buscar por (estación, dirección)
+          in: query
+          required: false
+          type: string
+        - name: ordering
+          description: Ordenar por
+          in: query
+          required: false
+          type: string
+          enum: ['order_date', 'date_delivered_order', 'station']
+      responses:
+        '200':
+          description: 'Listado de pedidos por central'
+      tags:
         - Pedidos centrales
   /api/v1/stations/{station_id}/orders/{order_id}/:
     parameters:
@@ -1407,6 +1453,20 @@ paths:
       responses:
         '200':
           description: 'Listado de pedidos por repartidor'
+      tags:
+        - Pedidos repartidor
+  /api/v1/delivery_men/{delivery_man_id}/orders/current_orders/:
+    parameters:
+      - name: delivery_man_id
+        in: path
+        required: true
+        type: string
+    get:
+      operationId: get_current_orders_delivery_man
+      description: Obtener las ordenes actuales de un repartidor
+      responses:
+        '200':
+          description: 'Obtener las ordenes actuales de un repartidor'
       tags:
         - Pedidos repartidor
   /api/v1/delivery_men/{delivery_man_id}/orders/{order_id}/reject_order/:
