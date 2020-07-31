@@ -59,7 +59,7 @@ class GeneralDeliveryConsumer(AsyncJsonWebsocketConsumer):
         user = self.scope['user']
         delivery_man_id = self.scope['url_route']['kwargs']['delivery_man_id']
 
-        if user.station is None:
+        if user.deliveryman is None:
             self.scope['user'] = AnonymousUser()
             raise DenyConnection("Invalid User")
 
@@ -86,7 +86,7 @@ class GeneralDeliveryConsumer(AsyncJsonWebsocketConsumer):
                 self.channel_name
             )
 
-    async def notify_location(self, event):
+    async def notify_order(self, event):
         await self.send_json(event["content"])
 
 

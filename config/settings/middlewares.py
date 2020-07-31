@@ -41,6 +41,7 @@ class TokenAuthMiddleware:
             # }
 
             # Get the user using ID
+
             user = get_user_model().objects.get(id=decoded_data["user_id"])
             scope['user'] = user
             close_old_connections()

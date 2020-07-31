@@ -31,7 +31,8 @@ class CustomerSimpleModelSerializer(serializers.ModelSerializer):
             'picture',
             'picture_url',
             'phone_number',
-            'reputation'
+            'reputation',
+            'is_safe_user'
         )
 
     def update(self, instance, data):
@@ -53,7 +54,8 @@ class CustomerSimpleOrderSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'phone_number',
-            'reputation'
+            'reputation',
+            'is_safe_user'
         )
         read_only_fields = fields
 
