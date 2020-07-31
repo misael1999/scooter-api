@@ -46,7 +46,7 @@ class DeliveryMenOrderViewSet(ScooterViewSet, AddDeliveryManMixin,
         permissions = [IsAuthenticated, IsActiveDeliveryMan, IsAccountOwnerDeliveryMan]
         if self.action in ['reject_order', 'accept_order', 'retrieve', 'is_owner']:
             permissions.append(IsOrderDeliveryManStationOwner)
-        elif self.action == 'list':
+        elif self.action in ['list', 'current_orders']:
             pass
         else:
             permissions.append(IsOrderDeliveryManOwner)

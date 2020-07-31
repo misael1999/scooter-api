@@ -15,7 +15,7 @@ from scooter.apps.common.models import Service, OrderStatus, Notification
 from scooter.apps.customers.models import CustomerAddress
 from scooter.apps.orders.models.orders import Order
 # Functions channels
-from scooter.apps.orders.utils.orders import send_order_to_station_channel
+from scooter.apps.orders.utils.orders import send_order_to_station_channel, notify_delivery_men
 from asgiref.sync import async_to_sync
 # Serializers primary field
 from scooter.apps.common.serializers.common import CustomerFilteredPrimaryKeyRelatedField
@@ -281,9 +281,14 @@ def send_order_delivery(location_selected, station, order):
                                                     status=['available', 'busy'])
 
             if delivery_men.count() == 0:
-                raise ValueError('No se encuentran repartidores disponibles')
+                delivery_men = get_nearest_delivery_man(location_selected=location_selected, station=station,
+                                                        list_exclude=[], distance=settings.RANGE_DISTANCE,
+                                                        status=['available', 'busy', 'out_service'])
+                if delivery_men.count() == 0:
+                    raise ValueError('No se encontraron repartidores disponibles')
 
         for delivery_man in delivery_men:
+            async_to_sync(notify_delivery_men)(delivery_man.id, order.id)
             user_id = delivery_man.user_id
             send_notification_push_order(user_id=user_id,
                                          title='Solicitud nueva',

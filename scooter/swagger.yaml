@@ -8,7 +8,7 @@ info:
   license:
     name: BSD License
   version: v1
-basePath: /dev/
+basePath: /appback/
 consumes:
   - application/json
 produces:
