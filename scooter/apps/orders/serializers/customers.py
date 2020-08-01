@@ -139,7 +139,6 @@ class CreateOrderSerializer(serializers.Serializer):
             if data['is_current_location']:
                 to_address = data['current_location']
                 customer_address = CustomerAddress.objects.create(**to_address,
-                                                                  alias='Última ubicación',
                                                                   type_address_id=1,
                                                                   status_id=3)
                 data['to_address'] = customer_address
