@@ -93,6 +93,34 @@ paths:
       tags:
         - Común
     parameters: []
+  /api/v1/commons/add_addresses/:
+    post:
+      operationId: register_recommendations_address
+      description: Registro de direcciones para recomendaciones
+      parameters:
+        - name: body
+          in: body
+          description: Registro de direcciones para recomendaciones
+          schema:
+            $ref: '#/definitions/RegisterCustomerAddress'
+      responses:
+        '201':
+          description: 'Información de la dirección'
+      tags:
+        - Común
+    parameters: []
+  /api/v1/commons/addresses_recommendations/:
+    parameters: []
+    get:
+      operationId: addresses_recomendations
+      description: Listado de direcciones de recomendaciones.
+      parameters: []
+      responses:
+        '200':
+          description: 'Listado de direcciones'
+      tags:
+        - Común
+
   # DEVICES
   /api/v1/devices/:
     post:

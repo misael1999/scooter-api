@@ -26,6 +26,26 @@ class PointSerializer(serializers.Serializer):
     lng = serializers.FloatField()
 
 
+class AddressRecommendationsSerializer(serializers.ModelSerializer):
+    point = PointSerializer()
+    type_address_id = serializers.IntegerField(default=3)
+
+    class Meta:
+        model = CustomerAddress
+        fields = ("alias", "full_address", "type_address_id", "exterior_number",
+                  "inside_number", "references", "point")
+
+    def create(self, data):
+        try:
+            point = data.pop('point', None)
+            if point:
+                data['point'] = Point(x=point['lng'], y=point['lat'], srid=4326)
+            address = CustomerAddress.objects.create(**data)
+            return address
+        except Exception as ex:
+            raise serializers.ValidationError({'detail': ex.args.__str__()})
+
+
 class CreateCustomerAddressSerializer(serializers.ModelSerializer):
     point = PointSerializer()
     type_address_id = serializers.IntegerField(default=1)

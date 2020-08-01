@@ -3,6 +3,8 @@ from rest_framework.decorators import action
 from rest_framework import status
 from rest_framework.response import Response
 # Custom viewset
+from scooter.apps.customers.models import CustomerAddress
+from scooter.apps.customers.serializers import AddressRecommendationsSerializer, CustomerAddressModelSerializer
 from scooter.utils.viewsets import ScooterViewSet
 # Permissions
 from rest_framework.permissions import IsAuthenticated
@@ -64,3 +66,22 @@ class StatusViewSet(ScooterViewSet):
         type_addresses = TypeVehicleSerializer(query, many=True).data
         data = self.set_response(status='ok', data=type_addresses, message='Tipos de vehiculos')
         return Response(data=data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['POST'])
+    def add_addresses(self, request, *args, **kwargs):
+        """ Create address recommendations """
+        serializer = AddressRecommendationsSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        obj = serializer.save()
+        data = self.set_response(status=True,
+                                 data={},
+                                 message='Se ha registrado una nueva dirección de recomendaciones')
+        return Response(data=data, status=status.HTTP_201_CREATED)
+
+    @action(methods=['GET'], detail=False)
+    def addresses_recommendations(self, request, *args, **kwargs):
+        addresses = CustomerAddress.objects.filter(type_address_id=3)
+        data = self.set_response(status=True, data=CustomerAddressModelSerializer(addresses, many=True).data,
+                                 message="Listado de direcciones")
+        return Response(data=data,
+                        status=status.HTTP_200_OK)

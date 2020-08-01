@@ -37,7 +37,8 @@ class CreateOrderSerializer(serializers.Serializer):
     details = DetailOrderSerializer(many=True, required=False, allow_null=True)
     station_id = serializers.PrimaryKeyRelatedField(queryset=Station.objects.all(), source="station")
     service_id = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all(), source="service")
-    from_address_id = CustomerFilteredPrimaryKeyRelatedField(queryset=CustomerAddress.objects, source="from_address")
+    # Modified to add address recommendations
+    from_address_id = serializers.PrimaryKeyRelatedField(queryset=CustomerAddress.objects.all(), source="from_address")
     to_address_id = CustomerFilteredPrimaryKeyRelatedField(queryset=CustomerAddress.objects, source="to_address")
     indications = serializers.CharField(max_length=500, required=False)
     approximate_price_order = serializers.CharField(max_length=30)
@@ -82,6 +83,7 @@ class CreateOrderSerializer(serializers.Serializer):
 
             # Check if the station has manual assignment activated
             station = data['station']
+            customer = data['customer']
             # Calculate price between two address
 
             data_service = calculate_service_price(from_address=data['from_address'],
@@ -108,8 +110,13 @@ class CreateOrderSerializer(serializers.Serializer):
             QUANTITY_SAFE_ORDER = station.quantity_safe_order
             is_safe_order = False
 
-            if member.total_orders >= QUANTITY_SAFE_ORDER:
+            if customer.is_safe_user:
                 is_safe_order = True
+            else:
+                if member.total_orders >= QUANTITY_SAFE_ORDER:
+                    is_safe_order = True
+                    customer.is_safe_user = True
+                    customer.save()
 
             if station.assign_delivery_manually:
                 order_status = OrderStatus.objects.get(slug_name="without_delivery")

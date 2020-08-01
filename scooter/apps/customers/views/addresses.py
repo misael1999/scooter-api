@@ -83,3 +83,4 @@ class CustomerAddressesViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cre
             error = self.set_error_response(status=False, field='status',
                                             message='Ha ocurrido un error al borrar la dirección')
             return Response(data=error, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
