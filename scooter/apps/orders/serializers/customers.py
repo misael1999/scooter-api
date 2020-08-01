@@ -6,6 +6,7 @@ from django.db.models import Avg
 from django.utils import timezone
 from rest_framework import serializers
 # Serializers
+from scooter.apps.customers.serializers import PointSerializer
 from scooter.apps.orders.models.ratings import RatingOrder
 from scooter.apps.orders.serializers import DetailOrderSerializer
 # Models
@@ -31,6 +32,16 @@ from string import ascii_uppercase, digits
 from scooter.utils.functions import send_notification_push_order
 
 
+class CurrentLocationAddressSerializer(serializers.ModelSerializer):
+    point = PointSerializer()
+    type_address_id = serializers.IntegerField(default=1)
+
+    class Meta:
+        model = CustomerAddress
+        fields = ("full_address", "type_address_id", "exterior_number",
+                  "references", "point")
+
+
 class CreateOrderSerializer(serializers.Serializer):
     """ Create new order for customer"""
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
@@ -38,8 +49,12 @@ class CreateOrderSerializer(serializers.Serializer):
     station_id = serializers.PrimaryKeyRelatedField(queryset=Station.objects.all(), source="station")
     service_id = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all(), source="service")
     # Modified to add address recommendations
+    current_location = CurrentLocationAddressSerializer(required=False, allow_null=True,
+                                                        help_text="For selected current location fast delivered")
+    is_current_location = serializers.BooleanField(required=False, allow_null=True, default=False)
     from_address_id = serializers.PrimaryKeyRelatedField(queryset=CustomerAddress.objects.all(), source="from_address")
     to_address_id = CustomerFilteredPrimaryKeyRelatedField(queryset=CustomerAddress.objects, source="to_address")
+
     indications = serializers.CharField(max_length=500, required=False)
     approximate_price_order = serializers.CharField(max_length=30)
     phone_number = serializers.CharField(max_length=15)
@@ -101,10 +116,10 @@ class CreateOrderSerializer(serializers.Serializer):
             member, created = MemberStation.objects.get_or_create(customer=data['customer'],
                                                                   station=station)
 
-            if created:
-                Notification.objects.create(user_id=station.user_id, title="Nuevo cliente",
-                                            type_notification_id=1,
-                                            body="Se ha agregado un nuevo cliente")
+            # if created:
+            #     Notification.objects.create(user_id=station.user_id, title="Nuevo cliente",
+            #                                 type_notification_id=1,
+            #                                 body="Se ha agregado un nuevo cliente")
 
             order_status = OrderStatus.objects.get(slug_name="await_delivery_man")
             QUANTITY_SAFE_ORDER = station.quantity_safe_order
@@ -120,6 +135,14 @@ class CreateOrderSerializer(serializers.Serializer):
 
             if station.assign_delivery_manually:
                 order_status = OrderStatus.objects.get(slug_name="without_delivery")
+
+            if data['is_current_location']:
+                to_address = data['current_location']
+                customer_address = CustomerAddress.objects.create(**to_address,
+                                                                  alias='Última ubicación',
+                                                                  type_address_id=1,
+                                                                  status_id=3)
+                data['to_address'] = customer_address
 
             order = Order.objects.create(**data,
                                          member_station=member,
@@ -170,6 +193,9 @@ class CreateOrderSerializer(serializers.Serializer):
             print("Exception in create order, please check it")
             print(ex.args.__str__())
             raise serializers.ValidationError({'detail': 'Error al crear la orden'})
+
+    def create_order(self, data):
+        pass
 
 
 class RetryOrderSerializer(serializers.Serializer):
