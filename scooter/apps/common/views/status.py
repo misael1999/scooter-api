@@ -19,7 +19,6 @@ from scooter.apps.common.serializers import (StatusModelSerializer,
                                              ScheduleModelSerializer, ServiceModelSerializer,
                                              TypeAddressModelSerializer)
 
-
 class StatusViewSet(ScooterViewSet):
     """ Return status"""
     lookup_field = 'id'
@@ -66,22 +65,3 @@ class StatusViewSet(ScooterViewSet):
         type_addresses = TypeVehicleSerializer(query, many=True).data
         data = self.set_response(status='ok', data=type_addresses, message='Tipos de vehiculos')
         return Response(data=data, status=status.HTTP_200_OK)
-
-    @action(detail=False, methods=['POST'])
-    def add_addresses(self, request, *args, **kwargs):
-        """ Create address recommendations """
-        serializer = AddressRecommendationsSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        obj = serializer.save()
-        data = self.set_response(status=True,
-                                 data={},
-                                 message='Se ha registrado una nueva dirección de recomendaciones')
-        return Response(data=data, status=status.HTTP_201_CREATED)
-
-    @action(methods=['GET'], detail=False)
-    def addresses_recommendations(self, request, *args, **kwargs):
-        addresses = CustomerAddress.objects.filter(type_address_id=3)
-        data = self.set_response(status=True, data=CustomerAddressModelSerializer(addresses, many=True).data,
-                                 message="Listado de direcciones")
-        return Response(data=data,
-                        status=status.HTTP_200_OK)

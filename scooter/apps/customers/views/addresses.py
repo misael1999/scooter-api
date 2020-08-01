@@ -29,7 +29,7 @@ class CustomerAddressesViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cre
     permission_classes = (IsAuthenticated, IsAccountOwnerCustomer)
     # Filters
     filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
-    search_fields = ('alias', 'street')
+    search_fields = ('alias', 'full_address')
     # ordering_fields = ('created',)
     # Affect the default order
     ordering = ('-created', 'alias')

@@ -3,10 +3,12 @@ from django.urls import path, include
 # Django rest frameworks
 from rest_framework.routers import DefaultRouter
 # Views
-from scooter.apps.common.views import status as status_view
+from scooter.apps.common import views as view_set
 
 router = DefaultRouter()
-router.register(r'api/v1/commons', status_view.StatusViewSet, basename='common')
+router.register(r'api/v1/commons', view_set.StatusViewSet, basename='common')
+router.register(r'api/v1/commons/addresses', view_set.RecommendationsAddressesViewSet,
+                basename='common-addresses')
 
 urlpatterns = [
     # Users

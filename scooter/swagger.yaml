@@ -93,7 +93,7 @@ paths:
       tags:
         - Común
     parameters: []
-  /api/v1/commons/add_addresses/:
+  /api/v1/commons/addresses/:
     post:
       operationId: register_recommendations_address
       description: Registro de direcciones para recomendaciones
@@ -102,25 +102,41 @@ paths:
           in: body
           description: Registro de direcciones para recomendaciones
           schema:
-            $ref: '#/definitions/RegisterCustomerAddress'
+            $ref: '#/definitions/RegisterRecommendationAddress'
       responses:
         '201':
           description: 'Información de la dirección'
       tags:
         - Común
-    parameters: []
-  /api/v1/commons/addresses_recommendations/:
-    parameters: []
     get:
-      operationId: addresses_recomendations
-      description: Listado de direcciones de recomendaciones.
-      parameters: []
+      operationId: get_customer_addresses
+      description: Obtener direcciones del cliente
+      parameters:
+        - name: limit
+          in: query
+          description: Numero de resultados por pagina
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: El índice inicial desde el que devolver los resultados.
+          required: false
+          type: integer
+        - name: category
+          description: Tipo de dirección
+          required: false
+          in: query
+          type: integer
+        - name: search
+          description: Buscar por (alias, calle, categoria)
+          in: query
+          required: false
+          type: string
       responses:
-        '200':
-          description: 'Listado de direcciones'
+        '201':
+          description: 'Información de la dirección'
       tags:
         - Común
-
   # DEVICES
   /api/v1/devices/:
     post:
@@ -1779,6 +1795,37 @@ definitions:
       - new_password
       - current_password
   # REGISTER CUSTOMER ADDRESS
+  RegisterRecommendationAddress:
+    type: object
+    properties:
+      alias:
+        type: string
+        description: Alias de la dirección
+      full_address:
+        type: string
+        description: Dirección completa
+      type_address_id:
+        type: number
+        example: 3
+        description: Tipo de direccion (Para entrega, Para compra)
+      point:
+        type: object
+        properties:
+          lat:
+            type: number
+            description: Latitude
+            example: 18.462859841665864
+          lng:
+            type: number
+            description: Longitude
+            example: -97.39279966871719
+    required:
+      - alias
+      - street
+      - suburb
+      - postal_code
+      - exterior_number
+      - references
   RegisterCustomerAddress:
     type: object
     properties:
