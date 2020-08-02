@@ -105,9 +105,9 @@ class OrderWithDetailModelSerializer(serializers.ModelSerializer):
 
 class CalculateServicePriceSerializer(serializers.Serializer):
     """ Calculate the price of the service before requesting the service """
-    from_address_id = CustomerFilteredPrimaryKeyRelatedField(queryset=CustomerAddress.objects.all(),
+    from_address_id = serializers.PrimaryKeyRelatedField(queryset=CustomerAddress.objects.all(),
                                                              source="from_address")
-    to_address_id = CustomerFilteredPrimaryKeyRelatedField(queryset=CustomerAddress.objects.all(),
+    to_address_id = CustomerFilteredPrimaryKeyRelatedField(queryset=CustomerAddress.objects,
                                                            source="to_address")
     station_id = serializers.PrimaryKeyRelatedField(queryset=Station.objects.all(), source="station")
     service_id = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all(), source="service")
