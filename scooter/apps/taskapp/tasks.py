@@ -34,7 +34,7 @@ def send_notification_push_task(user_id, title, body, data):
 def reject_orders():
     """ Verify orders and reject when nobody responds """
     now = timezone.localtime(timezone.now())
-    offset = now + timedelta(seconds=15)
+    offset = now + timedelta(seconds=0)
     orders = Order.objects.filter(maximum_response_time__lte=offset,
                                   order_status__slug_name__in=["await_delivery_man", "without_delivery"])
     if orders:
