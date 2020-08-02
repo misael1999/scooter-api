@@ -1,12 +1,13 @@
 # Rest framework
 from django.conf import settings
-from django.contrib.gis.geos import fromstr
+from django.contrib.gis.geos import fromstr, Point
 from django.utils import timezone
 from rest_framework import serializers
 # Serializers
 from scooter.apps.common.serializers import OrderStatusModelSerializer, ServiceModelSerializer
 from scooter.apps.common.serializers.common import Base64ImageField
-from scooter.apps.customers.serializers import CustomerAddressModelSerializer, CustomerSimpleOrderSerializer
+from scooter.apps.customers.serializers import CustomerAddressModelSerializer, CustomerSimpleOrderSerializer, \
+    PointSerializer
 # Models
 from scooter.apps.delivery_men.models import DeliveryMan
 from scooter.apps.delivery_men.serializers import DeliveryManOrderSerializer
@@ -111,6 +112,8 @@ class CalculateServicePriceSerializer(serializers.Serializer):
                                                            source="to_address")
     station_id = serializers.PrimaryKeyRelatedField(queryset=Station.objects.all(), source="station")
     service_id = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all(), source="service")
+    point = PointSerializer(required=False, allow_null=True)
+    is_current_location = serializers.BooleanField(required=False, allow_null=True)
 
     def validate(self, data):
         # Check if the station has the requested service
@@ -132,6 +135,11 @@ class CalculateServicePriceSerializer(serializers.Serializer):
 
             if is_free_order(station):
                 return 0.0
+
+            is_current_location = data.get('is_current_location', False)
+            point = data.pop('point', None)
+            if is_current_location:
+                point = Point(x=point['lng'], y=point['lat'], srid=4326)
 
             data_service = calculate_service_price(from_address=data['from_address'],
                                                    to_address=data['to_address'],
@@ -180,18 +188,24 @@ def get_nearest_delivery_man(location_selected, station, list_exclude, distance,
     return delivery_man
 
 
-def calculate_service_price(from_address, to_address, service):
+def calculate_service_price(from_address, to_address, service, is_current_location, point):
     try:
         # from_address = data['from_address']
         # to_address = data['to_address']
         # longitude position 0 and latitude position 1
         # from_point = (from_address.point[1], from_address.point[0])
         # to_point = (to_address.point[1], to_address.point[0])
+
+        to_point = to_address.point
+
+        if is_current_location:
+            to_point = point
+
         pnt = fromstr(
             from_address.point, srid=4326
         ).transform(3857, clone=True)
         pnt1 = fromstr(
-            to_address.point, srid=4326
+            to_point, srid=4326
         ).transform(3857, clone=True)
         distance_points = (pnt.distance(pnt1) / 1000)
         distance_points = distance_points + (distance_points * 0.30)

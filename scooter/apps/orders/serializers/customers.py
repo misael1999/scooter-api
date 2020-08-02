@@ -99,15 +99,7 @@ class CreateOrderSerializer(serializers.Serializer):
             # Check if the station has manual assignment activated
             station = data['station']
             customer = data['customer']
-            # Calculate price between two address
 
-            data_service = calculate_service_price(from_address=data['from_address'],
-                                                   to_address=data['to_address'],
-                                                   service=data['station_service'])
-            price = 0.0
-
-            if not is_free_order(station):
-                price = data_service['price_service']
 
             maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=settings.TIME_RESPONSE)
             qr_code = generate_qr_code()
@@ -144,6 +136,20 @@ class CreateOrderSerializer(serializers.Serializer):
                                                                       type_address_id=1,
                                                                       status_id=3)
                     data['to_address'] = customer_address
+
+            # Calculate price order ==========
+            # Calculate price between two address
+
+            data_service = calculate_service_price(from_address=data['from_address'],
+                                                   to_address=data['to_address'],
+                                                   service=data['station_service'],
+                                                   is_current_location=False,
+                                                   point=None
+                                                   )
+            price = 0.0
+
+            if not is_free_order(station):
+                price = data_service['price_service']
 
             order = Order.objects.create(**data,
                                          member_station=member,
