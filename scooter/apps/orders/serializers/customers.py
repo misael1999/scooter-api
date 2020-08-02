@@ -38,7 +38,7 @@ class CurrentLocationAddressSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomerAddress
-        fields = ("full_address",
+        fields = ("alias", "full_address",
                   "references", "point")
 
 
@@ -136,6 +136,8 @@ class CreateOrderSerializer(serializers.Serializer):
                     point = Point(x=to_address['point']['lng'], y=to_address['point']['lat'], srid=4326)
                     to_address['point'] = point
                     customer_address = CustomerAddress.objects.create(**to_address,
+                                                                      customer=customer,
+                                                                      exterior_number='',
                                                                       type_address_id=1,
                                                                       status_id=3)
 
