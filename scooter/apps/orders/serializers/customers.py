@@ -34,11 +34,10 @@ from scooter.utils.functions import send_notification_push_order
 
 class CurrentLocationAddressSerializer(serializers.ModelSerializer):
     point = PointSerializer()
-    type_address_id = serializers.IntegerField(default=1)
 
     class Meta:
         model = CustomerAddress
-        fields = ("full_address", "type_address_id", "exterior_number",
+        fields = ("full_address",
                   "references", "point")
 
 
@@ -101,7 +100,6 @@ class CreateOrderSerializer(serializers.Serializer):
             station = data['station']
             customer = data['customer']
 
-
             maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=settings.TIME_RESPONSE)
             qr_code = generate_qr_code()
 
@@ -129,7 +127,7 @@ class CreateOrderSerializer(serializers.Serializer):
             if station.assign_delivery_manually:
                 order_status = OrderStatus.objects.get(slug_name="without_delivery")
 
-            is_current_location = data.get('is_current_location', None)
+            is_current_location = data.get('is_current_location', False)
             if is_current_location:
                 to_address = data.get('current_location', None)
                 if to_address:
