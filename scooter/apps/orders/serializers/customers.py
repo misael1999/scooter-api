@@ -2,6 +2,7 @@
 from datetime import timedelta
 
 from django.conf import settings
+from django.contrib.gis.geos import Point
 from django.db.models import Avg
 from django.utils import timezone
 from rest_framework import serializers
@@ -131,9 +132,12 @@ class CreateOrderSerializer(serializers.Serializer):
             if is_current_location:
                 to_address = data.get('current_location', None)
                 if to_address:
+                    point = Point(x=to_address['point']['lng'], y=to_address['point']['lat'], srid=4326)
                     customer_address = CustomerAddress.objects.create(**to_address,
+                                                                      point=point,
                                                                       type_address_id=1,
                                                                       status_id=3)
+
                     data['to_address'] = customer_address
 
             # Calculate price order ==========
