@@ -109,7 +109,7 @@ class CalculateServicePriceSerializer(serializers.Serializer):
     from_address_id = serializers.PrimaryKeyRelatedField(queryset=CustomerAddress.objects.all(),
                                                              source="from_address")
     to_address_id = CustomerFilteredPrimaryKeyRelatedField(queryset=CustomerAddress.objects,
-                                                           source="to_address")
+                                                           source="to_address", required=False, allow_null=True)
     station_id = serializers.PrimaryKeyRelatedField(queryset=Station.objects.all(), source="station")
     service_id = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all(), source="service")
     point = PointSerializer(required=False, allow_null=True)
@@ -140,6 +140,7 @@ class CalculateServicePriceSerializer(serializers.Serializer):
             point = data.pop('point', None)
             if is_current_location:
                 point = Point(x=point['lng'], y=point['lat'], srid=4326)
+                data['to_address'] = None
 
             data_service = calculate_service_price(from_address=data['from_address'],
                                                    to_address=data['to_address'],
@@ -198,10 +199,10 @@ def calculate_service_price(from_address, to_address, service, is_current_locati
         # from_point = (from_address.point[1], from_address.point[0])
         # to_point = (to_address.point[1], to_address.point[0])
 
-        to_point = to_address.point
-
         if is_current_location:
             to_point = point
+        else:
+            to_point = to_address.point
 
         pnt = fromstr(
             from_address.point, srid=4326

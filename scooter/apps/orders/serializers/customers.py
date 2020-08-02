@@ -53,7 +53,8 @@ class CreateOrderSerializer(serializers.Serializer):
                                                         help_text="For selected current location fast delivered")
     is_current_location = serializers.BooleanField(required=False, allow_null=True)
     from_address_id = serializers.PrimaryKeyRelatedField(queryset=CustomerAddress.objects.all(), source="from_address")
-    to_address_id = CustomerFilteredPrimaryKeyRelatedField(queryset=CustomerAddress.objects, source="to_address")
+    to_address_id = CustomerFilteredPrimaryKeyRelatedField(queryset=CustomerAddress.objects, source="to_address",
+                                                           required=False, allow_null=True)
 
     indications = serializers.CharField(max_length=500, required=False)
     approximate_price_order = serializers.CharField(max_length=30)
