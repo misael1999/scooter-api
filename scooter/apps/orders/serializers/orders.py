@@ -143,7 +143,9 @@ class CalculateServicePriceSerializer(serializers.Serializer):
 
             data_service = calculate_service_price(from_address=data['from_address'],
                                                    to_address=data['to_address'],
-                                                   service=data['station_service'])
+                                                   service=data['station_service'],
+                                                   is_current_location=is_current_location,
+                                                   point=point)
             return data_service['price_service']
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
