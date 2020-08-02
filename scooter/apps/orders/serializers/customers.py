@@ -133,8 +133,8 @@ class CreateOrderSerializer(serializers.Serializer):
                 to_address = data.get('current_location', None)
                 if to_address:
                     point = Point(x=to_address['point']['lng'], y=to_address['point']['lat'], srid=4326)
+                    to_address['point'] = point
                     customer_address = CustomerAddress.objects.create(**to_address,
-                                                                      point=point,
                                                                       type_address_id=1,
                                                                       status_id=3)
 
