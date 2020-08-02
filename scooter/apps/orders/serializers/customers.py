@@ -128,9 +128,9 @@ class CreateOrderSerializer(serializers.Serializer):
             if station.assign_delivery_manually:
                 order_status = OrderStatus.objects.get(slug_name="without_delivery")
 
-            is_current_location = data.get('is_current_location', False)
+            is_current_location = data.pop('is_current_location', False)
             if is_current_location:
-                to_address = data.get('current_location', None)
+                to_address = data.pop('current_location', None)
                 if to_address:
                     point = Point(x=to_address['point']['lng'], y=to_address['point']['lat'], srid=4326)
                     to_address['point'] = point
