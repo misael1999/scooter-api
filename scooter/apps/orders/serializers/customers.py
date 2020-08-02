@@ -51,7 +51,7 @@ class CreateOrderSerializer(serializers.Serializer):
     # Modified to add address recommendations
     current_location = CurrentLocationAddressSerializer(required=False, allow_null=True,
                                                         help_text="For selected current location fast delivered")
-    is_current_location = serializers.BooleanField(required=False, allow_null=True, default=False)
+    is_current_location = serializers.BooleanField(required=False, allow_null=True)
     from_address_id = serializers.PrimaryKeyRelatedField(queryset=CustomerAddress.objects.all(), source="from_address")
     to_address_id = CustomerFilteredPrimaryKeyRelatedField(queryset=CustomerAddress.objects, source="to_address")
 
