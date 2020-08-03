@@ -16,3 +16,7 @@ class NotificationModelSerializer(serializers.ModelSerializer):
             'type_notification', 'user'
         )
         read_only_fields = fields
+
+
+class NotifyAllCustomersSerializer(serializers.Serializer):
+    pass
