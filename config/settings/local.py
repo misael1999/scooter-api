@@ -47,9 +47,23 @@ EMAIL_HOST_PASSWORD = env.str('MAIL_SERVER_PASSWORD')
 EMAIL_USE_TLS = env.bool('MAIL_USE_TLS')
 EMAIL_BACKEND = env('DJANGO_EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
 
-
 # django-extensions
 INSTALLED_APPS += ['django_extensions']  # noqa F405
+#
+# DEFAULT_FROM_EMAIL = env(
+#     'DJANGO_DEFAULT_FROM_EMAIL',
+#     default='Scooter <noreply@scooter-app.team>'
+# )
+# SERVER_EMAIL = env('DJANGO_SERVER_EMAIL', default=DEFAULT_FROM_EMAIL)
+# EMAIL_SUBJECT_PREFIX = env('DJANGO_EMAIL_SUBJECT_PREFIX', default='[Scooter envíos]')
+
+# Anymail (Mailgun)
+# INSTALLED_APPS += ['anymail']  # noqa F405
+# EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
+# ANYMAIL = {
+#     'MAILGUN_API_KEY': env('MAILGUN_API_KEY'),
+#     'MAILGUN_SENDER_DOMAIN': env('MAILGUN_DOMAIN')
+# }
 
 # Celery
 CELERY_TASK_ALWAYS_EAGER = False

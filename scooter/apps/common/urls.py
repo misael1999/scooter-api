@@ -7,6 +7,7 @@ from scooter.apps.common import views as view_set
 
 router = DefaultRouter()
 router.register(r'api/v1/commons', view_set.StatusViewSet, basename='common')
+# router.register(r'api/v1/commons/notifications', view_set.StatusViewSet, basename='notifications')
 router.register(r'api/v1/commons/addresses', view_set.RecommendationsAddressesViewSet,
                 basename='common-addresses')
 

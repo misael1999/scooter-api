@@ -17,7 +17,8 @@ from scooter.apps.common.serializers import (StatusModelSerializer,
                                              TypeVehicleSerializer,
                                              OrderStatusModelSerializer,
                                              ScheduleModelSerializer, ServiceModelSerializer,
-                                             TypeAddressModelSerializer)
+                                             TypeAddressModelSerializer, NotifyAllCustomersSerializer)
+
 
 class StatusViewSet(ScooterViewSet):
     """ Return status"""
@@ -64,4 +65,11 @@ class StatusViewSet(ScooterViewSet):
         query = TypeVehicle.objects.all()
         type_addresses = TypeVehicleSerializer(query, many=True).data
         data = self.set_response(status='ok', data=type_addresses, message='Tipos de vehiculos')
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    @action(methods=['post'], detail=False)
+    def notifications_customers(self, request, *args, **kwargs):
+        serializer = NotifyAllCustomersSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = self.set_response(status='ok', data={}, message='Notificación enviada')
         return Response(data=data, status=status.HTTP_200_OK)

@@ -201,6 +201,22 @@ paths:
       tags:
         - Usuarios general
     parameters: []
+  /api/v1/commons/notifications_customers/:
+    post:
+      operationId: notifications_customers
+      description: Notificaciones para clientes
+      parameters:
+        - name: body
+          in: body
+          description: Notificaciones para clientes
+          schema:
+            $ref: '#/definitions/NotificationUser'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Usuarios general
+    parameters: []
   # VERIFY ACCOUNT
   /api/v1/users/verify/:
     post:
@@ -1684,10 +1700,17 @@ definitions:
           comida:
             type: string
             example: "Arroz"
-    required:
-      - title
-      - message
-      - data
+  NotificationUser:
+    type: object
+    properties:
+      title:
+        type: string
+        example: "Prueba"
+        description: Titulo
+      body:
+        type: string
+        example: "Mensaje prueba"
+        description: Mensaje
   LoginToken:
     type: object
     properties:
