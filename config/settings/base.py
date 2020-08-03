@@ -203,7 +203,7 @@ REST_FRAMEWORK = {
     ),
     'EXCEPTION_HANDLER': 'scooter.utils.custom_handler_error.custom_exception_handler',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 15
+    'PAGE_SIZE': 30
 }
 
 FCM_DJANGO_SETTINGS = {
