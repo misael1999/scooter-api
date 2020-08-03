@@ -71,5 +71,6 @@ class StatusViewSet(ScooterViewSet):
     def notifications_customers(self, request, *args, **kwargs):
         serializer = NotifyAllCustomersSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        serializer.save()
         data = self.set_response(status='ok', data={}, message='Notificación enviada')
         return Response(data=data, status=status.HTTP_200_OK)
