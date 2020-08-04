@@ -154,10 +154,16 @@ class ScanQrOrderSerializer(serializers.Serializer):
                                            )
 
             # Update member station
+            station = instance.station
+            customer = instance.customer
             member_station = instance.member_station
             if member_station:
                 member_station.total_orders = member_station.total_orders + 1
                 member_station.save()
+                if not customer.is_safe_user:
+                    if station.quantity_safe_order >= member_station.total_orders:
+                        customer.is_safe_user = True
+                        customer.save()
 
             instance.date_delivered_order = timezone.localtime(timezone.now())
             instance.in_process = False
