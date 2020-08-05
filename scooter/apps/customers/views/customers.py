@@ -47,7 +47,8 @@ class CustomerViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         serializer = serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         customer = serializer.save()
-        message = 'Se ha enviado un correo ha {email} para validar tu cuenta'.format(email=customer.user.username)
+        message = 'Se ha enviado un correo ha {email} para validar tu cuenta,' \
+                  ' si no lo encuentras revisa en tu bandeja de SPAM'.format(email=customer.user.username)
         data = self.set_response(status='ok',
                                  data={},
                                  message=message)

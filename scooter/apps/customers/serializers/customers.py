@@ -100,10 +100,10 @@ class CustomerSignUpSerializer(serializers.Serializer):
                                            token_type='email_confirmation')
         subject = 'Bienvenido {name}, Verifica tu cuenta para comenzar'.format(name=customer.name)
         # Create a notification
-        Notification.objects.create(user=user, title="Bienvenido",
-                                    type_notification_id=1,
-                                    body="Te enviamos un correo para validar tu cuenta,"
-                                         " si no lo encuentras revisa en tu bandeja de SPAM")
+        # Notification.objects.create(user=user, title="Bienvenido",
+        #                             type_notification_id=1,
+        #                             body="Te enviamos un correo para validar tu cuenta,"
+        #                                  " si no lo encuentras revisa en tu bandeja de SPAM")
         data = {
             'user': user,
             'token': code,
