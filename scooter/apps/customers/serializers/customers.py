@@ -89,7 +89,7 @@ class CustomerSignUpSerializer(serializers.Serializer):
                     is_verified=False,
                     is_client=True,
                     role=User.CUSTOMER,
-                    verification_deadline=timezone.localtime(timezone.now()) + timedelta(days=1))
+                    verification_deadline=timezone.localtime(timezone.now()) + timedelta(days=2))
         user.set_password(data['password'])
         user.save()
         customer = Customer.objects.create(user=user,
@@ -102,7 +102,8 @@ class CustomerSignUpSerializer(serializers.Serializer):
         # Create a notification
         Notification.objects.create(user=user, title="Bienvenido",
                                     type_notification_id=1,
-                                    body="Te enviamos un correo para validar tu cuenta")
+                                    body="Te enviamos un correo para validar tu cuenta,"
+                                         " si no lo encuentras revisa en tu bandeja de SPAM")
         data = {
             'user': user,
             'token': code,

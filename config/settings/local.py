@@ -39,31 +39,31 @@ CACHES = {
 TEMPLATES[0]['OPTIONS']['debug'] = DEBUG  # NOQA
 
 # Email
-EMAIL_HOST = env.str('MAIL_SERVER',)
-EMAIL_PORT = env.int('MAIL_SERVER_PORT')
-EMAIL_HOST_USER = env.str('MAIL_SERVER_USER')
-DEFAULT_FROM_EMAIL = env.str('DEFAULT_FROM_EMAIL')
-EMAIL_HOST_PASSWORD = env.str('MAIL_SERVER_PASSWORD')
-EMAIL_USE_TLS = env.bool('MAIL_USE_TLS')
-EMAIL_BACKEND = env('DJANGO_EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
+# EMAIL_HOST = env.str('MAIL_SERVER',)
+# EMAIL_PORT = env.int('MAIL_SERVER_PORT')
+# EMAIL_HOST_USER = env.str('MAIL_SERVER_USER')
+# DEFAULT_FROM_EMAIL = env.str('DEFAULT_FROM_EMAIL')
+# EMAIL_HOST_PASSWORD = env.str('MAIL_SERVER_PASSWORD')
+# EMAIL_USE_TLS = env.bool('MAIL_USE_TLS')
+# EMAIL_BACKEND = env('DJANGO_EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
 
 # django-extensions
 INSTALLED_APPS += ['django_extensions']  # noqa F405
 #
-# DEFAULT_FROM_EMAIL = env(
-#     'DJANGO_DEFAULT_FROM_EMAIL',
-#     default='Scooter <noreply@scooter-app.team>'
-# )
-# SERVER_EMAIL = env('DJANGO_SERVER_EMAIL', default=DEFAULT_FROM_EMAIL)
-# EMAIL_SUBJECT_PREFIX = env('DJANGO_EMAIL_SUBJECT_PREFIX', default='[Scooter envíos]')
+DEFAULT_FROM_EMAIL = env(
+    'DJANGO_DEFAULT_FROM_EMAIL',
+    default='Scooter<help@scooter-app.team>'
+)
+SERVER_EMAIL = env('DJANGO_SERVER_EMAIL', default=DEFAULT_FROM_EMAIL)
+EMAIL_SUBJECT_PREFIX = env('DJANGO_EMAIL_SUBJECT_PREFIX', default='[Scooter envíos]')
 
 # Anymail (Mailgun)
-# INSTALLED_APPS += ['anymail']  # noqa F405
-# EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
-# ANYMAIL = {
-#     'MAILGUN_API_KEY': env('MAILGUN_API_KEY'),
-#     'MAILGUN_SENDER_DOMAIN': env('MAILGUN_DOMAIN')
-# }
+INSTALLED_APPS += ['anymail']  # noqa F405
+EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
+ANYMAIL = {
+    'MAILGUN_API_KEY': env('MAILGUN_API_KEY'),
+    'MAILGUN_SENDER_DOMAIN': env('MAILGUN_DOMAIN')
+}
 
 # Celery
 CELERY_TASK_ALWAYS_EAGER = False
