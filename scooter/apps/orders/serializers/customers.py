@@ -318,7 +318,7 @@ def send_order_delivery(location_selected, station, order):
         # Get nearest delivery man
         delivery_men = get_nearest_delivery_man(location_selected=location_selected, station=station,
                                                 list_exclude=[], distance=settings.RANGE_DISTANCE,
-                                                status=['available'])
+                                                status=['available', 'busy', 'out_service'])
 
         # Send push notification to delivery_man
         if delivery_men.count() == 0:
