@@ -71,7 +71,7 @@ def location_notice_not_enabled():
 def disabled_location():
     """ Disabled location when are available and not send location in several minutes """
     now = timezone.localtime(timezone.now())
-    offset = now - timedelta(minutes=50)
+    offset = now - timedelta(minutes=30)
     delivery_men = DeliveryMan.objects.filter(delivery_status__slug_name__in=['available', 'busy'],
                                               last_time_update_location__lte=offset)
     for delivery_man in delivery_men:
