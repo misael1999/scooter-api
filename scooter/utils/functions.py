@@ -37,10 +37,10 @@ def generate_verification_token(user, exp, token_type):
     return token.decode()
 
 
-def send_notification_push_order(user_id, title, body, data, sound):
+def send_notification_push_order(user_id, title, body, data, sound, android_channel_id):
     devices = FCMDevice.objects.filter(user_id=user_id)
     if devices:
-        devices.send_message(title=title, body=body, data=data, sound=sound)
+        devices.send_message(title=title, body=body, data=data, sound=sound, android_channel_id=android_channel_id)
 
 
 def get_date_from_querystring(request, date_find, default_value=None):

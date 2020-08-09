@@ -32,6 +32,7 @@ class NotifyAllCustomersSerializer(serializers.Serializer):
                 send_notification_push_order(customer.user_id, data['title'],
                                              body=data['body'],
                                              sound="default",
+                                             android_channel_id="messages",
                                              data={})
             return data
         except Exception as ex:
@@ -48,5 +49,6 @@ class NotifyAllDeliverySerializer(serializers.Serializer):
             send_notification_push_order(delivery.user_id, data['title'],
                                          body=data['body'],
                                          sound="default",
+                                         android_channel_id="locations",
                                          data={})
         return data

@@ -44,6 +44,7 @@ def reject_orders():
             send_notification_push_order(order.user_id, title='Pedido rechazado',
                                          body='No hubo respuesta por parte de los repartidores',
                                          sound="default",
+                                         android_channel_id="messages",
                                          data={"type": "REJECT_ORDER",
                                                "order_id": order.id,
                                                "message": "No hubo respuesta del pedid",
@@ -61,6 +62,8 @@ def location_notice_not_enabled():
                                               last_time_update_location__lte=offset)
     for delivery_man in delivery_men:
         send_notification_push_order(delivery_man.user_id, title='¡¡¡¡ Aviso !!!!!',
+                                     android_channel_id="locations",
+                                     sound="default",
                                      body='No estamos recibiendo tu ubicación,'
                                           ' por favor desactiva y activa tu disponibilidad',
                                      data={"type": "NOTICE_LOCATION",
@@ -81,6 +84,7 @@ def disabled_location():
                                           ' asi que te encuentras fuera de servicio,'
                                           'vuelve activar tu disponibilidad para recibir pedidos',
                                      sound="default",
+                                     android_channel_id="locations",
                                      data={"type": "NOTICE_LOCATION",
                                            "message": "No estamos recibiendo tu ubicación",
                                            'click_action': 'FLUTTER_NOTIFICATION_CLICK'})

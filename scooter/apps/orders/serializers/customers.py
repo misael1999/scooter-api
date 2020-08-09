@@ -340,8 +340,10 @@ def send_order_delivery(location_selected, station, order):
                                          title='Solicitud nueva',
                                          body='Ha recibido un nuevo pedido',
                                          sound="ringtone.mp3",
+                                         android_channel_id="alarms",
                                          data={"type": "NEW_ORDER",
                                                "order_id": order.id,
+                                               "ordering": "",
                                                "message": "Pedido de nuevo",
                                                'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                })
