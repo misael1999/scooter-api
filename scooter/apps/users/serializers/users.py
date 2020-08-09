@@ -150,7 +150,8 @@ class TestNotificationSerializer(serializers.Serializer):
             devices = FCMDevice.objects.filter(user=data['user'])
             if not devices:
                 raise ValueError('No se encontraron dispositivos registrados')
-            devices.send_message(title=data['title'], body=data['message'], data=data['data'], sound="ringtone.mp3")
+            devices.send_message(title=data['title'], body=data['message'], data=data['data'], sound="ringtone.mp3",
+                                 android_channel_id="alarms")
             return data
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
