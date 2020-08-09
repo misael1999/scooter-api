@@ -43,6 +43,7 @@ def reject_orders():
             # Function
             send_notification_push_order(order.user_id, title='Pedido rechazado',
                                          body='No hubo respuesta por parte de los repartidores',
+                                         sound="default",
                                          data={"type": "REJECT_ORDER",
                                                "order_id": order.id,
                                                "message": "No hubo respuesta del pedid",
@@ -79,6 +80,7 @@ def disabled_location():
                                      body='Has pasado mucho tiempo sin enviar tu ubicación,'
                                           ' asi que te encuentras fuera de servicio,'
                                           'vuelve activar tu disponibilidad para recibir pedidos',
+                                     sound="default",
                                      data={"type": "NOTICE_LOCATION",
                                            "message": "No estamos recibiendo tu ubicación",
                                            'click_action': 'FLUTTER_NOTIFICATION_CLICK'})

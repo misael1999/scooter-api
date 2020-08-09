@@ -339,6 +339,7 @@ def send_order_delivery(location_selected, station, order):
             send_notification_push_order(user_id=user_id,
                                          title='Solicitud nueva',
                                          body='Ha recibido un nuevo pedido',
+                                         sound="ringtone.mp3",
                                          data={"type": "NEW_ORDER",
                                                "order_id": order.id,
                                                "message": "Pedido de nuevo",

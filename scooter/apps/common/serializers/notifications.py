@@ -29,7 +29,10 @@ class NotifyAllCustomersSerializer(serializers.Serializer):
         try:
             customers = Customer.objects.all()
             for customer in customers:
-                send_notification_push_order(customer.user_id, data['title'], body=data['body'], data={})
+                send_notification_push_order(customer.user_id, data['title'],
+                                             body=data['body'],
+                                             sound="default",
+                                             data={})
             return data
         except Exception as ex:
             raise serializers.ValidationError({'detail': 'Ha ocurrido un error al enviar las notificaciones'})
@@ -42,5 +45,8 @@ class NotifyAllDeliverySerializer(serializers.Serializer):
     def create(self, data):
         delivery_men = DeliveryMan.objects.all()
         for delivery in delivery_men:
-            send_notification_push_order(delivery.user_id, data['title'], body=data['body'], data={})
+            send_notification_push_order(delivery.user_id, data['title'],
+                                         body=data['body'],
+                                         sound="default",
+                                         data={})
         return data
