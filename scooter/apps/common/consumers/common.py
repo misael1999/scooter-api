@@ -52,7 +52,7 @@ class GeneralOrderConsumer(AsyncJsonWebsocketConsumer):
 class GeneralDeliveryConsumer(AsyncJsonWebsocketConsumer):
 
     async def connect(self):
-        self.room_name = 'delivery'
+        self.room_name = 'orders'
         if self.scope['user'] == AnonymousUser():
             raise DenyConnection("Invalid User")
 
@@ -67,7 +67,7 @@ class GeneralDeliveryConsumer(AsyncJsonWebsocketConsumer):
             self.scope['user'] = AnonymousUser()
             raise DenyConnection("Invalid User")
 
-        self.room_group_name = '{room}-{id}'.format(room=self.room_name, id=delivery_man_id)
+        self.room_group_name = '{room}'.format(room=self.room_name)
         # Join room group
         await self.channel_layer.group_add(
             self.room_group_name,

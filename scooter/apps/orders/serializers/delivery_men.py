@@ -4,6 +4,7 @@ from django.utils import timezone
 # Serializers
 # Models
 from scooter.apps.common.models import DeliveryManStatus, OrderStatus, Notification, Service
+from scooter.apps.delivery_men.models import DeliveryMan
 from scooter.apps.orders.models.orders import HistoryRejectedOrders
 # Functions channels
 # Task Celery
@@ -12,6 +13,7 @@ from scooter.apps.taskapp.tasks import send_notification_push_task
 from scooter.apps.orders.serializers.orders import get_nearest_delivery_man
 # Functions channels
 from scooter.apps.orders.utils.orders import notify_station_accept
+from scooter.apps.orders.utils.orders import notify_delivery_men
 from asgiref.sync import async_to_sync
 
 
@@ -31,6 +33,7 @@ class AcceptOrderByDeliveryManSerializer(serializers.Serializer):
                                               code='order_already_delivery_man')
         data['order'] = order
         data['delivery_man'] = delivery_man
+
         return data
 
     def update(self, instance, data):
@@ -69,6 +72,9 @@ class AcceptOrderByDeliveryManSerializer(serializers.Serializer):
                                                'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                })
             async_to_sync(notify_station_accept)(order.station_id, order.id)
+            # Notify all delivery men that order was accepted
+            async_to_sync(notify_delivery_men)(order.id, 'ORDER_ACCEPTED')
+
             return data
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})

@@ -121,6 +121,7 @@ class CustomerFacebookAuthSerializer(serializers.Serializer):
                     username=user_info.get('email', '{0} sin email'.format(user_info.get('first_name'))),
                     facebook_id=user_info.get('id'),
                     auth_facebook=True,
+                    is_client=True,
                     verification_deadline=timezone.localtime(timezone.now()),
                     is_verified=True)
                 user.set_password(password)

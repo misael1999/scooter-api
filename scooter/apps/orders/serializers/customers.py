@@ -334,7 +334,6 @@ def send_order_delivery(location_selected, station, order):
                     raise ValueError('No se encontraron repartidores disponibles')
 
         for delivery_man in delivery_men:
-            async_to_sync(notify_delivery_men)(delivery_man.id, order.id)
             user_id = delivery_man.user_id
             send_notification_push_order(user_id=user_id,
                                          title='Solicitud nueva',
@@ -347,6 +346,8 @@ def send_order_delivery(location_selected, station, order):
                                                "message": "Pedido de nuevo",
                                                'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                })
+        async_to_sync(notify_delivery_men)(order.id, 'NEW_ORDER')
+
     except ValueError as e:
         raise ValueError(e)
     except Exception as ex:
