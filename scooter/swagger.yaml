@@ -1677,6 +1677,22 @@ paths:
       tags:
         - Pedidos repartidor
 # ====== MERCHANTS ================
+  /api/v1/merchants/login/:
+    post:
+      operationId: merchant_login
+      description: Login de comercios
+      parameters:
+        - name: body
+          in: body
+          description: Login
+          schema:
+            $ref: '#/definitions/LoginToken'
+      responses:
+        '200':
+          description: 'Regresa información del comercio y su access_token'
+      tags:
+        - Comercios
+    parameters: []
   /api/v1/merchants/:
     post:
       operationId: register_merchant

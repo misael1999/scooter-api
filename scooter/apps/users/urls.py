@@ -5,7 +5,8 @@ from rest_framework.routers import DefaultRouter
 # JWT
 from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 from scooter.apps.users.views import (CustomerTokenObtainPairView, StationTokenObtainPairView,
-                                      DeliveryManTokenObtainPairView, CustomerFacebookAuthViewSet)
+                                      DeliveryManTokenObtainPairView, CustomerFacebookAuthViewSet,
+                                      MerchantManTokenObtainPairView)
 # Views
 from scooter.apps.users.views import users as user_view
 
@@ -17,6 +18,7 @@ urlpatterns = [
     # JWT
     path('api/v1/customers/login/', CustomerTokenObtainPairView.as_view(), name='token_obtain_pair_customer'),
     path('api/v1/stations/login/', StationTokenObtainPairView.as_view(), name='token_obtain_pair_stations'),
+    path('api/v1/merchants/login/', MerchantManTokenObtainPairView.as_view(), name='token_obtain_pair_merchants'),
     path('api/v1/delivery_men/login/', DeliveryManTokenObtainPairView.as_view(), name='token_obtain_pair_delivery_men'),
     path('api/v1/users/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/v1/users/token/verify/', TokenVerifyView.as_view(), name='token_verify'),

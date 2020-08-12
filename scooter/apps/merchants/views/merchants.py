@@ -28,7 +28,6 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
     """ Handle signup and update of merchant """
     queryset = Merchant.objects.all()
     serializer_class = MerchantWithAllInfoSerializer
-    pagination_class = None
     lookup_field = 'id'
     # Filters
     filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
@@ -41,14 +40,6 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         if self.action == 'list':
             return Merchant.objects.filter(status__slug_name='active', information_is_complete=True)
         return self.queryset
-
-    def list(self, request, *args, **kwargs):
-        response = super().list(request, *args, **kwargs)
-        data = self.set_response(status='ok',
-                                 data=response.data,
-                                 message='Listado de comercios')
-
-        return Response(data, status=status.HTTP_200_OK)
 
     def get_serializer_class(self):
         serializer_class = self.serializer_class

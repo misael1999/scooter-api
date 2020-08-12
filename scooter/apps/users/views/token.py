@@ -7,6 +7,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from scooter.apps.users.serializers.token import (CustomerTokenObtainPairSerializer,
                                                   StationTokenObtainPairSerializer,
                                                   DeliveryManTokenObtainPairSerializer,
+                                                  MerchantTokenObtainPairSerializer,
                                                   CustomerFacebookAuthSerializer)
 import json
 # Views
@@ -23,6 +24,10 @@ class StationTokenObtainPairView(TokenObtainPairView):
 
 class DeliveryManTokenObtainPairView(TokenObtainPairView):
     serializer_class = DeliveryManTokenObtainPairSerializer
+
+
+class MerchantManTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MerchantTokenObtainPairSerializer
 
 
 class CustomerFacebookAuthViewSet(ScooterViewSet, CreateModelMixin):

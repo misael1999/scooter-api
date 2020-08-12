@@ -5,6 +5,8 @@ from rest_framework import serializers
 # Utilities
 from django.utils import timezone
 # Models
+from scooter.apps.merchants.models import Merchant
+from scooter.apps.merchants.serializers import MerchantUserSimpleSerializer
 from scooter.apps.users.models import User
 from scooter.apps.stations.models import Station
 from scooter.apps.customers.models import Customer
@@ -34,6 +36,26 @@ class StationTokenObtainPairSerializer(TokenObtainPairSerializer):
                                               format(email=self.user.username)})
 
         data['station'] = StationUserModelSerializer(station).data
+        # Add extra responses here
+        # data['user'] = UserModelSerializer(self.user).data
+        return data
+
+
+class MerchantTokenObtainPairSerializer(TokenObtainPairSerializer):
+    default_error_messages = {'no_active_account': 'Usuario o contraseña incorrectos'}
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        try:
+            merchant = self.user.merchant
+        except Merchant.DoesNotExist:
+            raise serializers.ValidationError({'detail': 'No tienes permisos para iniciar sesión'})
+
+        if not self.user.is_verified:
+            raise serializers.ValidationError({'detail': 'Es necesario que verifique su correo electronico {email}'.
+                                              format(email=self.user.username)})
+
+        data['merchant'] = MerchantUserSimpleSerializer(merchant).data
         # Add extra responses here
         # data['user'] = UserModelSerializer(self.user).data
         return data
