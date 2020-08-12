@@ -19,11 +19,13 @@ class User(ScooterModel, AbstractBaseUser, PermissionsMixin):
     STATION = 2
     DELIVERY_MAN = 3
     ADMIN = 4
+    MERCHANT = 5
     ROLE_CHOICES = (
         (CUSTOMER, _('Cliente')),
         (STATION, _('Central')),
         (DELIVERY_MAN, _('Repartidor')),
-        (ADMIN, _('Administrador'))
+        (ADMIN, _('Administrador')),
+        (MERCHANT, _('Comerciante')),
     )
     username = models.CharField(
         unique=True,
