@@ -1,4 +1,4 @@
-""" Vehicles app """
+""" Orders app """
 
 # Django
 from django.apps import AppConfig

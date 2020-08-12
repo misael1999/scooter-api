@@ -8,7 +8,7 @@ info:
   license:
     name: BSD License
   version: v1
-basePath: /appback/
+basePath: /
 consumes:
   - application/json
 produces:
@@ -71,6 +71,32 @@ paths:
       tags:
         - Común
     parameters: []
+  /api/v1/commons/categories/:
+    get:
+      operationId: categories_get
+      description: Listado de categorías.
+      parameters: []
+      responses:
+        '200':
+          description: 'Listado de categorías'
+      tags:
+        - Común
+    parameters: []
+  /api/v1/commons/categories/{category_id}/subcategories/:
+    parameters:
+      - name: category_id
+        in: path
+        required: true
+        type: string
+    get:
+      operationId: subcategories_get
+      description: Listado de subcategorias.
+      parameters: []
+      responses:
+        '200':
+          description: 'Listado de categorías'
+      tags:
+        - Común
   /api/v1/commons/type_addresses/:
     get:
       operationId: type_addresses_get
