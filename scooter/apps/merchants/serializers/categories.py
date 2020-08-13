@@ -2,7 +2,6 @@
 # Django rest framework
 from rest_framework import serializers
 # Models
-from scooter.apps.common.models import TypeVehicle
 from scooter.apps.common.serializers import Base64ImageField
 from scooter.apps.merchants.models import CategoryProducts
 # Utilities

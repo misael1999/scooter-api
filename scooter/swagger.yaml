@@ -1809,11 +1809,11 @@ paths:
         type: string
     patch:
       operationId: update_vehicle_unlock
-      description: Desbloquear vehiculo
+      description: Activar categoría
       parameters:
         - name: body
           in: body
-          description: Desbloquear vehiculo
+          description: Activar categoría
           schema:
             $ref: '#/definitions/UnlockCategory'
       responses:
@@ -1821,6 +1821,130 @@ paths:
           description: 'Información de la categoría'
       tags:
         - Comercios
+# PRODUCTS
+  /api/v1/merchants/{merchant_id}/products/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+    # CREATE PRODUCT BY MERCHANT
+    post:
+      operationId: register_product
+      description: Registro de productos
+      parameters:
+        - name: body
+          in: body
+          description: Registro de productos
+          schema:
+            $ref: '#/definitions/RegisterProduct'
+      responses:
+        '201':
+          description: 'Información del producto'
+      tags:
+        - Comercios
+    get:
+      operationId: get_products_merchant
+      description: Obtener productos de un comercio
+      parameters:
+        - name: limit
+          in: query
+          description: Numero de resultados por pagina
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: El índice inicial desde el que devolver los resultados.
+          required: false
+          type: integer
+        - name: status
+          description: ID Status
+          required: false
+          in: query
+          type: string
+        - name: search
+          description: Buscar por (nombre)
+          in: query
+          required: false
+          type: string
+        - name: ordering
+          description: Ordenar por
+          in: query
+          required: false
+          type: string
+          enum: ['created', 'name', '-created', '-name']
+      responses:
+        '201':
+          description: 'Listado de categorías por comercio'
+      tags:
+        - Comercios
+  /api/v1/merchants/{merchant_id}/products/{product_id}/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+      - name: product_id
+        in: path
+        required: true
+        type: string
+  # UPDATE PRODUCT BY MERCHANT
+    patch:
+      operationId: update_product
+      description: Actualizar datos del producto
+      parameters:
+        - name: body
+          in: body
+          description: Actualizar datos del producto
+          schema:
+            $ref: '#/definitions/UpdateProduct'
+      responses:
+        '201':
+          description: 'Información del producto'
+      tags:
+        - Comercios
+    # GET INFO CATEGORY BY MERCHANT
+    get:
+      operationId: get_product
+      description: Obtener datos del producto
+      responses:
+        '201':
+          description: 'Información del producto'
+      tags:
+        - Comercios
+    delete:
+      operationId: delete_producto
+      description: Desactivar producto
+      responses:
+        '201':
+          description: 'Información de la categoria'
+      tags:
+        - Comercios
+  /api/v1/merchants/{merchant_id}/products/{product_id}/unlock/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+      - name: product_id
+        in: path
+        required: true
+        type: string
+    patch:
+      operationId: update_product_unlock
+      description: Activar producto
+      parameters:
+        - name: body
+          in: body
+          description: Activar producto
+          schema:
+            $ref: '#/definitions/UnlockProduct'
+      responses:
+        '201':
+          description: 'Información del producto'
+      tags:
+        - Comercios
+
 # ======== DEFINITIONS ==============
 definitions:
   # LOGIN CUSTOMER
@@ -2598,9 +2722,73 @@ definitions:
         description: Nombre de la categoría
       picture:
         type: string
-        description: Modelo del vehiculo
+        description: Imagen de la categoría
     required:
       - name
   UnlockCategory:
+    type: object
+
+# PRODUCT'S MERCHANT
+  RegisterProduct:
+    type: object
+    properties:
+      name:
+        type: string
+        description: Nombre de la categoría
+      description:
+        type: string
+        description: Descripción del producto
+      description_long:
+        type: string
+        description: Descripcion larga del producto
+      stock:
+        type: number
+        example: 1
+        description: Cantidad de productos
+      price:
+        type: string
+        example: 1.0
+        description: Precio del producto
+      category_id:
+        type: number
+        example: 1
+        description: Id de la categoría del comercio
+      picture:
+        type: string
+        description: Imagen del producto
+    required:
+      - name
+      - description
+      - stock
+      - price
+      - category_id
+  UpdateProduct:
+    type: object
+    properties:
+      name:
+        type: string
+        description: Nombre de la categoría
+      description:
+        type: string
+        description: Descripción del producto
+      description_long:
+        type: string
+        description: Descripcion larga del producto
+      stock:
+        type: number
+        example: 1
+        description: Cantidad de productos
+      price:
+        type: string
+        example: 1.0
+        description: Precio del producto
+      category_id:
+        type: number
+        example: 1
+        description: Id de la categoría del comercio
+      picture:
+        type: string
+        description: Imagen del producto
+  UnlockProduct:
     type: object
 
