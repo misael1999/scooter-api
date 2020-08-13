@@ -2,7 +2,7 @@
 # Django rest framework
 from rest_framework import serializers
 # Models
-from scooter.apps.common.serializers import Base64ImageField
+from scooter.apps.common.serializers import Base64ImageField, StatusModelSerializer
 from scooter.apps.merchants.models import CategoryProducts
 # Utilities
 from scooter.utils.serializers.scooter import ScooterModelSerializer
@@ -12,11 +12,12 @@ from scooter.utils.serializers.scooter import ScooterModelSerializer
 
 class CategoryProductsModelSerializer(ScooterModelSerializer):
     picture = Base64ImageField(required=False, allow_null=True, allow_empty_file=True)
+    status = StatusModelSerializer(read_only=True)
 
     class Meta:
         model = CategoryProducts
-        fields = ("id", 'name', 'picture')
-        read_only_fields = ("id",)
+        fields = ("id", 'name', 'picture', 'status')
+        read_only_fields = ("id", "status")
 
     def validate(self, data):
         merchant = self.context['merchant']

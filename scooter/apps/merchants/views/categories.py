@@ -40,7 +40,7 @@ class CategoriesProductsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cr
     def get_queryset(self):
         """ Personalized query when the action is a list so that it only returns active categories """
         if self.action == 'list':
-            return self.merchant.categoryproducts_set.filter(status__slug_name="active")
+            return self.merchant.categoryproducts_set.all()
         return self.queryset
 
     def get_serializer_context(self):

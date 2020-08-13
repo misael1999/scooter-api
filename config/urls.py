@@ -32,6 +32,8 @@ urlpatterns = [
     # Stations
     path('', include('scooter.apps.stations.urls')),
     # Merchants
-    path('', include('scooter.apps.merchants.urls'))
+    path('', include('scooter.apps.merchants.urls')),
+    # Order merchant
+    path('', include('scooter.apps.orders_m.urls'))
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

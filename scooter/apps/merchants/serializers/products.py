@@ -2,7 +2,8 @@
 # Django rest framework
 from rest_framework import serializers
 # Models
-from scooter.apps.common.serializers import Base64ImageField
+from scooter.apps.common.serializers import Base64ImageField, MerchantFilteredPrimaryKeyRelatedField, \
+    StatusModelSerializer
 from scooter.apps.merchants.models import Product, CategoryProducts
 # Utilities
 from scooter.utils.serializers.scooter import ScooterModelSerializer
@@ -11,8 +12,9 @@ from scooter.utils.serializers.scooter import ScooterModelSerializer
 
 class ProductsModelSerializer(ScooterModelSerializer):
     picture = Base64ImageField(required=False, allow_null=True, allow_empty_file=True)
-    category_id = serializers.PrimaryKeyRelatedField(queryset=CategoryProducts.objects.all(), source="category")
-    status = serializers.StringRelatedField()
+    category_id = MerchantFilteredPrimaryKeyRelatedField(queryset=CategoryProducts.objects,
+                                                         source="category")
+    status = StatusModelSerializer(read_only=True)
 
     class Meta:
         model = Product

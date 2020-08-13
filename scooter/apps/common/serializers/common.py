@@ -67,3 +67,12 @@ class CustomerFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField)
         if not customer or not queryset:
             return None
         return queryset.filter(customer=customer)
+
+
+class MerchantFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
+    def get_queryset(self):
+        merchant = self.context.get('merchant', None)
+        queryset = super(MerchantFilteredPrimaryKeyRelatedField, self).get_queryset()
+        if not merchant or not queryset:
+            return None
+        return queryset.filter(merchant=merchant)

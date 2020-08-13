@@ -35,7 +35,8 @@ class OrderMerchant(ScooterModel):
                                 on_delete=models.DO_NOTHING)
     station_service = models.ForeignKey('stations.StationService',
                                         on_delete=models.DO_NOTHING,
-                                        related_name="station_service")
+                                        related_name="station_service",
+                                        null=True, blank=True)
     merchant_location = models.PointField(geography=True)
     to_address = models.ForeignKey('customers.CustomerAddress',
                                    on_delete=models.DO_NOTHING,
