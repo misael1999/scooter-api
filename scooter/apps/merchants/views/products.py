@@ -82,6 +82,10 @@ class ProductsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.CreateModelM
                                             message='Ha ocurrido un error al borrar el producto')
             return Response(data=error, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    @action(detail=False, methods=['GET'])
+    def group(self, request, *args, **kwargs):
+        pass
+
     @action(detail=True, methods=['PATCH'])
     def unlock(self, request, *args, **kwargs):
         product = self.get_object()
