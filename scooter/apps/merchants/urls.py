@@ -9,8 +9,8 @@ from scooter.apps.merchants import views as views
 router = DefaultRouter()
 router.register(r'api/v1/merchants', views.MerchantViewSet, basename='merchants')
 
-# router.register(r'api/v1/stations/(?P<station_id>[a-zA-Z0-9_-]+)/vehicles',
-#                 vehicle_view.VehiclesViewSet, basename='vehicles-station')
+router.register(r'api/v1/merchants/(?P<merchant_id>[a-zA-Z0-9_-]+)/categories',
+                views.CategoriesProductsViewSet, basename='categories-merchants')
 
 urlpatterns = [
     # Views

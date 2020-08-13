@@ -1329,52 +1329,6 @@ paths:
         '200':
           description: 'Listado de pedidos por central'
       tags:
-        - Pedidos centrales  /api/v1/stations/{station_id}/orders/:
-    parameters:
-      - name: station_id
-        in: path
-        required: true
-        type: string
-    get:
-      operationId: get_orders_customer
-      description: Obtener todas las ordenes
-      parameters:
-        - name: limit
-          in: query
-          description: Numero de resultados por pagina
-          required: false
-          type: integer
-        - name: offset
-          in: query
-          description: El índice inicial desde el que devolver los resultados.
-          required: false
-          type: integer
-        - name: order_status
-          description: ID del status de la orden
-          required: false
-          in: query
-          type: string
-        - name: in_process
-          description: En proceso
-          in: query
-          required: false
-          type: string
-          enum: ['true', 'false']
-        - name: search
-          description: Buscar por (estación, dirección)
-          in: query
-          required: false
-          type: string
-        - name: ordering
-          description: Ordenar por
-          in: query
-          required: false
-          type: string
-          enum: ['order_date', 'date_delivered_order', 'station']
-      responses:
-        '200':
-          description: 'Listado de pedidos por central'
-      tags:
         - Pedidos centrales
   /api/v1/stations/{station_id}/orders/{order_id}/:
     parameters:
@@ -1744,6 +1698,129 @@ paths:
       tags:
         - Comercios
     parameters: []
+# CATEGORIES
+  /api/v1/merchants/{merchant_id}/categories/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+    # CREATE CATEGORY BY MERCHANT
+    post:
+      operationId: register_category
+      description: Registro de categorías
+      parameters:
+        - name: body
+          in: body
+          description: Registro de categorías
+          schema:
+            $ref: '#/definitions/RegisterCategory'
+      responses:
+        '201':
+          description: 'Información del repartidor creado'
+      tags:
+        - Comercios
+    get:
+      operationId: get_categories_merchant
+      description: Obtener categorias
+      parameters:
+        - name: limit
+          in: query
+          description: Numero de resultados por pagina
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: El índice inicial desde el que devolver los resultados.
+          required: false
+          type: integer
+        - name: status
+          description: ID Status
+          required: false
+          in: query
+          type: string
+        - name: search
+          description: Buscar por (nombre)
+          in: query
+          required: false
+          type: string
+        - name: ordering
+          description: Ordenar por
+          in: query
+          required: false
+          type: string
+          enum: ['created', 'name', '-created', '-name']
+      responses:
+        '201':
+          description: 'Listado de categorías por comercio'
+      tags:
+        - Comercios
+  /api/v1/merchants/{merchant_id}/categories/{category_id}/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+      - name: category_id
+        in: path
+        required: true
+        type: string
+  # UPDATE CATEGORY BY MERCHANT
+    patch:
+      operationId: update_category
+      description: Actualizar datos de la categoria
+      parameters:
+        - name: body
+          in: body
+          description: Actualizar datos de la categoria
+          schema:
+            $ref: '#/definitions/UpdateCategory'
+      responses:
+        '201':
+          description: 'Información de la categoria'
+      tags:
+        - Comercios
+    # GET INFO CATEGORY BY MERCHANT
+    get:
+      operationId: get_category
+      description: Obtener datos de la categoria
+      responses:
+        '201':
+          description: 'Información de la categoria'
+      tags:
+        - Comercios
+    delete:
+      operationId: delete_category
+      description: Desactivar categoría
+      responses:
+        '201':
+          description: 'Información de la categoria'
+      tags:
+        - Comercios
+  /api/v1/merchants/{merchant_id}/categories/{category_id}/unlock/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+      - name: category_id
+        in: path
+        required: true
+        type: string
+    patch:
+      operationId: update_vehicle_unlock
+      description: Desbloquear vehiculo
+      parameters:
+        - name: body
+          in: body
+          description: Desbloquear vehiculo
+          schema:
+            $ref: '#/definitions/UnlockCategory'
+      responses:
+        '201':
+          description: 'Información de la categoría'
+      tags:
+        - Comercios
 # ======== DEFINITIONS ==============
 definitions:
   # LOGIN CUSTOMER
@@ -2501,4 +2578,29 @@ definitions:
       - password
       - station_name
       - contact_person
+  # CATEGORY'S MERCHANT
+  RegisterCategory:
+    type: object
+    properties:
+      name:
+        type: string
+        description: Nombre de la categoría
+      picture:
+        type: string
+        description: Imagen de la categoría
+    required:
+      - name
+  UpdateCategory:
+    type: object
+    properties:
+      name:
+        type: string
+        description: Nombre de la categoría
+      picture:
+        type: string
+        description: Modelo del vehiculo
+    required:
+      - name
+  UnlockCategory:
+    type: object
 
