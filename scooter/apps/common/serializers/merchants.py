@@ -17,8 +17,6 @@ class CategoryMerchantModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CategoryMerchant
-        fields = ('id', 'name', 'image' 'slug_name', 'subcategories')
+        fields = ('id', 'name', 'image', 'slug_name', 'subcategories')
         read_only_fields = ('id', 'name', 'image', 'slug_name', 'subcategories')
-
-
 
