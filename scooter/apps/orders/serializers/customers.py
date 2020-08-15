@@ -8,6 +8,7 @@ from django.utils import timezone
 from rest_framework import serializers
 # Serializers
 from scooter.apps.customers.serializers import PointSerializer
+from scooter.apps.merchants.models import Merchant
 from scooter.apps.orders.models.ratings import RatingOrder
 from scooter.apps.orders.serializers import DetailOrderSerializer
 # Models
@@ -46,7 +47,8 @@ class CreateOrderSerializer(serializers.Serializer):
     """ Create new order for customer"""
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     details = DetailOrderSerializer(many=True, required=False, allow_null=True)
-    station_id = serializers.PrimaryKeyRelatedField(queryset=Station.objects.all(), source="station")
+    station_id = serializers.PrimaryKeyRelatedField(queryset=Station.objects.all(),
+                                                    source="station", required=False, allow_null=True)
     service_id = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all(), source="service")
     # Modified to add address recommendations
     current_location = CurrentLocationAddressSerializer(required=False, allow_null=True,
@@ -60,30 +62,33 @@ class CreateOrderSerializer(serializers.Serializer):
     approximate_price_order = serializers.CharField(max_length=30)
     phone_number = serializers.CharField(max_length=15)
     validate_qr = serializers.BooleanField(default=False, allow_null=True)
+    # Merchants
+    merchant_id = serializers.PrimaryKeyRelatedField(queryset=Merchant.objects.all(), source="merchant")
+    is_order_to_merchant = serializers.BooleanField(required=True, allow_null=True)
 
     def validate(self, data):
         try:
             # Add customer of the context in object data
-            data['customer'] = self.context['customer']
-            now = timezone.localtime(timezone.now())
-            offset = now - timedelta(minutes=4)
-            # Total de ordenes que se hicieron en ese rango de tiempo
-            total_orders_range = Order.objects.filter(order_date__gte=offset, order_date__lt=now).count()
-
-            if total_orders_range >= settings.ORDER_PER_CUSTOMER:
-                raise serializers.ValidationError({'detail': 'Solo puedes hacer {} pedidos'
-                                                             ' a la vez, espera que termine uno'
-                                                  .format(settings.ORDER_PER_CUSTOMER)}, code="limit_orders")
-
-            total_orders_in_process = Order.objects.filter(in_process=True, customer=data['customer']).count()
-            # Validate that the orders in process are not greater than those allowed
-            if total_orders_in_process >= settings.ORDER_PER_CUSTOMER \
-                    or (total_orders_range + total_orders_in_process) == settings.ORDER_PER_CUSTOMER:
-                raise serializers.ValidationError({'detail': 'Solo puedes hacer {} pedidos'
-                                                             ' a la vez, espera que termine uno'
-                                                  .format(settings.ORDER_PER_CUSTOMER)}, code="limit_orders")
+            # now = timezone.localtime(timezone.now())
+            # offset = now - timedelta(minutes=4)
+            # # Total de ordenes que se hicieron en ese rango de tiempo
+            # total_orders_range = Order.objects.filter(order_date__gte=offset, order_date__lt=now).count()
+            #
+            # if total_orders_range >= settings.ORDER_PER_CUSTOMER:
+            #     raise serializers.ValidationError({'detail': 'Solo puedes hacer {} pedidos'
+            #                                                  ' a la vez, espera que termine uno'
+            #                                       .format(settings.ORDER_PER_CUSTOMER)}, code="limit_orders")
+            #
+            # total_orders_in_process = Order.objects.filter(in_process=True, customer=data['customer']).count()
+            # # Validate that the orders in process are not greater than those allowed
+            # if total_orders_in_process >= settings.ORDER_PER_CUSTOMER \
+            #         or (total_orders_range + total_orders_in_process) == settings.ORDER_PER_CUSTOMER:
+            #     raise serializers.ValidationError({'detail': 'Solo puedes hacer {} pedidos'
+            #                                                  ' a la vez, espera que termine uno'
+            #                                       .format(settings.ORDER_PER_CUSTOMER)}, code="limit_orders")
 
             station = data['station']
+            data['customer'] = self.context['customer']
             exist_service = station.services.get(service=data['service'])
             # if not exist_service:
             #     raise serializers.ValidationError({'detail': 'La central no cuenta con el servicio solicitado'})
@@ -98,35 +103,15 @@ class CreateOrderSerializer(serializers.Serializer):
             details = data.pop('details', None)
 
             # Check if the station has manual assignment activated
-            station = data['station']
             customer = data['customer']
+            station = data.get('station', None)
+            merchant = data.get('merchant', None)
 
             maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=settings.TIME_RESPONSE)
-            qr_code = generate_qr_code()
+            is_safe_order = customer.is_safe_user
 
-            # Add client to station for update info
-            member, created = MemberStation.objects.get_or_create(customer=data['customer'],
-                                                                  station=station)
-
-            # if created:
-            #     Notification.objects.create(user_id=station.user_id, title="Nuevo cliente",
-            #                                 type_notification_id=1,
-            #                                 body="Se ha agregado un nuevo cliente")
-
-            order_status = OrderStatus.objects.get(slug_name="await_delivery_man")
-            QUANTITY_SAFE_ORDER = station.quantity_safe_order
-            is_safe_order = False
-
-            if customer.is_safe_user:
-                is_safe_order = True
-            else:
-                if member.total_orders >= QUANTITY_SAFE_ORDER:
-                    is_safe_order = True
-                    customer.is_safe_user = True
-                    customer.save()
-
-            if station.assign_delivery_manually:
-                order_status = OrderStatus.objects.get(slug_name="without_delivery")
+            # if station.assign_delivery_manually:
+            #     order_status = OrderStatus.objects.get(slug_name="without_delivery")
 
             is_current_location = data.pop('is_current_location', False)
             to_address = data.pop('current_location', None)
@@ -139,15 +124,15 @@ class CreateOrderSerializer(serializers.Serializer):
                                                                       customer=customer,
                                                                       exterior_number='',
                                                                       type_address_id=1,
-                                                                      status_id=3)
+                                                                      status_id=1)
 
                     data['to_address'] = customer_address
 
             # Calculate price order ==========
             # Calculate price between two address
 
-            data_service = calculate_service_price(from_address=data['from_address'],
-                                                   to_address=data['to_address'],
+            data_service = calculate_service_price(from_address=data['from_address'].point,
+                                                   to_address=data['to_address'].point,
                                                    service=data['station_service'],
                                                    is_current_location=False,
                                                    point=None
@@ -157,21 +142,35 @@ class CreateOrderSerializer(serializers.Serializer):
             if not is_free_order(station):
                 price = data_service['price_service']
 
-            order = Order.objects.create(**data,
-                                         member_station=member,
-                                         qr_code=qr_code,
-                                         order_date=timezone.localtime(timezone.now()),
-                                         service_price=price,
-                                         distance=data_service['distance'],
-                                         is_safe_order=is_safe_order,
-                                         maximum_response_time=maximum_response_time,
-                                         order_status=order_status)
+            is_order_to_merchant = data.get('is_order_to_merchant', False)
+            if is_order_to_merchant:
+                if not self.valid_stock(details):
+                    raise ValueError('Un producto no cuenta con suficiente stock')
+                order_status = OrderStatus.objects.get(slug_name="await_confirmation_merchant")
+                data['order_price'] = self.calculate_order_price(details)
+                data['merchant_location'] = merchant.point
+                data['total_order'] = data['order_price'] + price
+
+            else:
+                order_status = OrderStatus.objects.get(slug_name="await_delivery_man")
+
+            data['order_status'] = order_status
+            data['qr_code'] = generate_qr_code()
+            data['price'] = price
+            data['distance'] = data_service['distance']
+            data['is_safe_order'] = is_safe_order
+            data['order_date'] = timezone.localtime(timezone.now())
+            data['maximum_response_time'] = maximum_response_time
+            order = Order.objects.create(**data)
 
             # Save detail order
-            if details is not None:
+            details_to_save = []
+            if details and is_order_to_merchant:
+                details_to_save = self.update_stock(details)
+            elif details:
                 details_to_save = [OrderDetail(**detail, order=order) for detail in details]
-                OrderDetail.objects.bulk_create(details_to_save)
 
+            OrderDetail.objects.bulk_create(details_to_save)
             # Is assign delivery manually is true, then send notification
             if station.assign_delivery_manually:
                 send_notification_push_task.delay(station.user_id,
@@ -209,6 +208,37 @@ class CreateOrderSerializer(serializers.Serializer):
 
     def create_order(self, data):
         pass
+
+    def valid_stock(self, details):
+        is_valid = True
+
+        for detail in details:
+            product = detail['product']
+            if product.stock < detail['quantity']:
+                is_valid = False
+                break
+
+        return is_valid
+
+    def calculate_order_price(self, details):
+        price_order = 0.0
+        for detail in details:
+            price_order = price_order + (detail['product'].price * detail['quantity'])
+
+        return price_order
+
+    def update_stock(self, details, order):
+        details_to_save = []
+        for detail in details:
+            product = detail['product']
+            product.stock = product.stock - detail['quantity']
+            product.save()
+            detail_product = OrderDetail(**detail,
+                                         product_price=product.price,
+                                         order=order)
+            details_to_save.append(detail_product)
+
+        return details_to_save
 
 
 class RetryOrderSerializer(serializers.Serializer):

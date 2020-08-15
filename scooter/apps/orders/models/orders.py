@@ -16,7 +16,7 @@ class Order(ScooterModel):
     delivery_man = models.ForeignKey('delivery_men.DeliveryMan',
                                      on_delete=models.DO_NOTHING, related_name="delivery_man",
                                      null=True, blank=True)
-    station = models.ForeignKey('stations.Station', on_delete=models.DO_NOTHING)
+    station = models.ForeignKey('stations.Station', on_delete=models.DO_NOTHING, null=True, blank=True)
     service = models.ForeignKey('common.Service', on_delete=models.DO_NOTHING)
     station_service = models.ForeignKey('stations.StationService', on_delete=models.DO_NOTHING,
                                         related_name="station_service")
@@ -25,9 +25,18 @@ class Order(ScooterModel):
                                      related_name='from_address', null=True, blank=True)
     to_address = models.ForeignKey('customers.CustomerAddress', on_delete=models.DO_NOTHING,
                                    related_name='to_address', null=True, blank=True)
+    # Merchants
+    merchant = models.ForeignKey('merchants.Merchant',
+                                 on_delete=models.DO_NOTHING, null=True, blank=True)
+    merchant_location = models.PointField(geography=True, null=True, blank=True)
+    order_price = models.FloatField(null=True, blank=True)
+    total_order = models.FloatField(null=True, blank=True)
+    is_delivery_by_store = models.BooleanField(default=False)
+    is_order_to_merchant = models.BooleanField(default=False)
+
     service_price = models.FloatField()
     indications = models.TextField(blank=True, null=True)
-    approximate_price_order = models.CharField(max_length=30)
+    approximate_price_order = models.CharField(max_length=30, null=True, blank=True)
     date_delivered_order = models.DateTimeField(null=True, blank=True)
     order_date = models.DateTimeField()
     qr_code = models.CharField(max_length=15, blank=True, null=True)
@@ -49,6 +58,10 @@ class OrderDetail(ScooterModel):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="details")
     product_name = models.CharField(max_length=200)
     picture = models.ImageField(upload_to='orders/pictures/', blank=True, null=True)
+    # merchants
+    product = models.ForeignKey('merchants.Product', on_delete=models.DO_NOTHING, null=True, blank=True)
+    quantity = models.PositiveIntegerField(null=True, blank=True)
+    product_price = models.FloatField(null=True, blank=True)
 
     class Meta:
         db_table = 'orders_order_detail'

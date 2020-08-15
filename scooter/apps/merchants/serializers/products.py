@@ -6,6 +6,7 @@ from scooter.apps.common.serializers import Base64ImageField, MerchantFilteredPr
     StatusModelSerializer
 from scooter.apps.merchants.models import Product, CategoryProducts
 # Utilities
+from scooter.apps.merchants.serializers import CategoryProductsModelSerializer
 from scooter.utils.serializers.scooter import ScooterModelSerializer
 # Serializers
 
@@ -14,11 +15,12 @@ class ProductsModelSerializer(ScooterModelSerializer):
     picture = Base64ImageField(required=False, allow_null=True, allow_empty_file=True)
     category_id = MerchantFilteredPrimaryKeyRelatedField(queryset=CategoryProducts.objects,
                                                          source="category")
+    category = CategoryProductsModelSerializer(read_only=True)
     status = StatusModelSerializer(read_only=True)
 
     class Meta:
         model = Product
-        fields = ('id', 'name', 'description', 'description_long', 'stock',
+        fields = ('id', 'name', 'description', 'description_long', 'stock', 'category',
                   'price', 'category_id', 'picture', 'merchant', 'total_sales', 'status')
         read_only_fields = ("id", "merchant", "total_sales", 'status')
 

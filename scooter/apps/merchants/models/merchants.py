@@ -10,6 +10,7 @@ class Merchant(ScooterModel):
     contact_person = models.CharField(max_length=80)
     picture = models.ImageField(upload_to='merchants/pictures/', blank=True, null=True)
     merchant_name = models.CharField(max_length=100)
+    description = models.CharField(max_length=120, null=True, blank=True)
     phone_number = models.CharField(max_length=15)
     # Config
     is_delivery_by_store = models.BooleanField(default=False)
@@ -17,8 +18,10 @@ class Merchant(ScooterModel):
     information_is_complete = models.BooleanField(default=False)
     category = models.ForeignKey('common.CategoryMerchant', on_delete=models.DO_NOTHING)
     subcategory = models.ForeignKey('common.SubcategoryMerchant', on_delete=models.DO_NOTHING, null=True, blank=True)
+    approximate_preparation_time = models.CharField(max_length=10, null=True)
     # stats
     reputation = models.FloatField(default=0)
+    point = models.PointField(geography=True, blank=True, null=True)
 
     def __str__(self):
         return self.merchant_name

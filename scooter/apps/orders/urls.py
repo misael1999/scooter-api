@@ -14,6 +14,8 @@ router.register(r'api/v1/delivery_men/(?P<delivery_man_id>[a-zA-Z0-9_-]+)/orders
 
 router.register(r'api/v1/stations/(?P<station_id>[a-zA-Z0-9_-]+)/orders',
                 orders_view.StationOrderViewSet, basename='station_orders')
+router.register(r'api/v1/merchants/(?P<merchant_id>[a-zA-Z0-9_-]+)/orders',
+                orders_view.MerchantOrderViewSet, basename='merchants_orders')
 urlpatterns = [
     # Views
     path('', include(router.urls))

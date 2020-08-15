@@ -10,7 +10,7 @@ from django.db import IntegrityError
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 # Models
-from scooter.apps.merchants.models import Merchant
+from scooter.apps.merchants.models import Merchant, MerchantSchedule
 from scooter.apps.users.models import User
 from scooter.apps.stations.models.stations import Station, StationAddress, StationSchedule, StationService
 from scooter.apps.common.models import Service, Schedule, CategoryMerchant, SubcategoryMerchant
@@ -44,6 +44,46 @@ class MerchantUserSimpleSerializer(serializers.ModelSerializer):
         fields = ('id', 'user', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
                   'information_is_complete', 'category', 'subcategory', 'reputation')
         read_only_fields = fields
+
+# ===============
+# Serializers to update info of merchant
+# ===============
+
+
+class GeneralInfoMerchantSerializer(serializers.Serializer):
+    picture = Base64ImageField()
+    merchant_name = serializers.CharField(max_length=80)
+    description = serializers.CharField(max_length=120, required=False, allow_null=True)
+
+
+# Station Schedule
+class MerchantScheduleSerializer(serializers.ModelSerializer):
+    schedule_id = serializers.PrimaryKeyRelatedField(queryset=Schedule.objects.all(), source="schedule")
+    schedule = serializers.StringRelatedField(read_only=True, required=False)
+
+    class Meta:
+        model = MerchantSchedule
+        fields = ("schedule_id", "from_hour", "to_hour", "schedule")
+
+    def validate(self, data):
+        if data['from_hour'] > data['to_hour']:
+            raise serializers.ValidationError('La hora de apertura debe ser mayor')
+
+        return data
+
+
+class ScheduleMerchantSerializer(serializers.Serializer):
+    schedules = MerchantScheduleSerializer(many=True)
+    approximate_preparation_time = serializers.CharField(max_length=10)
+
+
+
+
+# Update info of merchant
+class UpdateInfoMerchantSerializer(serializers.Serializer):
+
+    def update(self, instance, validated_data):
+        pass
 
 
 # Create a new merchant

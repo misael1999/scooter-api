@@ -5,12 +5,13 @@ from django.utils import timezone
 from rest_framework import serializers
 # Serializers
 from scooter.apps.common.serializers import OrderStatusModelSerializer, ServiceModelSerializer
-from scooter.apps.common.serializers.common import Base64ImageField
+from scooter.apps.common.serializers.common import Base64ImageField, MerchantFilteredPrimaryKeyRelatedField
 from scooter.apps.customers.serializers import CustomerAddressModelSerializer, CustomerSimpleOrderSerializer, \
     PointSerializer
 # Models
 from scooter.apps.delivery_men.models import DeliveryMan
 from scooter.apps.delivery_men.serializers import DeliveryManOrderSerializer
+from scooter.apps.merchants.models import Product
 from scooter.apps.orders.models.ratings import RatingOrder
 from scooter.apps.stations.models import Station, StationService
 from scooter.apps.common.models import Service
@@ -34,8 +35,11 @@ class RatingOrderSerializer(serializers.ModelSerializer):
 
 
 class DetailOrderSerializer(serializers.Serializer):
-    product_name = serializers.CharField(max_length=201)
+    product_name = serializers.CharField(max_length=201, allow_null=True, required=False)
     picture = Base64ImageField(required=False, use_url=True, allow_null=True, allow_empty_file=True, max_length=None)
+    product_id = MerchantFilteredPrimaryKeyRelatedField(queryset=Product.objects, source="product", allow_null=True,
+                                                        required=False)
+    quantity = serializers.IntegerField(min_value=1)
 
 
 class OrderCurrentStatusSerializer(serializers.ModelSerializer):
@@ -132,6 +136,7 @@ class CalculateServicePriceSerializer(serializers.Serializer):
     def create(self, data):
         try:
             station = data['station']
+            to_address = None
 
             if is_free_order(station):
                 return 0.0
@@ -140,10 +145,12 @@ class CalculateServicePriceSerializer(serializers.Serializer):
             point = data.pop('point', None)
             if is_current_location:
                 point = Point(x=point['lng'], y=point['lat'], srid=4326)
-                data['to_address'] = None
+                to_address = None
+            else:
+                to_address = data['to_address'].point
 
-            data_service = calculate_service_price(from_address=data['from_address'],
-                                                   to_address=data['to_address'],
+            data_service = calculate_service_price(from_address=data['from_address'].point,
+                                                   to_address=to_address,
                                                    service=data['station_service'],
                                                    is_current_location=is_current_location,
                                                    point=point)
@@ -202,10 +209,10 @@ def calculate_service_price(from_address, to_address, service, is_current_locati
         if is_current_location:
             to_point = point
         else:
-            to_point = to_address.point
+            to_point = to_address
 
         pnt = fromstr(
-            from_address.point, srid=4326
+            from_address, srid=4326
         ).transform(3857, clone=True)
         pnt1 = fromstr(
             to_point, srid=4326
@@ -228,7 +235,7 @@ def calculate_service_price(from_address, to_address, service, is_current_locati
         return {'price_service': price_service, 'distance': distance_points}
     except ValueError as e:
         print(e)
-        raise ValueError('Error al consultar precio de la orden')
+        raise ValueError('Error al consultar precio del servicio')
     except Exception as ex:
         print(ex)
-        raise ValueError('Error al consultar precio de la orden')
+        raise ValueError('Error al consultar precio del servicio')
