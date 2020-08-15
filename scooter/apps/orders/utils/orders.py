@@ -47,3 +47,19 @@ async def notify_delivery_men(order_id, type):
         group_name,
         {"type": "notify_order", "content": content},
     )
+
+
+async def notify_merchants(order_id, merchant_id, type):
+    """ Notify merchants when there are new order """
+    channel_layer = get_channel_layer()
+    group_name = 'merchants-{}'.format(merchant_id)
+    content = {
+        'data': {
+            'order_id': order_id,
+            'type': type
+        },
+    }
+    await channel_layer.group_send(
+        group_name,
+        {"type": "notify_order", "content": content},
+    )

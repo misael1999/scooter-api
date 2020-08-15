@@ -18,7 +18,7 @@ from scooter.apps.common.models import Service, OrderStatus, Notification
 from scooter.apps.customers.models import CustomerAddress
 from scooter.apps.orders.models.orders import Order
 # Functions channels
-from scooter.apps.orders.utils.orders import send_order_to_station_channel, notify_delivery_men
+from scooter.apps.orders.utils.orders import notify_merchants, notify_delivery_men
 from asgiref.sync import async_to_sync
 # Serializers primary field
 from scooter.apps.common.serializers.common import CustomerFilteredPrimaryKeyRelatedField
@@ -172,31 +172,36 @@ class CreateOrderSerializer(serializers.Serializer):
 
             OrderDetail.objects.bulk_create(details_to_save)
             # Is assign delivery manually is true, then send notification
-            if station.assign_delivery_manually:
-                send_notification_push_task.delay(station.user_id,
-                                                  'Solicitud nueva',
-                                                  'Ha recibido una nueva solicitud',
-                                                  {"type": "NEW_ORDER",
-                                                   "order_id": order.id,
-                                                   "message": "Ha recibido una nueva solicitud",
-                                                   'click_action': 'FLUTTER_NOTIFICATION_CLICK'
-                                                   })
-                # Send message by django channel
-                async_to_sync(send_order_to_station_channel)(station.id, order.id)
+            # if station.assign_delivery_manually:
+            #     send_notification_push_task.delay(station.user_id,
+            #                                       'Solicitud nueva',
+            #                                       'Ha recibido una nueva solicitud',
+            #                                       {"type": "NEW_ORDER",
+            #                                        "order_id": order.id,
+            #                                        "message": "Ha recibido una nueva solicitud",
+            #                                        'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+            #                                        })
+            #     # Send message by django channel
+            #     async_to_sync(send_order_to_station_channel)(station.id, order.id)
+            # else:
+            location_selected = None
+            location_selected = get_ref_location(order)
+
+            if is_order_to_merchant:
+                async_to_sync(notify_merchants)(merchant.id, order.id)
             else:
-                location_selected = None
-                location_selected = get_ref_location(order)
+                send_order_delivery(location_selected=location_selected,
+                                    station=station,
+                                    order=order)
+            # Get nearest delivery
 
-                # Get nearest delivery man
-                send_order_delivery(location_selected=location_selected, station=data['station'], order=order)
+            # user_id = delivery_man.user_id
+            # Save delivery man in history rejected for not find again
+            # HistoryRejectedOrders.objects.get_or_create(delivery_man=delivery_man, order=order)
 
-                # user_id = delivery_man.user_id
-                # Save delivery man in history rejected for not find again
-                # HistoryRejectedOrders.objects.get_or_create(delivery_man=delivery_man, order=order)
-
-                # Notification.objects.create(user_id=user_id, title="Nueva solicitud",
-                #                             type_notification_id=1,
-                #                             body="Has recibido una nueva solicitud")
+            # Notification.objects.create(user_id=user_id, title="Nueva solicitud",
+            #                             type_notification_id=1,
+            #                             body="Has recibido una nueva solicitud")
 
             return order.id
         except ValueError as e:

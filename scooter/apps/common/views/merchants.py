@@ -27,7 +27,7 @@ class CategoryMerchantViewSet(ScooterViewSet, mixins.CreateModelMixin, mixins.Li
     @action(detail=True, methods=['GET'])
     def subcategories(self, request, *args, **kwargs):
         category_merchant = self.get_object()
-        queryset = category_merchant.subcategorymerchant_set.all()
+        queryset = category_merchant.subcategories_set.all()
         serializer = SubcategoryMerchantModelSerializer(queryset, many=True).data
         data = self.set_response(status=True, data=serializer, message="Listado de subcategorias")
         return Response(data=data, status=status.HTTP_200_OK)
