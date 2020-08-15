@@ -7,8 +7,8 @@ class SubcategoryMerchantModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SubcategoryMerchant
-        fields = ('id', 'name', 'slug_name')
-        read_only_fields = ('id', 'name', 'slug_name')
+        fields = ('id', 'name', 'image', 'slug_name')
+        read_only_fields = ('id', 'name', 'image', 'slug_name')
 
 
 class CategoryMerchantModelSerializer(serializers.ModelSerializer):
@@ -17,8 +17,8 @@ class CategoryMerchantModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CategoryMerchant
-        fields = ('id', 'name', 'slug_name', 'subcategories')
-        read_only_fields = ('id', 'name', 'slug_name', 'subcategories')
+        fields = ('id', 'name', 'image' 'slug_name', 'subcategories')
+        read_only_fields = ('id', 'name', 'image', 'slug_name', 'subcategories')
 
 
 
