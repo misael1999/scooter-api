@@ -37,8 +37,8 @@ class RatingOrderSerializer(serializers.ModelSerializer):
 class DetailOrderSerializer(serializers.Serializer):
     product_name = serializers.CharField(max_length=201, allow_null=True, required=False)
     picture = Base64ImageField(required=False, use_url=True, allow_null=True, allow_empty_file=True, max_length=None)
-    product_id = MerchantFilteredPrimaryKeyRelatedField(queryset=Product.objects, source="product", allow_null=True,
-                                                        required=False)
+    product_id = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all(), source="product", allow_null=True,
+                                                    required=False)
     quantity = serializers.IntegerField(min_value=1)
 
 
@@ -61,7 +61,9 @@ class OrderModelSerializer(serializers.ModelSerializer):
         fields = ("id", "delivery_man", "station", "service", "distance",
                   "from_address_id", "to_address_id", "service_price",
                   "indications", "approximate_price_order", 'maximum_response_time',
-                  "date_delivered_order", "qr_code", "order_status", "order_date", 'validate_qr', 'is_safe_order')
+                  "date_delivered_order", "qr_code", "order_status", "order_date", 'validate_qr',
+                  'is_safe_order', 'merchant_location',
+                  'order_price', 'total_order', 'is_delivery_by_store', 'is_order_to_merchant')
 
 
 # For customer history orders
@@ -80,7 +82,8 @@ class OrderWithDetailSimpleSerializer(serializers.ModelSerializer):
                   "indications", "approximate_price_order", 'reason_rejection',
                   "order_date", "date_delivered_order", "qr_code", "order_status",
                   "customer", "delivery_man", "station", 'details', 'maximum_response_time',
-                  'validate_qr', 'rated_order', 'in_process', 'is_safe_order')
+                  'validate_qr', 'rated_order', 'in_process', 'is_safe_order', 'merchant_location',
+                  'order_price', 'total_order', 'is_delivery_by_store', 'is_order_to_merchant')
         read_only_fields = fields
 
 
@@ -104,7 +107,9 @@ class OrderWithDetailModelSerializer(serializers.ModelSerializer):
                   "indications", "approximate_price_order", 'reason_rejection',
                   "order_date", "date_delivered_order", "qr_code", "order_status",
                   "customer", "delivery_man", "station", 'details', 'maximum_response_time', 'validate_qr',
-                  'rated_order', 'in_process', 'service_id', 'is_safe_order', 'station_object')
+                  'rated_order', 'in_process', 'service_id', 'is_safe_order', 'station_object', 'merchant_location',
+                  'order_price', 'total_order', 'is_delivery_by_store', 'is_order_to_merchant',
+                  )
         read_only_fields = fields
 
 

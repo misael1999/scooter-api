@@ -20,6 +20,19 @@ class IsOrderStationOwner(BasePermission):
         return view.station == obj.station
 
 
+class IsOrderMerchantOwner(BasePermission):
+    """Verify requesting merchant is the order create."""
+
+    def has_permission(self, request, view):
+        """Let object permission grant access."""
+        obj = view.get_object()
+        return self.has_object_permission(request, view, obj)
+
+    def has_object_permission(self, request, view, obj):
+        """Verify requesting station is the order creator."""
+        return view.merchant.id == obj.merchant_id
+
+
 class IsOrderDeliveryManStationOwner(BasePermission):
     """Verify requesting delivery man is the station order create."""
 

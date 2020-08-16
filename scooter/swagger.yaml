@@ -1978,7 +1978,125 @@ paths:
           description: 'Información del producto'
       tags:
         - Comercios
-
+  /api/v1/merchants/{merchant_id}/orders/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+    get:
+      operationId: get_orders_merchant
+      description: Obtener todas las ordenes
+      parameters:
+        - name: limit
+          in: query
+          description: Numero de resultados por pagina
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: El índice inicial desde el que devolver los resultados.
+          required: false
+          type: integer
+        - name: order_status
+          description: ID del status de la orden
+          required: false
+          in: query
+          type: string
+        - name: in_process
+          description: En proceso
+          in: query
+          required: false
+          type: string
+          enum: ['true', 'false']
+        - name: search
+          description: Buscar por (cliente, dirección)
+          in: query
+          required: false
+          type: string
+        - name: ordering
+          description: Ordenar por
+          in: query
+          required: false
+          type: string
+          enum: ['order_date', 'date_delivered_order']
+      responses:
+        '200':
+          description: 'Listado de pedidos por comercio'
+      tags:
+        - Pedidos comercios
+  /api/v1/merchants/{merchant_id}/orders/{order_id}/accept_order/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+      - name: order_id
+        in: path
+        required: true
+        type: string
+    patch:
+      operationId: merchant_accept_order
+      description: Aceptar pedido
+      parameters:
+        - name: body
+          in: body
+          description: Aceptar pedido
+          schema:
+            $ref: '#/definitions/AcceptOrder'
+      responses:
+        '201':
+          description: 'Aceptar pedido'
+      tags:
+        - Pedidos comercios
+  /api/v1/merchants/{merchant_id}/orders/{order_id}/reject_order/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+      - name: order_id
+        in: path
+        required: true
+        type: string
+    patch:
+      operationId: merchant_reject_order
+      description: Rechazar pedido
+      parameters:
+        - name: body
+          in: body
+          description: Rechazar pedido
+          schema:
+            $ref: '#/definitions/RejectOrder'
+      responses:
+        '201':
+          description: 'Aceptar pedido'
+      tags:
+        - Pedidos comercios
+  /api/v1/merchants/{merchant_id}/orders/{order_id}/cancel_order/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+      - name: order_id
+        in: path
+        required: true
+        type: string
+    patch:
+      operationId: merchant_cancel_order
+      description: Cancelar pedido
+      parameters:
+        - name: body
+          in: body
+          description: Cancelar pedido
+          schema:
+            $ref: '#/definitions/CancelOrderMerchant'
+      responses:
+        '201':
+          description: 'Cancelar pedido'
+      tags:
+        - Pedidos comercios
 # ======== DEFINITIONS ==============
 definitions:
   # LOGIN CUSTOMER
@@ -2667,6 +2785,12 @@ definitions:
         type: string
         description: Numero de teléfono
         example: '2384080578'
+      merchant_id:
+        type: number
+        description: id del comercio
+      is_order_to_merchant:
+        type: bool
+        example: false
       details:
         type: array
         description: Lista de productos
@@ -2681,6 +2805,12 @@ definitions:
               type: string
               description: Imagen del producto
               example: base64Image
+            product_id:
+              type: number
+              description: Id del producto a comprar
+            quantity:
+              type: number
+              description: Cantidad de productos a comprar
     required:
       - station_id
       - service_id

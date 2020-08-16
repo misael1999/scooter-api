@@ -9,8 +9,8 @@ from scooter.apps.orders.utils.filters import OrderFilter
 from scooter.utils.viewsets.scooter import ScooterViewSet
 # Permissions
 from rest_framework.permissions import IsAuthenticated
-from scooter.apps.orders.permissions import IsOrderStationOwner
-from scooter.apps.stations.permissions import IsAccountOwnerStation
+from scooter.apps.orders.permissions import IsOrderMerchantOwner
+from scooter.apps.merchants.permissions import IsAccountOwnerMerchant
 # Serializers
 from scooter.apps.orders.serializers import (OrderModelSerializer,
                                              RejectOrderByDeliverySerializer,
@@ -31,7 +31,6 @@ class MerchantOrderViewSet(ScooterViewSet, AddMerchantMixin,
     serializer_class = OrderModelSerializer
     queryset = Order.objects.all()
     merchant = None
-    permission_classes = (IsAuthenticated, IsAccountOwnerStation)
     lookup_field = 'pk'
     filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
     search_fields = ('customer__name', 'from_address__street', 'from_address__suburb', 'qr_code')
@@ -52,9 +51,9 @@ class MerchantOrderViewSet(ScooterViewSet, AddMerchantMixin,
 
     def get_permissions(self):
         """Assign permission based on action."""
-        permissions = [IsAuthenticated, IsAccountOwnerStation]
+        permissions = [IsAuthenticated, IsAccountOwnerMerchant]
         if self.action in ['reject_order', 'assign_order', 'retrieve']:
-            permissions.append(IsOrderStationOwner)
+            permissions.append(IsOrderMerchantOwner)
         return [p() for p in permissions]
 
     def get_object(self):

@@ -88,12 +88,17 @@ class CreateOrderSerializer(serializers.Serializer):
             #                                                  ' a la vez, espera que termine uno'
             #                                       .format(settings.ORDER_PER_CUSTOMER)}, code="limit_orders")
 
-            station = data['station']
+            station = data.get('station', None)
+            merchant = data.get('merchant')
+            if merchant.is_delivery_by_store is False and not station:
+                raise serializers.ValidationError({'detail': 'Selecciona una central'})
+            if station is not None:
+                exist_service = station.services.get(service=data['service'])
+                data['station_service'] = exist_service
+
             data['customer'] = self.context['customer']
-            exist_service = station.services.get(service=data['service'])
             # if not exist_service:
             #     raise serializers.ValidationError({'detail': 'La central no cuenta con el servicio solicitado'})
-            data['station_service'] = exist_service
         except StationService.DoesNotExist:
             raise serializers.ValidationError({'detail': 'La central no cuenta con el servicio solicitado'})
         return data
@@ -102,12 +107,9 @@ class CreateOrderSerializer(serializers.Serializer):
         """ Create a new order and send message socket """
         try:
             details = data.pop('details', None)
-
-            # Check if the station has manual assignment activated
             customer = data['customer']
             station = data.get('station', None)
             merchant = data.get('merchant', None)
-
             maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=settings.TIME_RESPONSE)
             is_safe_order = customer.is_safe_user
 
@@ -129,19 +131,19 @@ class CreateOrderSerializer(serializers.Serializer):
 
                     data['to_address'] = customer_address
 
-            # Calculate price order ==========
             # Calculate price between two address
 
-            data_service = calculate_service_price(from_address=data['from_address'].point,
-                                                   to_address=data['to_address'].point,
-                                                   service=data['station_service'],
-                                                   is_current_location=False,
-                                                   point=None
-                                                   )
             price = 0.0
 
-            if not is_free_order(station):
+            if station and not is_free_order(station):
+                data_service = calculate_service_price(from_address=data['from_address'].point,
+                                                       to_address=data['to_address'].point,
+                                                       service=data['station_service'],
+                                                       is_current_location=False,
+                                                       point=None
+                                                       )
                 price = data_service['price_service']
+                data['distance'] = data_service['distance']
 
             is_order_to_merchant = data.get('is_order_to_merchant', False)
             if is_order_to_merchant:
@@ -151,14 +153,14 @@ class CreateOrderSerializer(serializers.Serializer):
                 data['order_price'] = self.calculate_order_price(details)
                 data['merchant_location'] = merchant.point
                 data['total_order'] = data['order_price'] + price
+                data['is_delivery_by_store'] = merchant.is_delivery_by_store
 
             else:
                 order_status = OrderStatus.objects.get(slug_name="await_delivery_man")
 
             data['order_status'] = order_status
             data['qr_code'] = generate_qr_code()
-            data['price'] = price
-            data['distance'] = data_service['distance']
+            data['service_price'] = price
             data['is_safe_order'] = is_safe_order
             data['order_date'] = timezone.localtime(timezone.now())
             data['maximum_response_time'] = maximum_response_time
@@ -167,7 +169,7 @@ class CreateOrderSerializer(serializers.Serializer):
             # Save detail order
             details_to_save = []
             if details and is_order_to_merchant:
-                details_to_save = self.update_stock(details)
+                details_to_save = self.update_stock(details=details, order=order)
             elif details:
                 details_to_save = [OrderDetail(**detail, order=order) for detail in details]
 
@@ -189,7 +191,17 @@ class CreateOrderSerializer(serializers.Serializer):
             location_selected = get_ref_location(order)
 
             if is_order_to_merchant:
-                async_to_sync(notify_merchants)(merchant.id, order.id)
+                async_to_sync(notify_merchants)(merchant.id, order.id, 'NEW_ORDER')
+                send_notification_push_order(user_id=merchant.user_id,
+                                             title='Solicitud nueva',
+                                             body='Ha recibido un nuevo pedido',
+                                             sound="default",
+                                             android_channel_id="alarms",
+                                             data={"type": "NEW_ORDER",
+                                                   "order_id": order.id,
+                                                   "message": "Pedido de nuevo",
+                                                   'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                                   })
             else:
                 send_order_delivery(location_selected=location_selected,
                                     station=station,
@@ -240,6 +252,7 @@ class CreateOrderSerializer(serializers.Serializer):
             product.stock = product.stock - detail['quantity']
             product.save()
             detail_product = OrderDetail(**detail,
+                                         product_name=product.name,
                                          product_price=product.price,
                                          order=order)
             details_to_save.append(detail_product)
@@ -354,7 +367,7 @@ def send_order_delivery(location_selected, station, order):
         # Get nearest delivery man
         delivery_men = get_nearest_delivery_man(location_selected=location_selected, station=station,
                                                 list_exclude=[], distance=settings.RANGE_DISTANCE,
-                                                status=['available', 'busy', 'out_service'])
+                                                status=['available', 'busy'])
 
         # Send push notification to delivery_man
         if delivery_men.count() == 0:

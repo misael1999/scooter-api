@@ -17,9 +17,9 @@ class Order(ScooterModel):
                                      on_delete=models.DO_NOTHING, related_name="delivery_man",
                                      null=True, blank=True)
     station = models.ForeignKey('stations.Station', on_delete=models.DO_NOTHING, null=True, blank=True)
-    service = models.ForeignKey('common.Service', on_delete=models.DO_NOTHING)
+    service = models.ForeignKey('common.Service', on_delete=models.DO_NOTHING, null=True, blank=True)
     station_service = models.ForeignKey('stations.StationService', on_delete=models.DO_NOTHING,
-                                        related_name="station_service")
+                                        related_name="station_service", null=True, blank=True)
     from_address = models.ForeignKey('customers.CustomerAddress', on_delete=models.DO_NOTHING,
                                      help_text='Place of purchase or place of delivery depending on the service',
                                      related_name='from_address', null=True, blank=True)
@@ -45,7 +45,7 @@ class Order(ScooterModel):
     reason_rejection = models.CharField(max_length=100, blank=True, null=True)
     maximum_response_time = models.DateTimeField()
     phone_number = models.CharField(max_length=15)
-    distance = models.FloatField()
+    distance = models.FloatField(null=True, blank=True)
     in_process = models.BooleanField(default=False)
     validate_qr = models.BooleanField(default=False)
     is_safe_order = models.BooleanField(default=False)

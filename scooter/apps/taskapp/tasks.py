@@ -81,7 +81,6 @@ def disabled_location():
     for delivery_man in delivery_men:
         send_notification_push_order(delivery_man.user_id, title='¡¡¡¡ Importante !!!!!',
                                      body='Has pasado mucho tiempo sin enviar tu ubicación,'
-                                          ' asi que te encuentras fuera de servicio,'
                                           'vuelve activar tu disponibilidad para recibir pedidos',
                                      sound="default",
                                      android_channel_id="locations",
@@ -89,5 +88,5 @@ def disabled_location():
                                            "message": "No estamos recibiendo tu ubicación",
                                            'click_action': 'FLUTTER_NOTIFICATION_CLICK'})
 
-    delivery_men.update(delivery_status_id=3)
+    # delivery_men.update(delivery_status_id=3)
 
