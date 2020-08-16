@@ -1,14 +1,8 @@
 # Rest framework
 from rest_framework import serializers
-# Serializers
 # Models
 from scooter.apps.common.models import OrderStatus
 from scooter.apps.delivery_men.models import DeliveryMan
-# Functions channels
-# Task Celery
-from scooter.apps.taskapp.tasks import send_notification_push_task
-# Functions
-from scooter.apps.orders.serializers.orders import get_nearest_delivery_man
 # Serializers primary field
 from scooter.apps.common.serializers.common import StationFilteredPrimaryKeyRelatedField
 # Task Celery

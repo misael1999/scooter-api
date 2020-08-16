@@ -39,7 +39,7 @@ class MerchantSchedule(ScooterModel):
 
 class MerchantAddress(ScooterModel):
     merchant = models.OneToOneField(Merchant, on_delete=models.CASCADE, related_name="address")
-    full_address = models.CharField(max_length=300)
+    full_address = models.CharField(max_length=300, null=True, blank=True)
     references = models.CharField(max_length=150, blank=True, null=True)
     point = models.PointField(blank=True, null=True)
 

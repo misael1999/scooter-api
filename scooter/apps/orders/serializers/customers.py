@@ -63,7 +63,8 @@ class CreateOrderSerializer(serializers.Serializer):
     phone_number = serializers.CharField(max_length=15)
     validate_qr = serializers.BooleanField(default=False, allow_null=True)
     # Merchants
-    merchant_id = serializers.PrimaryKeyRelatedField(queryset=Merchant.objects.all(), source="merchant")
+    merchant_id = serializers.PrimaryKeyRelatedField(queryset=Merchant.objects.all(), source="merchant",
+                                                     required=False, allow_null=True)
     is_order_to_merchant = serializers.BooleanField(required=True, allow_null=True)
 
     def validate(self, data):

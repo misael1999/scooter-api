@@ -1698,6 +1698,40 @@ paths:
       tags:
         - Comercios
     parameters: []
+  /api/v1/merchants/{merchant_id}/update_info/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+    patch:
+      operationId: update_merchant
+      description: Actualizar datos del comercio
+      parameters:
+        - name: body
+          in: body
+          description: Actualizar datos del comercio
+          schema:
+            $ref: '#/definitions/UpdateMerchant'
+      responses:
+        '201':
+          description: 'Información del comercio'
+      tags:
+        - Comercios
+    put:
+      operationId: update_merchant_put
+      description: Actualizar datos de la central
+      parameters:
+        - name: body
+          in: body
+          description: Actualizar datos de la central
+          schema:
+            $ref: '#/definitions/UpdateMerchant'
+      responses:
+        '201':
+          description: 'Información de comercios'
+      tags:
+        - Comercios
 # CATEGORIES
   /api/v1/merchants/{merchant_id}/categories/:
     parameters:
@@ -2791,4 +2825,52 @@ definitions:
         description: Imagen del producto
   UnlockProduct:
     type: object
+  UpdateMerchant:
+    type: object
+    properties:
+      general:
+        type: object
+        properties:
+          picture:
+            type: string
+          merchant_name:
+            type: string
+          description:
+            type: string
+          approximate_preparation_time:
+            type: string
+      schedules:
+        type: array
+        description: Lista de horarios
+        items:
+          type: object
+          properties:
+            schedule_id:
+              type: number
+              description: Id del día
+              example: 1
+            from_hour:
+              type: string
+              example: '10:00'
+              description: Desde la hora ...
+            to_hour:
+              type: string
+              example: '18:00'
+              description: Hasta la hora ...
+      address:
+        type: object
+        properties:
+          point:
+            type: object
+            properties:
+              lat:
+                type: number
+                description: Latitude
+                example: 18.462859841665864
+              lng:
+                type: number
+                description: Longitude
+                example: -97.39279966871719
+
+
 

@@ -7,14 +7,13 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from scooter.apps.merchants.models import Merchant
 # Permissions
-from scooter.apps.merchants.permissions import IsAccountOwnerMerchant
+from scooter.apps.merchants.permissions import IsAccountOwnerMerchant, IsSameMerchant
 # Utilities
 from scooter.utils.viewsets import ScooterViewSet
 # Models
-from scooter.apps.stations.models.stations import Station
 # Serializers
 from scooter.apps.merchants.serializers import (MerchantSignUpSerializer,
-                                                MerchantWithAllInfoSerializer)
+                                                MerchantWithAllInfoSerializer, UpdateInfoMerchantSerializer)
 
 from scooter.apps.users.serializers.users import UserModelSimpleSerializer
 # Filters
@@ -53,14 +52,14 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         if self.action in ['create']:
             permission_classes = [IsAuthenticated]
         elif self.action in ['partial_update', 'update', 'update_info']:
-            permission_classes = [IsAuthenticated, IsAccountOwnerMerchant]
+            permission_classes = [IsAuthenticated, IsSameMerchant]
         else:
             permission_classes = [IsAuthenticated]
 
         return [permission() for permission in permission_classes]
 
     def create(self, request, *args, **kwargs):
-        """ Station sign up """
+        """ Merchant sign up """
         serializer_class = self.get_serializer_class()
         serializer = serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -70,17 +69,16 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
                                  message='Se ha registrado un nuevo comercio')
         return Response(data, status=status.HTTP_201_CREATED)
 
-    #
-    # @action(detail=True, methods=('PATCH', 'PUT'))
-    # def update_info(self, request, *args, **kwargs):
-    #     try:
-    #         station = self.get_object()
-    #         partial = request.method == 'PATCH'
-    #         serializer = StationUpdateInfoSerializer(station, data=request.data, partial=partial)
-    #         serializer.is_valid(raise_exception=True)
-    #         serializer.save()
-    #         data = StationUserModelSerializer(station).data
-    #     except Station.DoesNotExist:
-    #         return Response(
-    #             self.set_error_response(status=False, field='Detail', message='No existe la central'))
-    #     return Response(self.set_response(status='ok', data=data, message='Información actualizada correctamente'))
+    @action(detail=True, methods=('PATCH', 'PUT'))
+    def update_info(self, request, *args, **kwargs):
+        try:
+            merchant = self.get_object()
+            partial = request.method == 'PATCH'
+            serializer = UpdateInfoMerchantSerializer(merchant, data=request.data, partial=partial)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            data = {}
+        except Merchant.DoesNotExist:
+            return Response(
+                self.set_error_response(status=False, field='Detail', message='No existe el comercio'))
+        return Response(self.set_response(status='ok', data=data, message='Información actualizada correctamente'))

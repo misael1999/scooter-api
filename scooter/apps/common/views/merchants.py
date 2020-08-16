@@ -1,4 +1,6 @@
 # Django rest
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from rest_framework import mixins, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -23,6 +25,10 @@ class CategoryMerchantViewSet(ScooterViewSet, mixins.CreateModelMixin, mixins.Li
             return CategoryMerchant.objects.filter(status__slug_name="active")
 
         return CategoryMerchant.objects.all()
+
+    @method_decorator(cache_page(7200))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
     @action(detail=True, methods=['GET'])
     def subcategories(self, request, *args, **kwargs):
