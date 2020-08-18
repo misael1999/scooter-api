@@ -1647,6 +1647,26 @@ paths:
       tags:
         - Comercios
     parameters: []
+  /api/v1/merchants/{merchant_id}/update_availability/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+    put:
+      operationId: merchant_update_availability
+      description: Actualizar la disponibilidad del comercio
+      parameters:
+        - name: body
+          in: body
+          description: Actualizar la disponibilidad del comercio
+          schema:
+            $ref: '#/definitions/UpdateAvailabilityMerchant'
+      responses:
+        '200':
+          description: 'Disponibilidad actualizada'
+      tags:
+        - Repartidores
   /api/v1/merchants/:
     post:
       operationId: register_merchant
@@ -2777,6 +2797,12 @@ definitions:
     properties:
       status:
         type: string
+  UpdateAvailabilityMerchant:
+    type: object
+    properties:
+      is_open:
+        type: string
+        example: true
   # ==== ORDERS
   RejectOrderDeliveryMan:
     type: object

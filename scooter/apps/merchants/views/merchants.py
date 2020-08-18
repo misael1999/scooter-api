@@ -13,7 +13,8 @@ from scooter.utils.viewsets import ScooterViewSet
 # Models
 # Serializers
 from scooter.apps.merchants.serializers import (MerchantSignUpSerializer,
-                                                MerchantWithAllInfoSerializer, UpdateInfoMerchantSerializer)
+                                                MerchantWithAllInfoSerializer, UpdateInfoMerchantSerializer,
+                                                AvailabilityMerchantSerializer)
 
 from scooter.apps.users.serializers.users import UserModelSimpleSerializer
 # Filters
@@ -81,4 +82,14 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         except Merchant.DoesNotExist:
             return Response(
                 self.set_error_response(status=False, field='Detail', message='No existe el comercio'))
-        return Response(self.set_response(status='ok', data=data, message='Información actualizada correctamente'))
+        return Response(self.set_response(status='ok', data=data, message='Información actualizada correctamente')) \
+
+
+    @action(detail=True, methods=('PUT',))
+    def update_availability(self, request, *args, **kwargs):
+        merchant = self.get_object()
+        serializer = AvailabilityMerchantSerializer(merchant, data=request.data, partial=False)
+        serializer.is_valid(raise_exception=True)
+        status_availability = serializer.save()
+        return Response(self.set_response(status='ok', data={'status': status_availability},
+                                          message='Cambio de disponibilidad correctamente'))

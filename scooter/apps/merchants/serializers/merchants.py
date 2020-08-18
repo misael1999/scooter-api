@@ -30,7 +30,8 @@ class MerchantWithAllInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Merchant
         fields = ('id', 'user', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
-                  'information_is_complete', 'category', 'subcategory', 'reputation', 'description', 'approximate_preparation_time')
+                  'information_is_complete', 'category', 'subcategory', 'reputation', 'description',
+                  'approximate_preparation_time', 'schedules', 'is_open')
         read_only_fields = fields
 
 
@@ -43,8 +44,18 @@ class MerchantUserSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Merchant
         fields = ('id', 'user', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
-                  'information_is_complete', 'category', 'subcategory', 'reputation')
+                  'information_is_complete', 'category', 'subcategory', 'reputation', 'description',
+                  'approximate_preparation_time', 'is_open')
         read_only_fields = fields
+
+
+class AvailabilityMerchantSerializer(serializers.Serializer):
+    is_open = serializers.BooleanField()
+
+    def update(self, merchant, data):
+        merchant.is_open = data['is_open']
+        merchant.save()
+        return merchant
 
 # ===============
 # Serializers to update info of merchant

@@ -22,6 +22,7 @@ class Merchant(ScooterModel):
     # stats
     reputation = models.FloatField(default=0)
     point = models.PointField(geography=True, blank=True, null=True)
+    is_open = models.BooleanField(default=False)
 
     def __str__(self):
         return self.merchant_name
