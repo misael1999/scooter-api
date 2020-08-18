@@ -5,7 +5,8 @@ from rest_framework.response import Response
 # Models
 from scooter.apps.common.models.status import Status
 # Serializers
-from scooter.apps.merchants.serializers import CategoryProductsModelSerializer
+from scooter.apps.merchants.serializers.categories import (CategoryProductsModelSerializer,
+                                                           CategoryWithProductsSerializer)
 # Viewset
 from scooter.apps.merchants.models import CategoryProducts
 from scooter.utils.viewsets.scooter import ScooterViewSet
@@ -26,7 +27,6 @@ class CategoriesProductsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cr
 
     serializer_class = CategoryProductsModelSerializer
     queryset = CategoryProducts.objects.all()
-    permission_classes = (IsAuthenticated, IsAccountOwnerMerchant)
     filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
     search_fields = ('name',)
     ordering_fields = ('created', 'name')
@@ -42,6 +42,14 @@ class CategoriesProductsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cr
         if self.action == 'list':
             return self.merchant.categoryproducts_set.all()
         return self.queryset
+
+    def get_permissions(self):
+        if self.action in ['create', 'products']:
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [IsAuthenticated, IsAccountOwnerMerchant]
+
+        return [permission() for permission in permission_classes]
 
     def get_serializer_context(self):
         """ Add instance of category to serializer context """
@@ -91,3 +99,10 @@ class CategoriesProductsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cr
         category.save()
         data = self.set_response(status=True, data={}, message="Categoría activada correctamente")
         return Response(data=data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['GET'])
+    def products(self, request, *args, **kwargs):
+        categories = self.merchant.categoryproducts_set.all()
+        data = CategoryWithProductsSerializer(categories, many=True).data
+        response = self.set_response(status=True, data=data, message="Productos con sus categorias")
+        return Response(data=response, status=status.HTTP_200_OK)

@@ -11,7 +11,7 @@ class Product(ScooterModel):
     description_long = models.TextField(null=True, blank=True)
     stock = models.PositiveIntegerField()
     price = models.FloatField()
-    category = models.ForeignKey('merchants.CategoryProducts', on_delete=models.DO_NOTHING)
+    category = models.ForeignKey('merchants.CategoryProducts', on_delete=models.DO_NOTHING, related_name="products")
     picture = models.ImageField(upload_to='merchants/products/', blank=True, null=True)
     merchant = models.ForeignKey('merchants.Merchant', on_delete=models.DO_NOTHING)
     # statistics

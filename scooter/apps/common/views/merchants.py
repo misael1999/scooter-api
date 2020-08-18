@@ -22,7 +22,7 @@ class CategoryMerchantViewSet(ScooterViewSet, mixins.CreateModelMixin, mixins.Li
 
     def get_queryset(self):
         if self.action == 'list':
-            return CategoryMerchant.objects.filter(status__slug_name="active")
+            return CategoryMerchant.objects.filter(status__slug_name__in=['active', 'inactive'])
 
         return CategoryMerchant.objects.all()
 

@@ -2,11 +2,11 @@
 # Django rest framework
 from rest_framework import serializers
 # Models
-from scooter.apps.common.serializers import Base64ImageField, MerchantFilteredPrimaryKeyRelatedField, \
-    StatusModelSerializer
+from scooter.apps.common.serializers import (Base64ImageField, MerchantFilteredPrimaryKeyRelatedField,
+                                             StatusModelSerializer)
 from scooter.apps.merchants.models import Product, CategoryProducts
 # Utilities
-from scooter.apps.merchants.serializers import CategoryProductsModelSerializer
+from scooter.apps.merchants.serializers.categories import CategoryProductsModelSerializer
 from scooter.utils.serializers.scooter import ScooterModelSerializer
 # Serializers
 

@@ -3,11 +3,18 @@
 from rest_framework import serializers
 # Models
 from scooter.apps.common.serializers import Base64ImageField, StatusModelSerializer
-from scooter.apps.merchants.models import CategoryProducts
+from scooter.apps.merchants.models import CategoryProducts, Product
 # Utilities
 from scooter.utils.serializers.scooter import ScooterModelSerializer
 
+
 # Serializers
+class ProductSimpleModelSerializer(ScooterModelSerializer):
+    class Meta:
+        model = Product
+        fields = ('id', 'name', 'description', 'description_long', 'stock', 'category',
+                  'price', 'category_id', 'picture', 'merchant', 'status')
+        read_only_fields = fields
 
 
 class CategoryProductsModelSerializer(ScooterModelSerializer):
@@ -44,3 +51,12 @@ class CategoryProductsModelSerializer(ScooterModelSerializer):
             instance.picture.delete()
 
         return super().update(instance, data)
+
+
+class CategoryWithProductsSerializer(serializers.ModelSerializer):
+    products = ProductSimpleModelSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = CategoryProducts
+        fields = ('id', 'name', 'picture', 'products')
+        read_only_fields = fields

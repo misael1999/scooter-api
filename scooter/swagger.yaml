@@ -1681,6 +1681,16 @@ paths:
           required: false
           in: query
           type: integer
+        - name: category
+          description: Categoría
+          required: false
+          in: query
+          type: integer
+        - name: subctegory
+          description: Subcategoría del comercio
+          required: false
+          in: query
+          type: integer
         - name: search
           description: Buscar por (nombre, categoria, subcategoria)
           in: query
@@ -1853,6 +1863,47 @@ paths:
       responses:
         '201':
           description: 'Información de la categoría'
+      tags:
+        - Comercios
+  /api/v1/merchants/{merchant_id}/categories/products/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+    get:
+      operationId: get_categories_products_merchant
+      description: Obtener los productos agrupado por categorias
+      parameters:
+        - name: limit
+          in: query
+          description: Numero de resultados por pagina
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: El índice inicial desde el que devolver los resultados.
+          required: false
+          type: integer
+        - name: status
+          description: ID Status
+          required: false
+          in: query
+          type: string
+        - name: search
+          description: Buscar por (nombre)
+          in: query
+          required: false
+          type: string
+        - name: ordering
+          description: Ordenar por
+          in: query
+          required: false
+          type: string
+          enum: ['created', 'name', '-created', '-name']
+      responses:
+        '201':
+          description: 'Obtener los productos agrupado por categorias'
       tags:
         - Comercios
 # PRODUCTS
