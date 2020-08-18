@@ -2049,6 +2049,24 @@ paths:
           description: 'Aceptar pedido'
       tags:
         - Pedidos comercios
+  /api/v1/merchants/{merchant_id}/orders/{order_id}/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+      - name: order_id
+        in: path
+        required: true
+        type: string
+    get:
+      operationId: merchant_get_order
+      description: Obtener información de un pedido
+      responses:
+        '201':
+            description: 'Obtener pedido'
+      tags:
+        - Pedidos comercios
   /api/v1/merchants/{merchant_id}/orders/{order_id}/reject_order/:
     parameters:
       - name: merchant_id
