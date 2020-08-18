@@ -25,10 +25,11 @@ class MerchantWithAllInfoSerializer(serializers.ModelSerializer):
 
     category = serializers.StringRelatedField(read_only=True)
     subcategory = serializers.StringRelatedField(read_only=True)
+    user = UserModelSimpleSerializer()
 
     class Meta:
         model = Merchant
-        fields = ('id', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
+        fields = ('id', 'user', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
                   'information_is_complete', 'category', 'subcategory', 'reputation')
         read_only_fields = fields
 
