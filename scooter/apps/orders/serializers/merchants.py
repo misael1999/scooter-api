@@ -6,6 +6,7 @@ from scooter.apps.common.models import OrderStatus
 from scooter.apps.delivery_men.models import DeliveryMan
 # Functions channels
 # Functions
+from scooter.apps.merchants.models import Product
 from scooter.apps.orders.serializers import send_order_delivery
 from scooter.apps.orders.serializers.orders import get_nearest_delivery_man
 # Serializers primary field
@@ -26,8 +27,15 @@ class AcceptOrderMerchantSerializer(serializers.Serializer):
             order.order_status = order_status
             order.in_process = True
             order.save()
+            details = order.details.all()
+            products_to_update = []
+            for detail in details:
+                product = Product.objects.get(pk=detail.product_id)
+                product.stock = product.stock - detail['quantity']
+                products_to_update.append(product)
+
+            Product.objects.bulk_update(products_to_update, fields=['stock'])
             # Update stock
-            # product.stock = product.stock - detail['quantity']
             # product.save()
             send_notification_push_order(user_id=order.user_id,
                                          title='{} esta preparando tu pedido'.format(merchant.merchant_name),
