@@ -193,7 +193,7 @@ def get_nearest_delivery_man(location_selected, station, list_exclude, distance,
     delivery_man = DeliveryMan.objects. \
         exclude(id__in=list_exclude). \
         filter(status__slug_name="active", delivery_status__slug_name__in=status, station=station) \
-        .annotate(distance=Distance('location', location_selected.point)) \
+        .annotate(distance=Distance('location', location_selected)) \
         .order_by('distance')[:SEARCH_NUMBER_DELIVERY]
     # delivery_man = DeliveryMan.objects.filter(station=station,
     #                                           location__distance_lte=(

@@ -2035,7 +2035,7 @@ paths:
         in: path
         required: true
         type: string
-    patch:
+    put:
       operationId: merchant_accept_order
       description: Aceptar pedido
       parameters:
@@ -2059,7 +2059,7 @@ paths:
         in: path
         required: true
         type: string
-    patch:
+    put:
       operationId: merchant_reject_order
       description: Rechazar pedido
       parameters:
@@ -2083,7 +2083,7 @@ paths:
         in: path
         required: true
         type: string
-    patch:
+    put:
       operationId: merchant_cancel_order
       description: Cancelar pedido
       parameters:
@@ -2095,6 +2095,30 @@ paths:
       responses:
         '201':
           description: 'Cancelar pedido'
+      tags:
+        - Pedidos comercios
+  /api/v1/merchants/{merchant_id}/orders/{order_id}/order_ready/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+      - name: order_id
+        in: path
+        required: true
+        type: string
+    put:
+      operationId: merchant_order_ready
+      description: Pedido listo
+      parameters:
+        - name: body
+          in: body
+          description: Pedido listo
+          schema:
+            $ref: '#/definitions/AcceptOrder'
+      responses:
+        '201':
+          description: 'Pedido listo'
       tags:
         - Pedidos comercios
 # ======== DEFINITIONS ==============
@@ -2855,6 +2879,9 @@ definitions:
       phone_number:
         type: string
         description: Teléfono
+      is_delivery_by_store:
+        type: boolean
+        description: Si el comercio tendra sus propios repartidores
       category_id:
         type: string
         description: Categoría del comercio

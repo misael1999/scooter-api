@@ -13,10 +13,11 @@ from scooter.apps.orders.permissions import IsOrderMerchantOwner
 from scooter.apps.merchants.permissions import IsAccountOwnerMerchant
 # Serializers
 from scooter.apps.orders.serializers import (OrderModelSerializer,
-                                             RejectOrderByDeliverySerializer,
                                              OrderWithDetailModelSerializer,
-                                             RejectOrderStationSerializer, AssignDeliveryManStationSerializer,
-                                             )
+                                             AcceptOrderMerchantSerializer,
+                                             RejectOrderMerchantSerializer,
+                                             CancelOrderMerchantSerializer,
+                                             OrderReadyMerchantSerializer)
 # Models
 from scooter.apps.orders.models.orders import Order
 # Mixin
@@ -62,25 +63,9 @@ class MerchantOrderViewSet(ScooterViewSet, AddMerchantMixin,
         return obj
 
     @action(methods=['PUT'], detail=True)
-    def reject_order(self, request, *args, **kwargs):
+    def accept_order(self, request, *args, **kwargs):
         order = self.get_object()
-        serializer = RejectOrderByDeliverySerializer(
-            order,
-            data=request.data,
-            context={'merchant': self.merchant, 'order': order},
-            partial=False
-        )
-        serializer.is_valid(raise_exception=True)
-        order = serializer.save()
-        data = self.set_response(status=True,
-                                 data={},
-                                 message='Solicitud rechazada')
-        return Response(data=data, status=status.HTTP_200_OK)
-
-    @action(methods=['PUT'], detail=True)
-    def assign_order(self, request, *args, **kwargs):
-        order = self.get_object()
-        serializer = AssignDeliveryManStationSerializer(
+        serializer = AcceptOrderMerchantSerializer(
             order,
             data=request.data,
             context={'merchant': self.merchant, 'order': order},
@@ -93,10 +78,10 @@ class MerchantOrderViewSet(ScooterViewSet, AddMerchantMixin,
                                  message='Pedido asignado correctamente')
         return Response(data=data, status=status.HTTP_200_OK)
 
-    @action(methods=['put'], detail=True)
+    @action(methods=['PUT'], detail=True)
     def reject_order(self, request, *args, **kwargs):
         order = self.get_object()
-        serializer = RejectOrderStationSerializer(
+        serializer = RejectOrderMerchantSerializer(
             order,
             data=request.data,
             context={'merchant': self.merchant, 'order': order},
@@ -106,22 +91,38 @@ class MerchantOrderViewSet(ScooterViewSet, AddMerchantMixin,
         order = serializer.save()
         data = self.set_response(status=True,
                                  data={},
-                                 message='Pedido rechazado correctamente')
+                                 message='Solicitud rechazada')
         return Response(data=data, status=status.HTTP_200_OK)
 
     @action(methods=['put'], detail=True)
     def cancel_order(self, request, *args, **kwargs):
-        pass
-        # order = self.get_object()
-        # serializer = RejectOrderStationSerializer(
-        #     order,
-        #     data=request.data,
-        #     context={'station': self.station, 'order': order},
-        #     partial=False
-        # )
-        # serializer.is_valid(raise_exception=True)
-        # order = serializer.save()
-        # data = self.set_response(status=True,
-        #                          data={},
-        #                          message='Pedido rechazado correctamente')
-        # return Response(data=data, status=status.HTTP_200_OK)
+        order = self.get_object()
+        serializer = CancelOrderMerchantSerializer(
+            order,
+            data=request.data,
+            context={'merchant': self.merchant, 'order': order},
+            partial=False
+        )
+        serializer.is_valid(raise_exception=True)
+        order = serializer.save()
+        data = self.set_response(status=True,
+                                 data={},
+                                 message='Pedido cancelado correctamente')
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    @action(methods=['put'], detail=True)
+    def order_ready(self, request, *args, **kwargs):
+        order = self.get_object()
+        serializer = OrderReadyMerchantSerializer(
+            order,
+            data=request.data,
+            context={'merchant': self.merchant, 'order': order},
+            partial=False
+        )
+        serializer.is_valid(raise_exception=True)
+        order = serializer.save()
+        data = self.set_response(status=True,
+                                 data={},
+                                 message='Pedido listo')
+        return Response(data=data, status=status.HTTP_200_OK)
+

@@ -5,26 +5,41 @@ from rest_framework import serializers
 from scooter.apps.common.models import OrderStatus
 from scooter.apps.delivery_men.models import DeliveryMan
 # Functions channels
-# Task Celery
-from scooter.apps.taskapp.tasks import send_notification_push_task
 # Functions
+from scooter.apps.orders.serializers import send_order_delivery
 from scooter.apps.orders.serializers.orders import get_nearest_delivery_man
 # Serializers primary field
 from scooter.apps.common.serializers.common import StationFilteredPrimaryKeyRelatedField
 # Task Celery
 from scooter.apps.taskapp.tasks import send_notification_push_task
+from scooter.utils.functions import send_notification_push_order
 
 
 class AcceptOrderMerchantSerializer(serializers.Serializer):
 
-    def update(self, instance, data):
+    def update(self, order, data):
         try:
+            merchant = self.context['merchant']
+            if order.order_status.slug_name is 'preparing_order':
+                raise ValueError('El pedido ya fue aceptado')
             order_status = OrderStatus.objects.get(slug_name="preparing_order")
-            instance.order_status = order_status
-            instance.save()
-            send_notification_push_task.delay(instance.user_id, 'Pedido aceptado',
-                                              'Se ha aceptado el pedido por parte del comercio', {"type": "NEW_ORDER", "order_id": instance.id})
-            return instance
+            order.order_status = order_status
+            order.in_process = True
+            order.save()
+            # Update stock
+            # product.stock = product.stock - detail['quantity']
+            # product.save()
+            send_notification_push_order(user_id=order.user_id,
+                                         title='{} esta preparando tu pedido'.format(merchant.merchant_name),
+                                         body='Te avisaremos cuando lo tenga listo',
+                                         sound="default",
+                                         android_channel_id="messages",
+                                         data={"type": "ACCEPTED_ORDER",
+                                               "order_id": order.id,
+                                               "message": "Preparando pedido",
+                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                               })
+            return order
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
         except Exception as ex:
@@ -36,13 +51,66 @@ class AcceptOrderMerchantSerializer(serializers.Serializer):
 class RejectOrderMerchantSerializer(serializers.Serializer):
     reason_rejection = serializers.CharField(max_length=100, required=True, allow_null=True)
 
-    def update(self, instance, data):
-        pass
+    def update(self, order, data):
+        merchant = self.context['merchant']
+        order_status = OrderStatus.objects.get(slug_name="rejected")
+        order.order_status = order_status
+        order.reason_rejection = data['reason_rejection']
+        order.save()
+        send_notification_push_order(user_id=order.user_id,
+                                     title='{} ha rechazado tu pedido'.format(merchant.merchant_name),
+                                     body='{}'.format(data['reason_rejection']),
+                                     sound="default",
+                                     android_channel_id="messages",
+                                     data={"type": "REJECT_ORDER",
+                                           "order_id": order.id,
+                                           "message": "Pedido rechazado",
+                                           'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                           })
+        return order
 
 
 class CancelOrderMerchantSerializer(serializers.Serializer):
     reason_rejection = serializers.CharField(max_length=100, required=True, allow_null=True)
 
-    def update(self, instance, data):
+    def update(self, order, data):
+        merchant = self.context['merchant']
+        order_status = OrderStatus.objects.get(slug_name="cancelled")
+        order.order_status = order_status
+        order.reason_rejection = data['reason_rejection']
+        order.save()
+        send_notification_push_order(user_id=order.user_id,
+                                     title='{} ha cancelado tu pedido'.format(merchant.merchant_name),
+                                     body='{}'.format(data['reason_rejection']),
+                                     sound="default",
+                                     android_channel_id="messages",
+                                     data={"type": "REJECT_ORDER",
+                                           "order_id": order.id,
+                                           "message": "Pedido cancelado",
+                                           'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                           })
+        return order
 
-        pass
+
+class OrderReadyMerchantSerializer(serializers.Serializer):
+
+    def update(self, order, data):
+        merchant = self.context['merchant']
+        if not merchant.is_delivery_by_store:
+            order_status = OrderStatus.objects.get(slug_name="order_ready")
+            order.order_status = order_status
+            order.save()
+            send_notification_push_order(user_id=order.user_id,
+                                         title='Tu pedido de {} esta listo'.format(merchant.merchant_name),
+                                         body='Estamos buscando al repartidor más cercano',
+                                         sound="default",
+                                         android_channel_id="messages",
+                                         data={"type": "REJECT_ORDER",
+                                               "order_id": order.id,
+                                               "message": "Pedido cancelado",
+                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                               })
+            send_order_delivery(location_selected=merchant.point,
+                                station=order.station,
+                                order=order)
+        return order

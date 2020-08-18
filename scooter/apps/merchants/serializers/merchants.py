@@ -53,7 +53,7 @@ class MerchantUserSimpleSerializer(serializers.ModelSerializer):
 class GeneralInfoMerchantSerializer(serializers.Serializer):
     picture = Base64ImageField()
     merchant_name = serializers.CharField(max_length=80)
-    description = serializers.CharField(max_length=120, required=False, allow_null=True)
+    description = serializers.CharField(max_length=120, required=False, allow_null=True, allow_blank=True)
     approximate_preparation_time = serializers.CharField(max_length=10)
 
 
@@ -226,6 +226,7 @@ class MerchantSignUpSerializer(serializers.Serializer):
     subcategory_id = serializers.PrimaryKeyRelatedField(queryset=SubcategoryMerchant.objects.all(),
                                                         source="subcategory",
                                                         required=False, allow_null=True)
+    is_delivery_by_store = serializers.BooleanField(default=False)
     merchant_name = serializers.CharField(max_length=100, validators=[UniqueValidator(
         queryset=Merchant.objects.all(),
         message='Ya existe un negocio con el mismo nombre. ¿El negocio es tuyo?,'

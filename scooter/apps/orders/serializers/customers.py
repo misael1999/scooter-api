@@ -154,7 +154,8 @@ class CreateOrderSerializer(serializers.Serializer):
                 data['merchant_location'] = merchant.point
                 data['total_order'] = data['order_price'] + price
                 data['is_delivery_by_store'] = merchant.is_delivery_by_store
-
+                if merchant.is_delivery_by_store:
+                    data.pop('station', None)
             else:
                 order_status = OrderStatus.objects.get(slug_name="await_delivery_man")
 
@@ -203,7 +204,7 @@ class CreateOrderSerializer(serializers.Serializer):
                                                    'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                    })
             else:
-                send_order_delivery(location_selected=location_selected,
+                send_order_delivery(location_selected=location_selected.point,
                                     station=station,
                                     order=order)
             # Get nearest delivery
@@ -249,8 +250,8 @@ class CreateOrderSerializer(serializers.Serializer):
         details_to_save = []
         for detail in details:
             product = detail['product']
-            product.stock = product.stock - detail['quantity']
-            product.save()
+            # product.stock = product.stock - detail['quantity']
+            # product.save()
             detail_product = OrderDetail(**detail,
                                          product_name=product.name,
                                          product_price=product.price,
@@ -370,18 +371,15 @@ def send_order_delivery(location_selected, station, order):
                                                 status=['available', 'busy'])
 
         # Send push notification to delivery_man
+        # if delivery_men.count() == 0:
+        #     delivery_men = get_nearest_delivery_man(location_selected=location_selected, station=station,
+        #                                             list_exclude=[], distance=settings.RANGE_DISTANCE,
+        #                                             status=['available', 'busy'])
+
         if delivery_men.count() == 0:
             delivery_men = get_nearest_delivery_man(location_selected=location_selected, station=station,
                                                     list_exclude=[], distance=settings.RANGE_DISTANCE,
-                                                    status=['available', 'busy'])
-
-            if delivery_men.count() == 0:
-                delivery_men = get_nearest_delivery_man(location_selected=location_selected, station=station,
-                                                        list_exclude=[], distance=settings.RANGE_DISTANCE,
-                                                        status=['available', 'busy', 'out_service'])
-                if delivery_men.count() == 0:
-                    raise ValueError('No se encontraron repartidores disponibles')
-
+                                                    status=['available', 'busy', 'out_service'])
         for delivery_man in delivery_men:
             user_id = delivery_man.user_id
             send_notification_push_order(user_id=user_id,
@@ -400,7 +398,7 @@ def send_order_delivery(location_selected, station, order):
     except ValueError as e:
         raise ValueError(e)
     except Exception as ex:
-        raise ValueError('Error al mandar notificaciones')
+        raise ValueError('Error al mandar notificaciones de pedido')
 
 
 def generate_qr_code():
