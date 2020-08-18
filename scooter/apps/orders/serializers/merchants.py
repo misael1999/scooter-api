@@ -31,7 +31,7 @@ class AcceptOrderMerchantSerializer(serializers.Serializer):
             products_to_update = []
             for detail in details:
                 product = Product.objects.get(pk=detail.product_id)
-                product.stock = product.stock - detail['quantity']
+                product.stock = product.stock - detail.quantity
                 products_to_update.append(product)
 
             Product.objects.bulk_update(products_to_update, fields=['stock'])
@@ -53,7 +53,7 @@ class AcceptOrderMerchantSerializer(serializers.Serializer):
         except Exception as ex:
             print("Exception in reject order, please check it")
             print(ex.args.__str__())
-            raise serializers.ValidationError({'detail': 'Error al rechazar el pedido'})
+            raise serializers.ValidationError({'detail': 'Error al aceptar el pedido'})
 
 
 class RejectOrderMerchantSerializer(serializers.Serializer):
