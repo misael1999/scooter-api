@@ -30,7 +30,7 @@ class MerchantWithAllInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Merchant
         fields = ('id', 'user', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
-                  'information_is_complete', 'category', 'subcategory', 'reputation')
+                  'information_is_complete', 'category', 'subcategory', 'reputation', 'description', 'approximate_preparation_time')
         read_only_fields = fields
 
 
