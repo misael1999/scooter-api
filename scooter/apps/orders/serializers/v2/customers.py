@@ -54,8 +54,8 @@ class CreateOrderSerializer(serializers.Serializer):
     current_location = CurrentLocationAddressSerializer(required=False, allow_null=True,
                                                         help_text="For selected current location fast delivered")
     is_current_location = serializers.BooleanField(required=False, allow_null=True)
-    from_address_id = serializers.PrimaryKeyRelatedField(queryset=CustomerAddress.objects.all(),
-                                                         source="from_address", allow_null=True, allow_empty=True)
+    from_address_id = serializers.PrimaryKeyRelatedField(allow_null=True, allow_empty=True, required=False, queryset=CustomerAddress.objects.all(),
+                                                         source="from_address")
     to_address_id = CustomerFilteredPrimaryKeyRelatedField(queryset=CustomerAddress.objects, source="to_address",
                                                            required=False, allow_null=True)
 
@@ -64,8 +64,8 @@ class CreateOrderSerializer(serializers.Serializer):
     phone_number = serializers.CharField(max_length=15)
     validate_qr = serializers.BooleanField(default=False, allow_null=True)
     # Merchants
-    merchant_id = serializers.PrimaryKeyRelatedField(queryset=Merchant.objects.all(), source="merchant",
-                                                     required=False, allow_null=True, allow_empty=True)
+    merchant_id = serializers.PrimaryKeyRelatedField(allow_null=True, allow_empty=True, required=False,
+                                                     queryset=Merchant.objects.all(), source="merchant")
     is_order_to_merchant = serializers.BooleanField(required=True, allow_null=True)
 
     def validate(self, data):
