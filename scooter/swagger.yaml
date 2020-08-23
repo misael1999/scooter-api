@@ -1215,6 +1215,67 @@ paths:
           description: 'Listado de pedidos'
       tags:
         - Pedidos clientes
+  /api/v2/customers/{customer_id}/orders/:
+    parameters:
+      - name: customer_id
+        in: path
+        required: true
+        type: string
+    post:
+      operationId: create_order_v2_customer
+      description: Crear pedido version 2
+      parameters:
+        - name: body
+          in: body
+          description: Crear un nuevo pedido
+          schema:
+            $ref: '#/definitions/CreateOrderv2'
+      responses:
+        '200':
+          description: 'Pedido creado'
+      tags:
+        - Pedidos clientes
+    get:
+      operationId: get_orders_customer
+      description: Obtener todas las ordenes
+      parameters:
+        - name: limit
+          in: query
+          description: Numero de resultados por pagina
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: El índice inicial desde el que devolver los resultados.
+          required: false
+          type: integer
+        - name: order_status
+          description: ID del status de la orden
+          required: false
+          in: query
+          type: string
+        - name: search
+          description: Buscar por (estación, dirección)
+          in: query
+          required: false
+          type: string
+        - name: ordering
+          description: Ordenar por
+          in: query
+          required: false
+          type: string
+          enum: ['order_date', 'date_delivered_order', 'station']
+        - name: in_process
+          description: En proceso
+          in: query
+          required: false
+          type: string
+          enum: ['true', 'false']
+      responses:
+        '200':
+          description: 'Listado de pedidos'
+      tags:
+        - Pedidos clientes v2
   /api/v1/customers/{customer_id}/orders/{order_id}/current_status/:
     parameters:
       - name: customer_id
@@ -2874,6 +2935,59 @@ definitions:
       - from_address_id
       - to_address_id
   CreateOrder:
+    type: object
+    properties:
+      station_id:
+        type: number
+        description: Id de la estación
+        example: 1
+      service_id:
+        type: number
+        description: Id del servicio
+        example: 1
+      from_address_id:
+        type: number
+        description: Id de la dirección para compra o recolección
+        example: 1
+      to_address_id:
+        type: number
+        description: Id de la dirección de entrega
+        example: 1
+      indications:
+        type: string
+        description: Indicaciones del pedido
+        example: Quiero que el producto este ...
+      approximate_price_order:
+        type: string
+        description: Precio aproximado de la compra
+        example: Menos de 100
+      phone_number:
+        type: string
+        description: Numero de teléfono
+        example: '2384080578'
+      details:
+        type: array
+        description: Lista de productos
+        items:
+          type: object
+          properties:
+            product_name:
+              type: string
+              description: Nombre del producto
+              example: Arroz
+            picture:
+              type: string
+              description: Imagen del producto
+              example: base64Image
+    required:
+      - station_id
+      - service_id
+      - from_address_id
+      - to_address_id
+      - service_price
+      - approximate_price_order
+      - details
+  CreateOrderv2:
     type: object
     properties:
       station_id:
