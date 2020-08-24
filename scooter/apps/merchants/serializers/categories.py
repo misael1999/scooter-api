@@ -3,17 +3,35 @@
 from rest_framework import serializers
 # Models
 from scooter.apps.common.serializers import Base64ImageField, StatusModelSerializer
-from scooter.apps.merchants.models import CategoryProducts, Product
+from scooter.apps.merchants.models import CategoryProducts, Product, ProductMenuOption, ProductMenuCategory
 # Utilities
 from scooter.utils.serializers.scooter import ScooterModelSerializer
 
 
+class ProductMenuOptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductMenuOption
+        fields = ('name',
+                  'type', 'price')
+
+
+class ProductMenuCategorySerializer(serializers.ModelSerializer):
+    options = ProductMenuOptionSerializer(many=True)
+
+    class Meta:
+        model = ProductMenuCategory
+        fields = ('name', 'is_obligatory',
+                  'min_options_choose', 'max_options_choose', 'ordering', 'options')
+
+
 # Serializers
 class ProductSimpleModelSerializer(ScooterModelSerializer):
+    menu_categories = ProductMenuCategorySerializer(many=True, required=False)
+
     class Meta:
         model = Product
         fields = ('id', 'name', 'description', 'description_long', 'stock', 'category',
-                  'price', 'category_id', 'picture', 'merchant', 'status')
+                  'price', 'category_id', 'picture', 'merchant', 'status',  'menu_categories')
         read_only_fields = fields
 
 
