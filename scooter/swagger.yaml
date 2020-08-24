@@ -3156,6 +3156,47 @@ definitions:
       picture:
         type: string
         description: Imagen del producto
+      menu_categories:
+        type: array
+        description: Categoría del menú
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+              description: Nombre de la categoría
+            product_id:
+              type: number
+              description: Id del producto
+              example: 1
+            is_obligatory:
+              type: string
+              description: Es necesario
+            min_options_choose:
+              type: number
+              example: 1
+              description: Minimo de opciones a elegir
+            max_options_choose:
+              type: number
+              example: 1
+              description: Máximo de opciones a elegir
+            ordering:
+              type: number
+              description: Ordenamiento para mostrar
+            options:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: Nombre de la opción
+                  type_id:
+                    type: number
+                    description: Tipo de opción
+                  price:
+                    type: number
+                    description: Precio del producto
     required:
       - name
       - description

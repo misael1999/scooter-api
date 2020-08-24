@@ -9,6 +9,7 @@ class CategoryProducts(ScooterModel):
     name = models.CharField(max_length=70)
     picture = models.ImageField(upload_to='merchants/categories/', blank=True, null=True)
     merchant = models.ForeignKey('merchants.Merchant', on_delete=models.DO_NOTHING)
+    ordering = models.PositiveIntegerField(null=True)
 
     def __str__(self):
         return self.name

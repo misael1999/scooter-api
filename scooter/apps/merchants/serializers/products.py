@@ -4,11 +4,27 @@ from rest_framework import serializers
 # Models
 from scooter.apps.common.serializers import (Base64ImageField, MerchantFilteredPrimaryKeyRelatedField,
                                              StatusModelSerializer)
-from scooter.apps.merchants.models import Product, CategoryProducts
+from scooter.apps.merchants.models import Product, CategoryProducts, ProductMenuCategory, ProductMenuOption
 # Utilities
 from scooter.apps.merchants.serializers.categories import CategoryProductsModelSerializer
 from scooter.utils.serializers.scooter import ScooterModelSerializer
 # Serializers
+
+
+class ProductMenuOptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductMenuOption
+        fields = ('name',
+                  'type', 'price')
+
+
+class ProductMenuCategorySerializer(serializers.ModelSerializer):
+    options = ProductMenuOptionSerializer(many=True)
+
+    class Meta:
+        model = ProductMenuCategory
+        fields = ('name', 'is_obligatory',
+                  'min_options_choose', 'max_options_choose', 'ordering', 'options')
 
 
 class ProductsModelSerializer(ScooterModelSerializer):
@@ -17,11 +33,12 @@ class ProductsModelSerializer(ScooterModelSerializer):
                                                          source="category")
     category = CategoryProductsModelSerializer(read_only=True)
     status = StatusModelSerializer(read_only=True)
+    menu_categories = ProductMenuCategorySerializer(many=True, required=False)
 
     class Meta:
         model = Product
         fields = ('id', 'name', 'description', 'description_long', 'stock', 'category',
-                  'price', 'category_id', 'picture', 'merchant', 'total_sales', 'status')
+                  'price', 'category_id', 'picture', 'merchant', 'total_sales', 'status', 'menu_categories')
         read_only_fields = ("id", "merchant", "total_sales", 'status')
 
     def validate(self, data):
@@ -41,6 +58,26 @@ class ProductsModelSerializer(ScooterModelSerializer):
 
         data['merchant'] = merchant
         return data
+
+    def create(self, data):
+        try:
+            menu_categories = data.pop('menu_categories', None)
+            if menu_categories:
+                data['have_menu'] = True
+            product = super(ProductsModelSerializer, self).create(data)
+            menu_option_to_save = []
+            if menu_categories:
+                for menu in menu_categories:
+                    options = menu.pop('options', [])
+                    menu_category = ProductMenuCategory.objects.create(**menu, product_id=product.id)
+                    menu_option_to_save = [ProductMenuOption(**option, menu_id=menu_category.id) for option in options]
+
+                ProductMenuOption.objects.bulk_create(menu_option_to_save)
+            return product
+        except Exception as ex:
+            print("Exception save product, please check it")
+            print(ex.args.__str__())
+            raise serializers.ValidationError({'detail': 'Error al actualizar la información'})
 
     def update(self, instance, data):
         picture = data.get('picture', None)
