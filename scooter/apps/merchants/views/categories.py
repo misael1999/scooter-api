@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from scooter.apps.common.models.status import Status
 # Serializers
 from scooter.apps.merchants.serializers.categories import (CategoryProductsModelSerializer,
-                                                           CategoryWithProductsSerializer)
+                                                           CategoryWithProductsSerializer, ProductSimpleModelSerializer)
 # Viewset
 from scooter.apps.merchants.models import CategoryProducts
 from scooter.utils.viewsets.scooter import ScooterViewSet
@@ -102,7 +102,15 @@ class CategoriesProductsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cr
 
     @action(detail=False, methods=['GET'])
     def products(self, request, *args, **kwargs):
-        categories = self.merchant.categoryproducts_set.all()
-        data = CategoryWithProductsSerializer(categories, many=True).data
-        response = self.set_response(status=True, data=data, message="Productos con sus categorias")
+        categories = self.merchant.categoryproducts_set.filter(status__slug_name="active")
+        # data = CategoryWithProductsSerializer(categories, many=True).data
+        list_categories = []
+        # For filter by status, get only actives
+        for category in categories:
+            category_temp = CategoryWithProductsSerializer(category).data
+            category_temp['products'] = ProductSimpleModelSerializer(category.products.filter(
+                status__slug_name="active"), many=True).data
+            list_categories.append(category_temp)
+
+        response = self.set_response(status=True, data=list_categories, message="Productos con sus categorias")
         return Response(data=response, status=status.HTTP_200_OK)

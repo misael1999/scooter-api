@@ -72,9 +72,9 @@ class CategoryProductsModelSerializer(ScooterModelSerializer):
 
 
 class CategoryWithProductsSerializer(serializers.ModelSerializer):
-    products = ProductSimpleModelSerializer(many=True, read_only=True)
+    # products = ProductSimpleModelSerializer(many=True, read_only=True)
 
     class Meta:
         model = CategoryProducts
-        fields = ('id', 'name', 'picture', 'products')
+        fields = ('id', 'name', 'picture')
         read_only_fields = fields
