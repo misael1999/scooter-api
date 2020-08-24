@@ -38,7 +38,8 @@ class ProductsModelSerializer(ScooterModelSerializer):
     class Meta:
         model = Product
         fields = ('id', 'name', 'description', 'description_long', 'stock', 'category',
-                  'price', 'category_id', 'picture', 'merchant', 'total_sales', 'status', 'menu_categories')
+                  'price', 'category_id', 'picture', 'merchant', 'total_sales', 'status',
+                  'have_menu', 'menu_categories')
         read_only_fields = ("id", "merchant", "total_sales", 'status')
 
     def validate(self, data):
@@ -70,7 +71,8 @@ class ProductsModelSerializer(ScooterModelSerializer):
                 for menu in menu_categories:
                     options = menu.pop('options', [])
                     menu_category = ProductMenuCategory.objects.create(**menu, product_id=product.id)
-                    menu_option_to_save = [ProductMenuOption(**option, menu_id=menu_category.id) for option in options]
+                    for option in options:
+                        menu_option_to_save.append(ProductMenuOption(**option, menu_id=menu_category.id))
 
                 ProductMenuOption.objects.bulk_create(menu_option_to_save)
             return product
