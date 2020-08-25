@@ -1234,7 +1234,7 @@ paths:
         '200':
           description: 'Pedido creado'
       tags:
-        - Pedidos clientes
+        - Pedidos clientes v2
     get:
       operationId: get_orders_customer
       description: Obtener todas las ordenes
@@ -3044,6 +3044,21 @@ definitions:
             quantity:
               type: number
               description: Cantidad de productos a comprar
+            menu_options:
+              type: array
+              description: Opciones de menú
+              items:
+                type: object
+                properties:
+                  menu_id:
+                    type: number
+                    description: Id del menu
+                  option_id:
+                    type: number
+                    description: id de la opcion elegida por categoria
+                  price_option:
+                    type: number
+                    description: Si la opción tiene un precio
     required:
       - station_id
       - service_id

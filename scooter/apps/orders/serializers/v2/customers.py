@@ -10,9 +10,9 @@ from rest_framework import serializers
 from scooter.apps.customers.serializers import PointSerializer
 from scooter.apps.merchants.models import Merchant
 from scooter.apps.orders.models.ratings import RatingOrder
-from scooter.apps.orders.serializers import DetailOrderSerializer
+from scooter.apps.orders.serializers.v2.orders import DetailOrderSerializer
 # Models
-from scooter.apps.orders.models.orders import (OrderDetail, HistoryRejectedOrders)
+from scooter.apps.orders.models.orders import (OrderDetail, HistoryRejectedOrders, OrderDetailMenu)
 from scooter.apps.stations.models import Station, StationService, MemberStation
 from scooter.apps.common.models import Service, OrderStatus, Notification
 from scooter.apps.customers.models import CustomerAddress
@@ -43,7 +43,7 @@ class CurrentLocationAddressSerializer(serializers.ModelSerializer):
                   "references", "point")
 
 
-class CreateOrderSerializer(serializers.Serializer):
+class CreateOrderSerializer(serializers.ModelSerializer):
     """ Create new order for customer"""
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     details = DetailOrderSerializer(many=True, required=False, allow_null=True)
@@ -51,22 +51,23 @@ class CreateOrderSerializer(serializers.Serializer):
                                                     source="station", required=False, allow_null=True)
     service_id = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all(), source="service")
     # Modified to add address recommendations
-    current_location = CurrentLocationAddressSerializer(required=False, allow_null=True,
-                                                        help_text="For selected current location fast delivered")
-    is_current_location = serializers.BooleanField(required=False, allow_null=True)
-    from_address_id = serializers.PrimaryKeyRelatedField(allow_null=True, allow_empty=True, required=False, queryset=CustomerAddress.objects.all(),
+    from_address_id = serializers.PrimaryKeyRelatedField(allow_null=True, allow_empty=True, required=False,
+                                                         queryset=CustomerAddress.objects.all(),
                                                          source="from_address")
     to_address_id = CustomerFilteredPrimaryKeyRelatedField(queryset=CustomerAddress.objects, source="to_address",
                                                            required=False, allow_null=True)
 
-    indications = serializers.CharField(max_length=500, required=False)
-    approximate_price_order = serializers.CharField(max_length=30)
-    phone_number = serializers.CharField(max_length=15)
     validate_qr = serializers.BooleanField(default=False, allow_null=True)
     # Merchants
     merchant_id = serializers.PrimaryKeyRelatedField(allow_null=True, allow_empty=True, required=False,
                                                      queryset=Merchant.objects.all(), source="merchant")
     is_order_to_merchant = serializers.BooleanField(required=True, allow_null=True)
+
+    class Meta:
+        model = Order
+        fields = ('user', 'details', 'station_id', 'service_id', 'from_address_id', 'to_address_id',
+                  'indications', 'approximate_price_order', 'phone_number', 'validate_qr', 'merchant_id',
+                  'is_order_to_merchant')
 
     def validate(self, data):
         try:
@@ -95,30 +96,16 @@ class CreateOrderSerializer(serializers.Serializer):
             maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=settings.TIME_RESPONSE)
             is_safe_order = customer.is_safe_user
 
-            # if station.assign_delivery_manually:
-            #     order_status = OrderStatus.objects.get(slug_name="without_delivery")
-
-            is_current_location = data.pop('is_current_location', False)
-            to_address = data.pop('current_location', None)
-
-            if is_current_location:
-                if to_address:
-                    point = Point(x=to_address['point']['lng'], y=to_address['point']['lat'], srid=4326)
-                    to_address['point'] = point
-                    customer_address = CustomerAddress.objects.create(**to_address,
-                                                                      customer=customer,
-                                                                      exterior_number='',
-                                                                      type_address_id=1,
-                                                                      status_id=1)
-
-                    data['to_address'] = customer_address
-
-            # Calculate price between two address
+            is_order_to_merchant = data.get('is_order_to_merchant', False)
 
             price = 0.0
-
+            from_address = None
+            if is_order_to_merchant:
+                from_address = merchant.point
+            else:
+                from_address = data['from_address'].point
             if station and not is_free_order(station):
-                data_service = calculate_service_price(from_address=data['from_address'].point,
+                data_service = calculate_service_price(from_address=from_address,
                                                        to_address=data['to_address'].point,
                                                        service=data['station_service'],
                                                        is_current_location=False,
@@ -127,7 +114,6 @@ class CreateOrderSerializer(serializers.Serializer):
                 price = data_service['price_service']
                 data['distance'] = data_service['distance']
 
-            is_order_to_merchant = data.get('is_order_to_merchant', False)
             if is_order_to_merchant:
                 if not self.valid_stock(details):
                     raise ValueError('Un producto no cuenta con suficiente stock')
@@ -150,13 +136,12 @@ class CreateOrderSerializer(serializers.Serializer):
             order = Order.objects.create(**data)
 
             # Save detail order
-            details_to_save = []
             if details and is_order_to_merchant:
                 details_to_save = self.update_stock(details=details, order=order)
             elif details:
                 details_to_save = [OrderDetail(**detail, order=order) for detail in details]
+                OrderDetail.objects.bulk_create(details_to_save)
 
-            OrderDetail.objects.bulk_create(details_to_save)
             # Is assign delivery manually is true, then send notification
             # if station.assign_delivery_manually:
             #     send_notification_push_task.delay(station.user_id,
@@ -170,8 +155,6 @@ class CreateOrderSerializer(serializers.Serializer):
             #     # Send message by django channel
             #     async_to_sync(send_order_to_station_channel)(station.id, order.id)
             # else:
-            location_selected = None
-            location_selected = get_ref_location(order)
 
             if is_order_to_merchant:
                 async_to_sync(notify_merchants)(merchant.id, order.id, 'NEW_ORDER')
@@ -186,6 +169,8 @@ class CreateOrderSerializer(serializers.Serializer):
                                                    'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                    })
             else:
+                location_selected = None
+                location_selected = get_ref_location(order)
                 send_order_delivery(location_selected=location_selected.point,
                                     station=station,
                                     order=order)
@@ -207,8 +192,6 @@ class CreateOrderSerializer(serializers.Serializer):
             print(ex.args.__str__())
             raise serializers.ValidationError({'detail': 'Error al crear la orden'})
 
-    def create_order(self, data):
-        pass
 
     def valid_stock(self, details):
         is_valid = True
@@ -231,14 +214,25 @@ class CreateOrderSerializer(serializers.Serializer):
     def update_stock(self, details, order):
         details_to_save = []
         for detail in details:
+            options = detail.pop('menu_options', None)
             product = detail['product']
             # product.stock = product.stock - detail['quantity']
             # product.save()
-            detail_product = OrderDetail(**detail,
-                                         product_name=product.name,
-                                         product_price=product.price,
-                                         order=order)
-            details_to_save.append(detail_product)
+            # Save detail
+            detail_product = OrderDetail.objects.create(**detail,
+                                                        product_name=product.name,
+                                                        product_price=product.price,
+                                                        order=order)
+            details_options_to_save = []
+            if options:
+                for option in options:
+                    details_options_to_save.append(OrderDetailMenu(**option,
+                                                                   detail=detail_product,
+                                                                   name_menu=option['menu'].name,
+                                                                   name_option=option['option'].name,
+                                                                   price_option=option['option'].price))
+
+            OrderDetailMenu.objects.bulk_create(details_options_to_save)
 
         return details_to_save
 

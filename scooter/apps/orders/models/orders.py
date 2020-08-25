@@ -62,9 +62,25 @@ class OrderDetail(ScooterModel):
     product = models.ForeignKey('merchants.Product', on_delete=models.DO_NOTHING, null=True, blank=True)
     quantity = models.PositiveIntegerField(null=True, blank=True)
     product_price = models.FloatField(null=True, blank=True)
+    have_menu_options = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'orders_order_detail'
+
+
+class OrderDetailMenu(ScooterModel):
+    detail = models.ForeignKey(OrderDetail, on_delete=models.DO_NOTHING,
+                               related_name="menu_options")
+    menu = models.ForeignKey('merchants.ProductMenuCategory', on_delete=models.DO_NOTHING,
+                             related_name="order_menu_category")
+    option = models.ForeignKey('merchants.ProductMenuOption', on_delete=models.DO_NOTHING,
+                               related_name="order_menu_option")
+    name_menu = models.CharField(max_length=100)
+    name_option = models.CharField(max_length=100)
+    price_option = models.FloatField(blank=True, null=True, default=0)
+
+    class Meta:
+        db_table = 'orders_order_detail_menu'
 
 
 class HistoryRejectedOrders(ScooterModel):

@@ -11,8 +11,9 @@ from scooter.utils.serializers.scooter import ScooterModelSerializer
 class ProductMenuOptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductMenuOption
-        fields = ('name',
+        fields = ('id', 'name',
                   'type', 'price')
+        read_only_fields = ('id',)
 
 
 class ProductMenuCategorySerializer(serializers.ModelSerializer):
@@ -20,8 +21,9 @@ class ProductMenuCategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductMenuCategory
-        fields = ('name', 'is_obligatory',
+        fields = ('id', 'name', 'is_obligatory',
                   'min_options_choose', 'max_options_choose', 'ordering', 'options')
+        read_only_fields = ('id',)
 
 
 # Serializers

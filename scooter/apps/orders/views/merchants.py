@@ -18,6 +18,7 @@ from scooter.apps.orders.serializers import (OrderModelSerializer,
                                              RejectOrderMerchantSerializer,
                                              CancelOrderMerchantSerializer,
                                              OrderReadyMerchantSerializer)
+from scooter.apps.orders.serializers.v2 import (OrderWithDetailModelSerializer,)
 # Models
 from scooter.apps.orders.models.orders import Order
 # Mixin

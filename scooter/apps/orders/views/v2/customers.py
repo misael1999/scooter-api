@@ -13,9 +13,9 @@ from scooter.apps.customers.permissions.customers import IsAccountOwnerCustomer
 # Serializers
 from scooter.apps.orders.serializers import (OrderModelSerializer,
                                              CalculateServicePriceSerializer,
-                                             OrderWithDetailModelSerializer, OrderCurrentStatusSerializer,
-                                             UpdateOrderStatusSerializer)
+                                             OrderCurrentStatusSerializer)
 from scooter.apps.orders.serializers.v2 import (CreateOrderSerializer,
+                                                OrderWithDetailModelSerializer,
                                                 RantingOrderCustomerSerializer,
                                                 RetryOrderSerializer)
 # Models
