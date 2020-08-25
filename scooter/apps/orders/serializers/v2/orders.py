@@ -12,15 +12,25 @@ from scooter.apps.orders.models.orders import Order
 # Django Geo
 from scooter.apps.orders.serializers import RatingOrderSerializer
 from scooter.apps.stations.serializers import StationSimpleOrderSerializer
-from scooter.apps.orders.models import OrderDetailMenu
+from scooter.apps.orders.models import OrderDetailMenu, OrderDetailMenuOption
 
 
-class DetailOptionsSerializer(serializers.ModelSerializer):
+class DetailMenuOptionSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = OrderDetailMenuOption
+        fields = ('id', 'option', 'option_name', 'price_option')
+        read_only_fields = ('id', 'option_name', 'price_option')
+
+
+class DetailMenuSerializer(serializers.ModelSerializer):
+
+    options = DetailMenuOptionSerializer(many=True)
 
     class Meta:
         model = OrderDetailMenu
-        fields = ("id", 'menu', 'option', 'name_menu', 'name_option')
-        read_only_fields = ('id', 'name_menu', 'name_option')
+        fields = ("id", 'menu', 'menu_name', 'options')
+        read_only_fields = ('id', 'menu_name')
 
 
 class DetailOrderSerializer(serializers.Serializer):
@@ -29,7 +39,7 @@ class DetailOrderSerializer(serializers.Serializer):
     product_id = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all(), source="product", allow_null=True,
                                                     required=False)
     quantity = serializers.IntegerField(min_value=1, allow_null=True, required=True)
-    menu_options = DetailOptionsSerializer(many=True, required=False, allow_null=True)
+    menu_options = DetailMenuSerializer(many=True, required=False, allow_null=True)
 
     def create(self, validated_data):
         pass

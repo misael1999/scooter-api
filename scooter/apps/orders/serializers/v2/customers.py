@@ -12,7 +12,8 @@ from scooter.apps.merchants.models import Merchant
 from scooter.apps.orders.models.ratings import RatingOrder
 from scooter.apps.orders.serializers.v2.orders import DetailOrderSerializer
 # Models
-from scooter.apps.orders.models.orders import (OrderDetail, HistoryRejectedOrders, OrderDetailMenu)
+from scooter.apps.orders.models.orders import (OrderDetail, HistoryRejectedOrders, OrderDetailMenu,
+                                               OrderDetailMenuOption)
 from scooter.apps.stations.models import Station, StationService, MemberStation
 from scooter.apps.common.models import Service, OrderStatus, Notification
 from scooter.apps.customers.models import CustomerAddress
@@ -192,7 +193,6 @@ class CreateOrderSerializer(serializers.ModelSerializer):
             print(ex.args.__str__())
             raise serializers.ValidationError({'detail': 'Error al crear la orden'})
 
-
     def valid_stock(self, details):
         is_valid = True
 
@@ -214,7 +214,7 @@ class CreateOrderSerializer(serializers.ModelSerializer):
     def update_stock(self, details, order):
         details_to_save = []
         for detail in details:
-            options = detail.pop('menu_options', None)
+            menu_options = detail.pop('menu_options', [])
             product = detail['product']
             # product.stock = product.stock - detail['quantity']
             # product.save()
@@ -224,15 +224,18 @@ class CreateOrderSerializer(serializers.ModelSerializer):
                                                         product_price=product.price,
                                                         order=order)
             details_options_to_save = []
-            if options:
+            for menu_option in menu_options:
+                options = menu_option.pop('options', [])
+                detail_menu = OrderDetailMenu.objects.create(**menu_option,
+                                                             detail=detail_product,
+                                                             menu_name=menu_option['menu'].name)
                 for option in options:
-                    details_options_to_save.append(OrderDetailMenu(**option,
-                                                                   detail=detail_product,
-                                                                   name_menu=option['menu'].name,
-                                                                   name_option=option['option'].name,
-                                                                   price_option=option['option'].price))
+                    details_options_to_save.append(OrderDetailMenuOption(**option,
+                                                                         option_name=option['option'].name,
+                                                                         price_option=option['option'].price,
+                                                                         detail_menu=detail_menu))
 
-            OrderDetailMenu.objects.bulk_create(details_options_to_save)
+            OrderDetailMenuOption.objects.bulk_create(details_options_to_save)
 
         return details_to_save
 

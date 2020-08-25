@@ -3050,15 +3050,17 @@ definitions:
               items:
                 type: object
                 properties:
-                  menu_id:
+                  menu:
                     type: number
                     description: Id del menu
-                  option_id:
-                    type: number
-                    description: id de la opcion elegida por categoria
-                  price_option:
-                    type: number
-                    description: Si la opción tiene un precio
+                  options:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        option:
+                          type: number
+                          description: Id de la opción
     required:
       - station_id
       - service_id
