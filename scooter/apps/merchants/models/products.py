@@ -32,9 +32,13 @@ class ProductMenuCategory(ScooterModel):
     name = models.CharField(max_length=150)
     product = models.ForeignKey(Product, on_delete=models.DO_NOTHING, related_name="menu_categories")
     is_obligatory = models.BooleanField()
+    limit_options_choose = models.PositiveIntegerField(default=0)
     min_options_choose = models.PositiveIntegerField()
     max_options_choose = models.PositiveIntegerField()
-    ordering = models.PositiveIntegerField()
+    is_range = models.BooleanField(default=False)
+    have_quantity = models.BooleanField(default=False)
+    min_quantity = models.PositiveIntegerField(default=0)
+    max_quantity = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.name
@@ -43,7 +47,6 @@ class ProductMenuCategory(ScooterModel):
 class ProductMenuOption(ScooterModel):
     menu = models.ForeignKey(ProductMenuCategory, on_delete=models.DO_NOTHING, related_name="options")
     name = models.CharField(max_length=90)
-    type = models.ForeignKey(TypeOption, on_delete=models.DO_NOTHING)
     price = models.FloatField(null=True, blank=True)
 
     def __str__(self):
