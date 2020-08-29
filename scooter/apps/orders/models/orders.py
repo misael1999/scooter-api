@@ -73,6 +73,7 @@ class OrderDetailMenu(ScooterModel):
                                related_name="menu_options")
     menu = models.ForeignKey('merchants.ProductMenuCategory', on_delete=models.DO_NOTHING,
                              related_name="order_menu_category")
+    price = models.FloatField(default=0)
     menu_name = models.CharField(max_length=100)
 
     class Meta:

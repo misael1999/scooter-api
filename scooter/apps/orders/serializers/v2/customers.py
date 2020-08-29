@@ -119,9 +119,7 @@ class CreateOrderSerializer(serializers.ModelSerializer):
                 if not self.valid_stock(details):
                     raise ValueError('Un producto no cuenta con suficiente stock')
                 order_status = OrderStatus.objects.get(slug_name="await_confirmation_merchant")
-                data['order_price'] = self.calculate_order_price(details)
                 data['merchant_location'] = merchant.point
-                data['total_order'] = data['order_price'] + price
                 data['is_delivery_by_store'] = merchant.is_delivery_by_store
                 if merchant.is_delivery_by_store:
                     data.pop('station', None)
@@ -138,7 +136,7 @@ class CreateOrderSerializer(serializers.ModelSerializer):
 
             # Save detail order
             if details and is_order_to_merchant:
-                details_to_save = self.update_stock(details=details, order=order)
+                details_to_save = self.create_details_merchant(details=details, order=order)
             elif details:
                 details_to_save = [OrderDetail(**detail, order=order) for detail in details]
                 OrderDetail.objects.bulk_create(details_to_save)
@@ -204,16 +202,32 @@ class CreateOrderSerializer(serializers.ModelSerializer):
 
         return is_valid
 
-    def calculate_order_price(self, details):
+    def get_order_price(self, details):
         price_order = 0.0
+        extra_price = 0.0
+        menu_price = 0.0
         for detail in details:
+            # Para sumar el precio de las opciones seleccionadas
+            menu_options = detail.get('menu_options', [])
+            for menu_option in menu_options:
+                options = menu_option.get('options', [])
+                menu_price = 0.0
+                for option in options:
+                    extra_price = extra_price + option['option'].price
+
             price_order = price_order + (detail['product'].price * detail['quantity'])
 
-        return price_order
+        return {
+            'price_order': price_order,
+            "extra_price": extra_price
+        }
 
-    def update_stock(self, details, order):
+    def create_details_merchant(self, details, order):
         details_to_save = []
+        price_order = 0.0
+
         for detail in details:
+            extra_price = 0.0
             menu_options = detail.pop('menu_options', [])
             product = detail['product']
             # product.stock = product.stock - detail['quantity']
@@ -226,17 +240,28 @@ class CreateOrderSerializer(serializers.ModelSerializer):
             details_options_to_save = []
             for menu_option in menu_options:
                 options = menu_option.pop('options', [])
+                menu_price = 0.0
                 detail_menu = OrderDetailMenu.objects.create(**menu_option,
                                                              detail=detail_product,
                                                              menu_name=menu_option['menu'].name)
                 for option in options:
+                    option_obj = option['option']
+                    extra_price = extra_price + option_obj.price
+                    menu_price = menu_price + option_obj.price
                     details_options_to_save.append(OrderDetailMenuOption(**option,
-                                                                         option_name=option['option'].name,
-                                                                         price_option=option['option'].price,
+                                                                         option_name=option_obj.name,
+                                                                         price_option=option_obj.price,
                                                                          detail_menu=detail_menu))
 
+                detail_menu.price = menu_price
+                detail_menu.save()
+            # El precio extra son las opciones que tienen un costo
+            price_order = price_order + ((detail['product'].price + extra_price) * detail['quantity'])
             OrderDetailMenuOption.objects.bulk_create(details_options_to_save)
 
+        order.order_price = price_order
+        order.total_order = price_order + order.service_price
+        order.save()
         return details_to_save
 
 

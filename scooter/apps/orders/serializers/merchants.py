@@ -51,7 +51,7 @@ class AcceptOrderMerchantSerializer(serializers.Serializer):
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
         except Exception as ex:
-            print("Exception in reject order, please check it")
+            print("Exception in accept order, please check it")
             print(ex.args.__str__())
             raise serializers.ValidationError({'detail': 'Error al aceptar el pedido'})
 
