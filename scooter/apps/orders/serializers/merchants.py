@@ -105,7 +105,7 @@ class OrderReadyMerchantSerializer(serializers.Serializer):
     def update(self, order, data):
         merchant = self.context['merchant']
         if not merchant.is_delivery_by_store:
-            order_status = OrderStatus.objects.get(slug_name="order_ready")
+            order_status = OrderStatus.objects.get(slug_name="await_delivery_man")
             order.order_status = order_status
             order.save()
             send_notification_push_order(user_id=order.user_id,
@@ -113,9 +113,9 @@ class OrderReadyMerchantSerializer(serializers.Serializer):
                                          body='Estamos buscando al repartidor más cercano',
                                          sound="default",
                                          android_channel_id="messages",
-                                         data={"type": "REJECT_ORDER",
+                                         data={"type": "ORDER_READY",
                                                "order_id": order.id,
-                                               "message": "Pedido cancelado",
+                                               "message": "Pedido listo para ser recogido",
                                                'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                })
             send_order_delivery(location_selected=merchant.point,
