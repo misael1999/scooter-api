@@ -11,7 +11,7 @@ from scooter.apps.customers.serializers import CustomerAddressModelSerializer, C
 # Models
 from scooter.apps.delivery_men.models import DeliveryMan
 from scooter.apps.delivery_men.serializers import DeliveryManOrderSerializer
-from scooter.apps.merchants.models import Product
+from scooter.apps.merchants.models import Product, Merchant
 from scooter.apps.orders.models.ratings import RatingOrder
 from scooter.apps.stations.models import Station, StationService
 from scooter.apps.common.models import Service
@@ -116,11 +116,14 @@ class OrderWithDetailModelSerializer(serializers.ModelSerializer):
 class CalculateServicePriceSerializer(serializers.Serializer):
     """ Calculate the price of the service before requesting the service """
     from_address_id = serializers.PrimaryKeyRelatedField(queryset=CustomerAddress.objects.all(),
-                                                             source="from_address")
+                                                         source="from_address", required=False,
+                                                         allow_null=True, allow_empty=True)
     to_address_id = CustomerFilteredPrimaryKeyRelatedField(queryset=CustomerAddress.objects,
                                                            source="to_address", required=False, allow_null=True)
     station_id = serializers.PrimaryKeyRelatedField(queryset=Station.objects.all(), source="station")
     service_id = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all(), source="service")
+    merchant_id = serializers.PrimaryKeyRelatedField(queryset=Merchant.objects.all(), source="merchant")
+    is_order_to_merchant = serializers.BooleanField(default=False)
     point = PointSerializer(required=False, allow_null=True)
     is_current_location = serializers.BooleanField(required=False, allow_null=True)
 
@@ -141,10 +144,17 @@ class CalculateServicePriceSerializer(serializers.Serializer):
     def create(self, data):
         try:
             station = data['station']
+            merchant = data.get('merchant', None)
             to_address = None
-
+            from_address = None
+            is_order_to_merchant = data.get('is_order_to_merchant', False)
             if is_free_order(station):
                 return 0.0
+
+            if is_order_to_merchant:
+                from_address = merchant.point
+            else:
+                from_address = from_address=data['from_address'].point
 
             is_current_location = data.get('is_current_location', False)
             point = data.pop('point', None)
@@ -154,7 +164,7 @@ class CalculateServicePriceSerializer(serializers.Serializer):
             else:
                 to_address = data['to_address'].point
 
-            data_service = calculate_service_price(from_address=data['from_address'].point,
+            data_service = calculate_service_price(from_address,
                                                    to_address=to_address,
                                                    service=data['station_service'],
                                                    is_current_location=is_current_location,

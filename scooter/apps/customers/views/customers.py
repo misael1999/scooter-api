@@ -14,7 +14,7 @@ from scooter.apps.customers.models.customers import Customer
 from scooter.apps.customers.serializers.customers import (CustomerSignUpSerializer,
                                                           CustomerSimpleModelSerializer,
                                                           CustomerUserModelSerializer,
-                                                          ChangePasswordCustomerSerializer)
+                                                          ChangePasswordCustomerSerializer, EnterPromoCodeSerializer)
 
 
 class CustomerViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
@@ -75,3 +75,16 @@ class CustomerViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         serializer.save()
         return Response(self.set_response(status='ok', data=CustomerUserModelSerializer(customer).data,
                                           message='Contraseña actualizada correctamente'))
+
+    @action(detail=True, methods=['POST'])
+    def enter_promo_code(self, request, *args, **kwargs):
+        customer = self.get_object()
+        """ Customer enter promo code """
+        serializer_class = EnterPromoCodeSerializer
+        serializer = serializer_class(customer, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        customer = serializer.save()
+        data = self.set_response(status='ok',
+                                 data={},
+                                 message="Cuando realices tus primer pedido, tendras un envío gratis")
+        return Response(data, status=status.HTTP_201_CREATED)

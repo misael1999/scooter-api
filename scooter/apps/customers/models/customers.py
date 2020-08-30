@@ -13,7 +13,9 @@ class Customer(ScooterModel):
     picture_url = models.CharField(max_length=300, blank=True, null=True)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
     is_safe_user = models.BooleanField(default=False)
-
+    code_share = models.CharField(max_length=10, null=True)
+    code_used = models.BooleanField(default=False)
+    code_used_complete = models.BooleanField(default=False)
     # stats
     reputation = models.FloatField(default=0)
 
@@ -41,4 +43,40 @@ class CustomerAddress(ScooterModel):
         return self.full_address
 
 
+class HistoryCustomerInvitation(ScooterModel):
 
+    code = models.CharField(max_length=50,
+                            unique=True,
+                            help_text="Code the customer issued by")
+
+    issued_by = models.ForeignKey(
+        'customers.Customer',
+        on_delete=models.CASCADE,
+        help_text='Customer that is providing the invitation',
+        related_name='issued_by'
+    )
+    used_by = models.ForeignKey(
+        'customers.Customer',
+        on_delete=models.CASCADE,
+        null=True,
+        help_text='User that used the code to order'
+    )
+
+    date = models.DateTimeField()
+    is_pending = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = 'customers_customer_history_invitation'
+
+
+class CustomerInvitation(ScooterModel):
+
+    history = models.ForeignKey(HistoryCustomerInvitation, on_delete=models.DO_NOTHING)
+    customer = models.ForeignKey('customers.Customer', on_delete=models.DO_NOTHING)
+    created_at = models.DateTimeField()
+    expiration_date = models.DateTimeField()
+    used = models.BooleanField(default=False)
+    used_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'customers_customer_invitation'

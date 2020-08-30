@@ -123,11 +123,14 @@ class CustomerFacebookAuthSerializer(serializers.Serializer):
         return data
 
     def create(self, data):
+        is_new_user = False
         user_info = data['user']
         customer = None
         try:
             user = User.objects.get(facebook_id=user_info.get('id'))
             customer = user.customer
+            customer.picture_url = user_info.get('picture')['data']['url']
+            customer.save()
         except User.DoesNotExist:
             try:
                 user_exist = User.objects.filter(username=user_info.get('email', '')).exists()
@@ -135,7 +138,7 @@ class CustomerFacebookAuthSerializer(serializers.Serializer):
                 if user_exist:
                     message = "No es posible iniciar sesión con facebook, ya se encuentra registrado en la aplicación "
                     raise ValueError(message)
-
+                is_new_user = True
                 # Generate password random
                 password = User.objects.make_random_password()
 
@@ -169,6 +172,7 @@ class CustomerFacebookAuthSerializer(serializers.Serializer):
         refresh = RefreshToken.for_user(user)
         response = dict()
         response['refresh'] = str(refresh)
+        response['is_new_user'] = is_new_user
         response['access'] = str(refresh.access_token)
         response['customer'] = CustomerUserModelSerializer(customer).data
         return response

@@ -1,4 +1,7 @@
 """ Customers serializers """
+# Utilities
+import random
+from string import ascii_uppercase, digits
 # Django
 from django.conf import settings
 from django.utils import timezone
@@ -9,7 +12,7 @@ from rest_framework.validators import UniqueValidator
 # Models
 from scooter.apps.common.models import Notification
 from scooter.apps.users.models import User
-from scooter.apps.customers.models.customers import Customer
+from scooter.apps.customers.models.customers import Customer, HistoryCustomerInvitation, CustomerInvitation
 # Utilities
 from scooter.utils.functions import send_mail_verification, generate_verification_token
 # Serializers
@@ -30,6 +33,7 @@ class CustomerSimpleModelSerializer(serializers.ModelSerializer):
             'birthdate',
             'picture',
             'picture_url',
+            'code_share',
             'phone_number',
             'reputation',
             'is_safe_user'
@@ -53,6 +57,7 @@ class CustomerSimpleOrderSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'name',
+            'code_share',
             'phone_number',
             'reputation',
             'is_safe_user'
@@ -92,7 +97,9 @@ class CustomerSignUpSerializer(serializers.Serializer):
                     verification_deadline=timezone.localtime(timezone.now()) + timedelta(days=2))
         user.set_password(data['password'])
         user.save()
+        code_share = generate_code_to_share()
         customer = Customer.objects.create(user=user,
+                                           code_share=code_share,
                                            name=data['name'])
 
         code = generate_verification_token(user=user,
@@ -135,4 +142,63 @@ class ChangePasswordCustomerSerializer(serializers.Serializer):
             raise serializers.ValidationError({'detail': str(ex)})
         except Exception as e:
             raise serializers.ValidationError({'detail': 'Ha ocurrido un error desconocido'})
+
+
+class EnterPromoCodeSerializer(serializers.Serializer):
+
+    code = serializers.CharField(max_length=10)
+
+    def update(self, customer, data):
+        try:
+            # Verify that the user has not used an invitation code
+            if customer.code_used:
+                raise ValueError('Ya ha usado un código de invitacíon no puede usar otro')
+            customer_exist = Customer.objects.get(code_share=data['code'])
+            now = timezone.localtime(timezone.now())
+            # We place that it is pending until you complete your first order
+            history = HistoryCustomerInvitation.objects.create(
+                issued_by=customer_exist,
+                used_by=customer,
+                code=data['code'],
+                is_pending=True,
+                date=now
+            )
+            # # Create free shipping to the user who invites with their code
+            # invitation = CustomerInvitation.objects.create(
+            #     customer=customer,
+            #     history=history,
+            #     created_at=now,
+            #     expiration_date=now + timedelta(days=10)
+            # )
+            # # Create free shipping to the user who invites with their code
+            # invitation_issued = CustomerInvitation.objects.create(
+            #     customer=customer_exist,
+            #     history=history,
+            #     created_at=now,
+            #     expiration_date=now + timedelta(days=10)
+            # )
+            customer.code_used = True
+            customer.save()
+            return data
+        except Customer.DoesNotExist:
+            raise serializers.ValidationError({'detail': 'No existe el código'})
+        except ValueError as ex:
+            raise serializers.ValidationError({'detail': str(ex)})
+        except Exception as e:
+            raise serializers.ValidationError({'detail': 'Ha ocurrido un error desconocido'})
+
+
+def generate_code_to_share():
+    try:
+        CODE_LENGTH = 7
+        """ Handle code creation """
+        pool = ascii_uppercase + digits
+        code = ''.join(random.choices(pool, k=CODE_LENGTH))
+        while Customer.objects.filter(code_share=code).exists():
+            code = ''.join(random.choices(pool, k=CODE_LENGTH))
+
+        return code
+    except Exception as ex:
+        raise ValueError('Error al generar el codigo qr')
+
 

@@ -1,9 +1,12 @@
 # Rest framework
+from datetime import timedelta
+
 from rest_framework import serializers
 from django.utils import timezone
 # Serializers
 # Models
 from scooter.apps.common.models import DeliveryManStatus, OrderStatus, Notification, Service
+from scooter.apps.customers.models import HistoryCustomerInvitation, CustomerInvitation
 from scooter.apps.delivery_men.models import DeliveryMan
 from scooter.apps.orders.models.orders import HistoryRejectedOrders
 # Functions channels
@@ -15,6 +18,8 @@ from scooter.apps.orders.serializers.orders import get_nearest_delivery_man
 from scooter.apps.orders.utils.orders import notify_station_accept
 from scooter.apps.orders.utils.orders import notify_delivery_men
 from asgiref.sync import async_to_sync
+
+from scooter.utils.functions import send_notification_push_order
 
 
 class AcceptOrderByDeliveryManSerializer(serializers.Serializer):
@@ -162,6 +167,7 @@ class ScanQrOrderSerializer(serializers.Serializer):
             # Update member station
             station = instance.station
             customer = instance.customer
+            self.generate_free_delivery(customer=customer)
             member_station = instance.member_station
             if member_station:
                 member_station.total_orders = member_station.total_orders + 1
@@ -190,6 +196,47 @@ class ScanQrOrderSerializer(serializers.Serializer):
             print("Exception in reject order, please check it")
             print(ex.args.__str__())
             raise serializers.ValidationError({'detail': 'Error al escanear el código'})
+
+    def generate_free_delivery(self, customer):
+        try:
+            if not customer.code_used_complete:
+                history = HistoryCustomerInvitation.objects.filter(is_pending=True, customer=customer)
+                # Create free shipping to the user who invites with their code
+                if history.exists():
+                    now = timezone.localtime(timezone.now())
+                    invitation = CustomerInvitation.objects.create(
+                        customer=customer,
+                        history=history[0],
+                        created_at=now,
+                        expiration_date=now + timedelta(days=10)
+                    )
+                    # Create free shipping to the user who invites with their code
+                    invitation_issued = CustomerInvitation.objects.create(
+                        customer=history[0].issued_by,
+                        history=history,
+                        created_at=now,
+                        expiration_date=now + timedelta(days=10)
+                    )
+                    history.is_pending = False
+                    history.save()
+
+                    # Send notifications
+                    send_notification_push_order(user_id=history[0].issued_by.user_id,
+                                                 title='¡Tienes un pedido gratis!',
+                                                 body='{} ha utilizado tu código de referido'.format(customer.name),
+                                                 sound="default",
+                                                 android_channel_id="messages",
+                                                 data={"type": "INVITATIONS",
+                                                       'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                                       })
+                    customer.code_used_complete = True
+                    customer.save()
+        except ValueError as e:
+            raise ValueError('Error al validar la invitación')
+        except Exception as ex:
+            print("Exception in rating order, please check it")
+            print(ex.args.__str__())
+            raise ValueError('Error al validar la invitación')
 
 
 class UpdateOrderStatusSerializer(serializers.Serializer):
