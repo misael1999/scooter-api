@@ -30,12 +30,13 @@ def send_notification_push_task(user_id, title, body, data):
         devices.send_message(title=title, body=body, data=data)
 
 
-@periodic_task(name='reject_orders', run_every=timedelta(minutes=1))
+@periodic_task(name='reject_orders', run_every=timedelta(hours=1))
 def reject_orders():
     """ Verify orders and reject when nobody responds """
     now = timezone.localtime(timezone.now())
     offset = now + timedelta(seconds=0)
     orders = Order.objects.filter(maximum_response_time__lte=offset,
+                                  merchant=None,
                                   order_status__slug_name__in=["await_delivery_man", "without_delivery"])
     if orders:
         order_status = OrderStatus.objects.get(slug_name='rejected')
@@ -50,10 +51,34 @@ def reject_orders():
                                                "message": "No hubo respuesta del pedid",
                                                'click_action': 'FLUTTER_NOTIFICATION_CLICK'})
         orders.update(order_status=order_status,
-                      reason_rejection="Sin respuesta de los repartidores")
+                      reason_rejection="Pedido ignorado por el comerciante")
 
 
-@periodic_task(name='location_notice_not_enabled', run_every=timedelta(minutes=7))
+@periodic_task(name='ignore_orders', run_every=timedelta(minutes=1))
+def ignore_orders():
+    """ Verify orders and reject when nobody responds """
+    now = timezone.localtime(timezone.now())
+    offset = now + timedelta(seconds=0)
+    orders = Order.objects.filter(maximum_response_time__lte=offset,
+                                  merchant=None,
+                                  order_status__slug_name__in=["await_confirmation_merchant"])
+    if orders:
+        order_status = OrderStatus.objects.get(slug_name='ignored')
+        for order in orders:
+            # Function
+            send_notification_push_order(order.user_id, title='Pedido ignorado por el comerciante',
+                                         body='No hubo respuesta por parte del comercio',
+                                         sound="default",
+                                         android_channel_id="messages",
+                                         data={"type": "IGNORE_ORDER",
+                                               "order_id": order.id,
+                                               "message": "No hubo respuesta del comerciante",
+                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'})
+        orders.update(order_status=order_status,
+                      reason_rejection="Pedido ignorado por el comerciante")
+
+
+@periodic_task(name='location_notice_not_enabled', run_every=timedelta(minutes=20))
 def location_notice_not_enabled():
     """ Notice when the location is not enabled """
     now = timezone.localtime(timezone.now())
@@ -71,7 +96,9 @@ def location_notice_not_enabled():
                                            'click_action': 'FLUTTER_NOTIFICATION_CLICK'})
 
 
-@periodic_task(name='disabled_location', run_every=timedelta(hours=1))
+
+
+@periodic_task(name='disabled_location', run_every=timedelta(hours=2))
 def disabled_location():
     """ Disabled location when are available and not send location in several minutes """
     now = timezone.localtime(timezone.now())

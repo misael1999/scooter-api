@@ -169,7 +169,7 @@ class CalculateServicePriceSerializer(serializers.Serializer):
                                                    service=data['station_service'],
                                                    is_current_location=is_current_location,
                                                    point=point)
-            return round(data_service['price_service'])
+            return data_service['price_service']
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
         except Exception as ex:
@@ -247,7 +247,7 @@ def calculate_service_price(from_address, to_address, service, is_current_locati
             # Verify how to much kilometers left and after multiply for the price kilomers ans
             kilometers_left = distance_points - service.to_kilometer
             price_service = service.base_rate_price + (kilometers_left * service.price_kilometer)
-        return {'price_service': price_service, 'distance': distance_points}
+        return {'price_service': round(price_service), 'distance': distance_points}
     except ValueError as e:
         print(e)
         raise ValueError('Error al consultar precio del servicio')
