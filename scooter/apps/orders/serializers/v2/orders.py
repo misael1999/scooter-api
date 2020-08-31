@@ -7,6 +7,7 @@ from scooter.apps.customers.serializers import CustomerAddressModelSerializer, C
 # Models
 from scooter.apps.delivery_men.serializers import DeliveryManOrderSerializer
 from scooter.apps.merchants.models import Product
+from scooter.apps.merchants.serializers import MerchantUserSimpleSerializer
 
 from scooter.apps.orders.models.orders import Order
 # Django Geo
@@ -49,6 +50,7 @@ class DetailOrderSerializer(serializers.Serializer):
 
 
 class OrderWithDetailModelSerializer(serializers.ModelSerializer):
+    merchant = MerchantUserSimpleSerializer()
     station = serializers.StringRelatedField(read_only=True)
     station_object = StationSimpleOrderSerializer(read_only=True, source="station")
     customer = CustomerSimpleOrderSerializer(read_only=True)
@@ -63,7 +65,7 @@ class OrderWithDetailModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ("id", "service",
+        fields = ("id", 'merchant', "service",
                   "from_address", "to_address", "service_price", "distance",
                   "indications", "approximate_price_order", 'reason_rejection',
                   "order_date", "date_delivered_order", "qr_code", "order_status",

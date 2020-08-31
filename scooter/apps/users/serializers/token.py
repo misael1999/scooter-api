@@ -12,7 +12,7 @@ from scooter.apps.stations.models import Station
 from scooter.apps.customers.models import Customer
 from scooter.apps.delivery_men.models import DeliveryMan
 # Serializers
-from scooter.apps.customers.serializers.customers import CustomerUserModelSerializer
+from scooter.apps.customers.serializers.customers import CustomerUserModelSerializer, generate_code_to_share
 from scooter.apps.stations.serializers.delivery_men import DeliveryManUserModelSerializer
 from scooter.apps.stations.serializers.stations import StationUserModelSerializer
 # Facebook
@@ -158,7 +158,9 @@ class CustomerFacebookAuthSerializer(serializers.Serializer):
                 full_name = '{first_name} {middle_name} {last_name}'.format(first_name=first_name,
                                                                             middle_name=middle_name,
                                                                             last_name=last_name)
+                code_share = generate_code_to_share()
                 customer = Customer.objects.create(user=user,
+                                                   code_share=code_share,
                                                    picture_url=user_info.get('picture')['data']['url'],
                                                    name=full_name)
             except ValueError as ex:

@@ -12,6 +12,7 @@ from scooter.apps.customers.serializers import CustomerAddressModelSerializer, C
 from scooter.apps.delivery_men.models import DeliveryMan
 from scooter.apps.delivery_men.serializers import DeliveryManOrderSerializer
 from scooter.apps.merchants.models import Product, Merchant
+from scooter.apps.merchants.serializers import MerchantUserSimpleSerializer
 from scooter.apps.orders.models.ratings import RatingOrder
 from scooter.apps.stations.models import Station, StationService
 from scooter.apps.common.models import Service
@@ -89,6 +90,7 @@ class OrderWithDetailSimpleSerializer(serializers.ModelSerializer):
 
 class OrderWithDetailModelSerializer(serializers.ModelSerializer):
     station = serializers.StringRelatedField(read_only=True)
+    merchant = MerchantUserSimpleSerializer()
     station_object = StationSimpleOrderSerializer(read_only=True, source="station")
     customer = CustomerSimpleOrderSerializer(read_only=True)
     from_address = CustomerAddressModelSerializer()
@@ -102,7 +104,7 @@ class OrderWithDetailModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ("id", "service",
+        fields = ("id",'merchant', "service",
                   "from_address", "to_address", "service_price", "distance",
                   "indications", "approximate_price_order", 'reason_rejection',
                   "order_date", "date_delivered_order", "qr_code", "order_status",
