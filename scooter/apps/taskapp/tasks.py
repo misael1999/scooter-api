@@ -48,7 +48,7 @@ def reject_orders():
                                          android_channel_id="messages",
                                          data={"type": "REJECT_ORDER",
                                                "order_id": order.id,
-                                               "message": "No hubo respuesta del pedid",
+                                               "message": "No hubo respuesta del pedido",
                                                'click_action': 'FLUTTER_NOTIFICATION_CLICK'})
         orders.update(order_status=order_status,
                       reason_rejection="Pedido ignorado por el comerciante")

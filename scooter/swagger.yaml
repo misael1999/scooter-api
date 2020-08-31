@@ -568,6 +568,12 @@ paths:
     post:
       operationId: put_enter_promo_code
       description: Ingresar código de promoción
+      parameters:
+        - name: body
+          in: body
+          description: Código de promocion
+          schema:
+            $ref: '#/definitions/EnterPromoCode'
       responses:
         '201':
           description: 'Código de promoción ingresado'
@@ -2472,6 +2478,12 @@ definitions:
       picture:
         type: string
         description: Imagen de perfil
+  EnterPromoCode:
+    type: object
+    properties:
+      code:
+        type: string
+        description: código de promoción
   ChangePassword:
     type: object
     properties:

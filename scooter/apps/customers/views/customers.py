@@ -86,5 +86,5 @@ class CustomerViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         customer = serializer.save()
         data = self.set_response(status='ok',
                                  data={},
-                                 message="Cuando realices tus primer pedido, tendras un envío gratis")
+                                 message="Cuando realices tu primer pedido, tendrás un envío gratis")
         return Response(data, status=status.HTTP_201_CREATED)

@@ -20,6 +20,17 @@ from scooter.apps.users.serializers.users import UserModelSimpleSerializer
 from scooter.apps.common.serializers import Base64ImageField
 
 
+class CustomerInvitationSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Customer
+        fields = (
+            'id',
+            'name',
+            'code_share',
+        )
+        read_only_fields = fields
+
+
 class CustomerSimpleModelSerializer(serializers.ModelSerializer):
     picture = Base64ImageField(max_length=None, required=False, use_url=True)
     user = UserModelSimpleSerializer()
@@ -202,5 +213,25 @@ def generate_code_to_share():
         return code
     except Exception as ex:
         raise ValueError('Error al generar el codigo qr')
+
+
+class HistoryCustomerInvitationModelSerializer(serializers.ModelSerializer):
+
+    issued_by = CustomerInvitationSimpleSerializer()
+    used_by = CustomerInvitationSimpleSerializer()
+
+    class Meta:
+        model = HistoryCustomerInvitation
+        fields = ('id', 'code', 'issued_by', 'used_by', 'date', 'is_pending')
+        read_only_fields = fields
+
+
+class CustomerInvitationModelSerializer(serializers.ModelSerializer):
+    history = HistoryCustomerInvitationModelSerializer()
+
+    class Meta:
+        model = CustomerInvitation
+        fields = ('history', 'customer', 'created_at',
+                  'expiration_date', 'used', 'used_at')
 
 

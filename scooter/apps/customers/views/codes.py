@@ -1,14 +1,13 @@
 # Django rest
+from django.db.models import Q
 from rest_framework import mixins, status
 from rest_framework.response import Response
 # Models
-from scooter.apps.customers.models.customers import CustomerAddress, CustomerInvitation
-from scooter.apps.common.models.status import Status
-# Serializers
-from scooter.apps.customers.serializers.addresses import (CustomerAddressModelSerializer,
-                                                          CreateCustomerAddressSerializer)
+from scooter.apps.customers.models.customers import CustomerInvitation, HistoryCustomerInvitation
+
 # Viewset
-from scooter.apps.orders.serializers import CustomerInvitationModelSerializer
+from scooter.apps.customers.serializers import (CustomerInvitationModelSerializer,
+                                                HistoryCustomerInvitationModelSerializer)
 from scooter.utils.viewsets.scooter import ScooterViewSet
 # Mixins
 from scooter.apps.common.mixins.customers import AddCustomerMixin
@@ -40,3 +39,11 @@ class CustomerInvitationsViewSet(ScooterViewSet, mixins.ListModelMixin, AddCusto
         if self.action == 'list':
             return self.customer.customerinvitation_set.filter()
         return self.queryset
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs).data
+        pendings = HistoryCustomerInvitation.objects.filter(Q(is_pending=True) |
+                                                            Q(used_by=self.customer) |
+                                                            Q(issued_by=self.customer))
+        response['pendings'] = HistoryCustomerInvitationModelSerializer(pendings, many=True).data
+        return Response(data=response, status=status.HTTP_200_OK)
