@@ -40,6 +40,10 @@ class ProductMenuCategory(ScooterModel):
     min_quantity = models.PositiveIntegerField(default=0)
     max_quantity = models.PositiveIntegerField(default=0)
 
+    class Meta:
+        get_latest_by = 'created'
+        ordering = ['-created']
+
     def __str__(self):
         return self.name
 
@@ -48,6 +52,10 @@ class ProductMenuOption(ScooterModel):
     menu = models.ForeignKey(ProductMenuCategory, on_delete=models.DO_NOTHING, related_name="options")
     name = models.CharField(max_length=90)
     price = models.FloatField(null=True, blank=True)
+
+    class Meta:
+        get_latest_by = 'created'
+        ordering = ['-created']
 
     def __str__(self):
         return self.name

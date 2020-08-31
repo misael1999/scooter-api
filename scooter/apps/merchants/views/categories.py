@@ -31,7 +31,7 @@ class CategoriesProductsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cr
     search_fields = ('name',)
     ordering_fields = ('created', 'name')
     # Affect the default order
-    ordering = ('-created', '-name')
+    ordering = ('-created',)
     filter_fields = ('status',)
     """ Method dispatch in AddMerchantMixin """
     merchant = None
