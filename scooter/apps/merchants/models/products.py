@@ -42,7 +42,7 @@ class ProductMenuCategory(ScooterModel):
 
     class Meta:
         get_latest_by = 'created'
-        ordering = ['-created']
+        ordering = ['created']
 
     def __str__(self):
         return self.name
@@ -55,7 +55,7 @@ class ProductMenuOption(ScooterModel):
 
     class Meta:
         get_latest_by = 'created'
-        ordering = ['-created']
+        ordering = ['created']
 
     def __str__(self):
         return self.name
