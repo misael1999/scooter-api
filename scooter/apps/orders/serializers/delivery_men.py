@@ -200,7 +200,7 @@ class ScanQrOrderSerializer(serializers.Serializer):
     def generate_free_delivery(self, customer):
         try:
             if not customer.code_used_complete:
-                history = HistoryCustomerInvitation.objects.filter(is_pending=True, customer=customer)
+                history = HistoryCustomerInvitation.objects.filter(is_pending=True, used_by=customer)
                 # Create free shipping to the user who invites with their code
                 if history.exists():
                     now = timezone.localtime(timezone.now())

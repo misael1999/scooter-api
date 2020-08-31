@@ -20,9 +20,7 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 
 
-class CustomerInvitationsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.CreateModelMixin,
-                                 mixins.UpdateModelMixin, mixins.RetrieveModelMixin,
-                                 mixins.DestroyModelMixin, AddCustomerMixin):
+class CustomerInvitationsViewSet(ScooterViewSet, mixins.ListModelMixin, AddCustomerMixin):
     """ View set for the customers can register a new address """
 
     serializer_class = CustomerInvitationModelSerializer
@@ -36,10 +34,9 @@ class CustomerInvitationsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.C
 
     """ Method dispatch in AddCustomerMixin """
     customer = None
-    address_instance = None
 
     def get_queryset(self):
         """ Personalized query when the action is a list so that it only returns active addresss """
         if self.action == 'list':
-            return self.customer.customerinvitation_set.filter(status__slug_name='active')
+            return self.customer.customerinvitation_set.filter()
         return self.queryset
