@@ -122,7 +122,9 @@ class CalculateServicePriceSerializer(serializers.Serializer):
                                                            source="to_address", required=False, allow_null=True)
     station_id = serializers.PrimaryKeyRelatedField(queryset=Station.objects.all(), source="station")
     service_id = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all(), source="service")
-    merchant_id = serializers.PrimaryKeyRelatedField(queryset=Merchant.objects.all(), source="merchant")
+    merchant_id = serializers.PrimaryKeyRelatedField(queryset=Merchant.objects.all(),
+                                                     source="merchant", required=False,
+                                                     allow_null=True, allow_empty=True)
     is_order_to_merchant = serializers.BooleanField(default=False)
     point = PointSerializer(required=False, allow_null=True)
     is_current_location = serializers.BooleanField(required=False, allow_null=True)
