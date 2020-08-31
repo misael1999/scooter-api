@@ -3,6 +3,7 @@ from rest_framework import serializers
 # Serializers
 # Models
 from scooter.apps.common.models import OrderStatus
+from scooter.apps.customers.models import HistoryCustomerInvitation, CustomerInvitation
 from scooter.apps.delivery_men.models import DeliveryMan
 # Functions channels
 # Functions
@@ -122,3 +123,20 @@ class OrderReadyMerchantSerializer(serializers.Serializer):
                                 station=order.station,
                                 order=order)
         return order
+
+
+class HistoryCustomerInvitationModelSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = HistoryCustomerInvitation
+        fields = ('id', 'code', 'issued_by', 'used_by', 'date', 'is_pending')
+        read_only_fields = fields
+
+
+class CustomerInvitationModelSerializer(serializers.ModelSerializer):
+    history = HistoryCustomerInvitationModelSerializer()
+
+    class Meta:
+        model = CustomerInvitation
+        fields = ('history', 'customer', 'created_at',
+                  'expiration_date', 'used', 'used_at')

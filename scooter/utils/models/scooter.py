@@ -11,7 +11,6 @@ class ScooterModel(models.Model):
     class Meta:
         abstract = True
         get_latest_by = 'created'
-        ordering = ['-created', '-modified']
 
 
 

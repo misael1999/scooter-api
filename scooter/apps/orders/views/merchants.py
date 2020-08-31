@@ -127,3 +127,5 @@ class MerchantOrderViewSet(ScooterViewSet, AddMerchantMixin,
                                  message='Pedido listo')
         return Response(data=data, status=status.HTTP_200_OK)
 
+
+

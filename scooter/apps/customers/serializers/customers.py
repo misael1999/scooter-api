@@ -152,8 +152,10 @@ class EnterPromoCodeSerializer(serializers.Serializer):
         try:
             # Verify that the user has not used an invitation code
             if customer.code_used:
-                raise ValueError('Ya ha usado un código de invitacíon no puede usar otro')
+                raise ValueError('Ya ha usado un código de invitacíon, no puede usar otro')
             customer_exist = Customer.objects.get(code_share=data['code'])
+            if customer.id == customer_exist.id:
+                raise ValueError('No es posible que usted use su propio código de invitación')
             now = timezone.localtime(timezone.now())
             # We place that it is pending until you complete your first order
             history = HistoryCustomerInvitation.objects.create(
