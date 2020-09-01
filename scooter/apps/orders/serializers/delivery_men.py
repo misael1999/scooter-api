@@ -217,8 +217,8 @@ class ScanQrOrderSerializer(serializers.Serializer):
                         created_at=now,
                         expiration_date=now + timedelta(days=10)
                     )
-                    history.is_pending = False
-                    history.save()
+                    history[0].is_pending = False
+                    history[0].save()
 
                     # Send notifications
                     send_notification_push_order(user_id=history[0].issued_by.user_id,
@@ -234,7 +234,7 @@ class ScanQrOrderSerializer(serializers.Serializer):
         except ValueError as e:
             raise ValueError('Error al validar la invitación')
         except Exception as ex:
-            print("Exception in rating order, please check it")
+            print("Exception in validation invitation, please check it")
             print(ex.args.__str__())
             raise ValueError('Error al validar la invitación')
 
