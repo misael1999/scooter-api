@@ -71,7 +71,7 @@ class HistoryCustomerInvitation(ScooterModel):
         db_table = 'customers_customer_history_invitation'
 
 
-class CustomerInvitation(ScooterModel):
+class CustomerPromotion(ScooterModel):
 
     history = models.ForeignKey(HistoryCustomerInvitation, on_delete=models.DO_NOTHING)
     customer = models.ForeignKey('customers.Customer', on_delete=models.DO_NOTHING)
@@ -81,4 +81,4 @@ class CustomerInvitation(ScooterModel):
     used_at = models.DateTimeField(blank=True, null=True)
 
     class Meta:
-        db_table = 'customers_customer_invitation'
+        db_table = 'customers_customer_promotions'

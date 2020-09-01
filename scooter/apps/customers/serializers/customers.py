@@ -12,7 +12,7 @@ from rest_framework.validators import UniqueValidator
 # Models
 from scooter.apps.common.models import Notification
 from scooter.apps.users.models import User
-from scooter.apps.customers.models.customers import Customer, HistoryCustomerInvitation, CustomerInvitation
+from scooter.apps.customers.models.customers import Customer, HistoryCustomerInvitation, CustomerPromotion
 # Utilities
 from scooter.utils.functions import send_mail_verification, generate_verification_token
 # Serializers
@@ -215,7 +215,7 @@ def generate_code_to_share():
         raise ValueError('Error al generar el codigo qr')
 
 
-class HistoryCustomerInvitationModelSerializer(serializers.ModelSerializer):
+class HistoryCustomerModelSerializer(serializers.ModelSerializer):
 
     issued_by = CustomerInvitationSimpleSerializer()
     used_by = CustomerInvitationSimpleSerializer()
@@ -226,11 +226,11 @@ class HistoryCustomerInvitationModelSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
-class CustomerInvitationModelSerializer(serializers.ModelSerializer):
-    history = HistoryCustomerInvitationModelSerializer()
+class CustomerPromotionModelSerializer(serializers.ModelSerializer):
+    history = HistoryCustomerModelSerializer()
 
     class Meta:
-        model = CustomerInvitation
+        model = CustomerPromotion
         fields = ('history', 'customer', 'created_at',
                   'expiration_date', 'used', 'used_at')
 

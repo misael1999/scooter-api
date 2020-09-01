@@ -16,7 +16,7 @@ from scooter.apps.orders.models.orders import (OrderDetail, HistoryRejectedOrder
                                                OrderDetailMenuOption)
 from scooter.apps.stations.models import Station, StationService, MemberStation
 from scooter.apps.common.models import Service, OrderStatus, Notification
-from scooter.apps.customers.models import CustomerAddress, CustomerInvitation, HistoryCustomerInvitation
+from scooter.apps.customers.models import CustomerAddress
 from scooter.apps.orders.models.orders import Order
 # Functions channels
 from scooter.apps.orders.utils.orders import notify_merchants, notify_delivery_men

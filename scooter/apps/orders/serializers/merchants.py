@@ -3,7 +3,6 @@ from rest_framework import serializers
 # Serializers
 # Models
 from scooter.apps.common.models import OrderStatus
-from scooter.apps.customers.models import HistoryCustomerInvitation, CustomerInvitation
 from scooter.apps.delivery_men.models import DeliveryMan
 # Functions channels
 # Functions

@@ -6,7 +6,7 @@ from django.utils import timezone
 # Serializers
 # Models
 from scooter.apps.common.models import DeliveryManStatus, OrderStatus, Notification, Service
-from scooter.apps.customers.models import HistoryCustomerInvitation, CustomerInvitation
+from scooter.apps.customers.models import HistoryCustomerInvitation, CustomerPromotion
 from scooter.apps.delivery_men.models import DeliveryMan
 from scooter.apps.orders.models.orders import HistoryRejectedOrders
 # Functions channels
@@ -157,6 +157,10 @@ class ScanQrOrderSerializer(serializers.Serializer):
                 "body": 'Tu pedido ha sido entregado',
                 "type": "ORDER_DELIVERED"
             }
+            # Update member station
+            station = instance.station
+            customer = instance.customer
+            self.generate_free_delivery(customer=customer)
 
             instance = update_order_status(service=data['service'],
                                            order_status=OrderStatus.objects.get(slug_name="delivered"),
@@ -164,10 +168,6 @@ class ScanQrOrderSerializer(serializers.Serializer):
                                            data=data_notification
                                            )
 
-            # Update member station
-            station = instance.station
-            customer = instance.customer
-            self.generate_free_delivery(customer=customer)
             member_station = instance.member_station
             if member_station:
                 member_station.total_orders = member_station.total_orders + 1
@@ -201,19 +201,20 @@ class ScanQrOrderSerializer(serializers.Serializer):
         try:
             if not customer.code_used_complete:
                 history = HistoryCustomerInvitation.objects.filter(is_pending=True, used_by=customer)
+               # import pdb; pdb.set_trace()
                 # Create free shipping to the user who invites with their code
                 if history.exists():
                     now = timezone.localtime(timezone.now())
-                    invitation = CustomerInvitation.objects.create(
+                    invitation = CustomerPromotion.objects.create(
                         customer=customer,
                         history=history[0],
                         created_at=now,
                         expiration_date=now + timedelta(days=10)
                     )
                     # Create free shipping to the user who invites with their code
-                    invitation_issued = CustomerInvitation.objects.create(
+                    invitation_issued = CustomerPromotion.objects.create(
                         customer=history[0].issued_by,
-                        history=history,
+                        history=history[0],
                         created_at=now,
                         expiration_date=now + timedelta(days=10)
                     )
@@ -232,6 +233,7 @@ class ScanQrOrderSerializer(serializers.Serializer):
                     customer.code_used_complete = True
                     customer.save()
         except ValueError as e:
+            print(e.args.__str__())
             raise ValueError('Error al validar la invitación')
         except Exception as ex:
             print("Exception in validation invitation, please check it")

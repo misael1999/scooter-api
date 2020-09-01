@@ -15,7 +15,7 @@ router.register(r'api/v1/customers/(?P<customer_id>[a-zA-Z0-9_-]+)/addresses',
 router.register(r'api/v1/customers/(?P<customer_id>[a-zA-Z0-9_-]+)/notifications',
                 notifications_view.NotificationCustomerViewSet, basename='customer_notifications')
 router.register(r'api/v1/customers/(?P<customer_id>[a-zA-Z0-9_-]+)/invitations',
-                code_view.CustomerInvitationsViewSet, basename='customer_invitations')
+                code_view.CustomerPromotionsViewSet, basename='customer_invitations')
 urlpatterns = [
     # Views
     path('', include(router.urls))
