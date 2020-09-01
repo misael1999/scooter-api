@@ -39,7 +39,7 @@ class DetailOrderSerializer(serializers.Serializer):
     picture = Base64ImageField(required=False, use_url=True, allow_null=True, allow_empty_file=True, max_length=None)
     product_id = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all(), source="product", allow_null=True,
                                                     required=False)
-    quantity = serializers.IntegerField(min_value=1, allow_null=True, required=True)
+    quantity = serializers.IntegerField(min_value=1, allow_null=True, required=False)
     menu_options = DetailMenuSerializer(many=True, required=False, allow_null=True)
 
     def create(self, validated_data):
