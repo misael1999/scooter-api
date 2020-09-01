@@ -55,7 +55,7 @@ class AvailabilityMerchantSerializer(serializers.Serializer):
     def update(self, merchant, data):
         merchant.is_open = data['is_open']
         merchant.save()
-        return merchant
+        return merchant.is_open
 
 # ===============
 # Serializers to update info of merchant
