@@ -62,6 +62,8 @@ class HistoryCustomerInvitation(ScooterModel):
         help_text='User that used the code to order'
     )
 
+    used_used_by = models.BooleanField(default=False, help_text="Already used by use enter code promo")
+
     date = models.DateTimeField()
     is_pending = models.BooleanField(default=True)
 
