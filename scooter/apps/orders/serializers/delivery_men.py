@@ -334,7 +334,7 @@ def get_data_notification(status_slug_name):
 
 def get_message_accept(order):
 
-    if order.is_safe_order:
+    if order.is_safe_order or order.is_order_to_merchant:
         return {
             'title': 'En camino al comercio',
             'body': 'Tu scooter ya va en camino al comercio',
