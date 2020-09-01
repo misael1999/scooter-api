@@ -1,5 +1,6 @@
 # Django rest
 from django.db.models import Q
+from django.utils import timezone
 from rest_framework import mixins, status
 from rest_framework.response import Response
 # Models
@@ -37,11 +38,16 @@ class CustomerInvitationsViewSet(ScooterViewSet, mixins.ListModelMixin, AddCusto
     def get_queryset(self):
         """ Personalized query when the action is a list so that it only returns active addresss """
         if self.action == 'list':
-            return self.customer.customerinvitation_set.filter()
+            return self.customer.customerinvitation_set.all()
         return self.queryset
 
     def list(self, request, *args, **kwargs):
-        response = super().list(request, *args, **kwargs).data
-        # pendings = HistoryCustomerInvitation.objects.filter(issued_by=self.customer)
-        # response['pendings'] = HistoryCustomerInvitationModelSerializer(pendings, many=True).data
-        return Response(data=response, status=status.HTTP_200_OK)
+        data = {}
+        now = timezone.localtime(timezone.now())
+        available_set = self.customer.customerinvitation_set.all(expiration_date__gte=now)
+        expiration_set = self.customer.customerinvitation_set.all(expiration_date__lte=now)
+        invitations = HistoryCustomerInvitation.objects.filter(issued_by=self.customer)
+        data['history'] = HistoryCustomerInvitationModelSerializer(invitations, many=True).data
+        data['available'] = CustomerInvitationModelSerializer(available_set, many=True).data
+        data['expiration'] = CustomerInvitationModelSerializer(expiration_set, many=True).data
+        return Response(data=data, status=status.HTTP_200_OK)
