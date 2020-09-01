@@ -74,7 +74,7 @@ class CreateOrderSerializer(serializers.ModelSerializer):
         try:
             station = data.get('station', None)
             merchant = data.get('merchant', None)
-            if merchant.is_delivery_by_store is False and not station:
+            if merchant and merchant.is_delivery_by_store is False and not station:
                 raise serializers.ValidationError({'detail': 'Selecciona una central'})
             if station is not None:
                 exist_service = station.services.get(service=data['service'])
