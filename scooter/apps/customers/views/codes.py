@@ -42,8 +42,6 @@ class CustomerInvitationsViewSet(ScooterViewSet, mixins.ListModelMixin, AddCusto
 
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs).data
-        pendings = HistoryCustomerInvitation.objects.filter(Q(is_pending=True) |
-                                                            Q(used_by=self.customer) |
-                                                            Q(issued_by=self.customer))
-        response['pendings'] = HistoryCustomerInvitationModelSerializer(pendings, many=True).data
+        # pendings = HistoryCustomerInvitation.objects.filter(issued_by=self.customer)
+        # response['pendings'] = HistoryCustomerInvitationModelSerializer(pendings, many=True).data
         return Response(data=response, status=status.HTTP_200_OK)
