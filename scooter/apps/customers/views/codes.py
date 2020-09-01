@@ -48,6 +48,7 @@ class CustomerInvitationsViewSet(ScooterViewSet, mixins.ListModelMixin, AddCusto
         expiration_set = self.customer.customerinvitation_set.filter(expiration_date__lte=now)
         invitations = HistoryCustomerInvitation.objects.filter(issued_by=self.customer)
         data['history'] = HistoryCustomerInvitationModelSerializer(invitations, many=True).data
+        data['pending'] = HistoryCustomerInvitation.objects.filter(used_by=self.customer)
         data['available'] = CustomerInvitationModelSerializer(available_set, many=True).data
         data['expiration'] = CustomerInvitationModelSerializer(expiration_set, many=True).data
         return Response(data=data, status=status.HTTP_200_OK)
