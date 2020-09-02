@@ -201,12 +201,14 @@ class ScanQrOrderSerializer(serializers.Serializer):
         try:
             if not customer.code_used_complete:
                 history = HistoryCustomerInvitation.objects.filter(is_pending=True, used_by=customer)
-               # import pdb; pdb.set_trace()
+                # import pdb; pdb.set_trace()
                 # Create free shipping to the user who invites with their code
                 if history.exists():
                     history_temp = history[0]
                     now = timezone.localtime(timezone.now())
                     invitation = CustomerPromotion.objects.create(
+                        name="Envío gratis",
+                        description="Tienes un envío gratis, para utilizarlo en tu proxíma compra ",
                         customer=customer,
                         history=history_temp,
                         created_at=now,
@@ -214,6 +216,8 @@ class ScanQrOrderSerializer(serializers.Serializer):
                     )
                     # Create free shipping to the user who invites with their code
                     invitation_issued = CustomerPromotion.objects.create(
+                        name="Envío gratis",
+                        description="Tienes un envío gratis, para utilizarlo en tu proxíma compra ",
                         customer=history_temp.issued_by,
                         history=history_temp,
                         created_at=now,

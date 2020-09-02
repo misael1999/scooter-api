@@ -164,38 +164,40 @@ class EnterPromoCodeSerializer(serializers.Serializer):
             # Verify that the user has not used an invitation code
             if customer.code_used:
                 raise ValueError('Ya ha usado un código de invitacíon, no puede usar otro')
-            customer_exist = Customer.objects.filter(code_share=data['code'])
+            customer_exist_list = Customer.objects.filter(code_share=data['code'])
 
-            if customer.id == customer_exist.id:
-                raise ValueError('No es posible que usted use su propio código de invitación')
-            now = timezone.localtime(timezone.now())
-            # We place that it is pending until you complete your first order
-            history = HistoryCustomerInvitation.objects.create(
-                issued_by=customer_exist,
-                used_by=customer,
-                code=data['code'],
-                is_pending=True,
-                date=now
-            )
-            # # Create free shipping to the user who invites with their code
-            # invitation = CustomerInvitation.objects.create(
-            #     customer=customer,
-            #     history=history,
-            #     created_at=now,
-            #     expiration_date=now + timedelta(days=10)
-            # )
-            # # Create free shipping to the user who invites with their code
-            # invitation_issued = CustomerInvitation.objects.create(
-            #     customer=customer_exist,
-            #     history=history,
-            #     created_at=now,
-            #     expiration_date=now + timedelta(days=10)
-            # )
-            customer.code_used = True
-            customer.save()
+            if customer_exist_list.exists():
+                customer_exist = customer_exist_list[0]
+                if customer.id == customer_exist.id:
+                    raise ValueError('No es posible que usted use su propio código de invitación')
+                now = timezone.localtime(timezone.now())
+                # We place that it is pending until you complete your first order
+                history = HistoryCustomerInvitation.objects.create(
+                    issued_by=customer_exist,
+                    used_by=customer,
+                    code=data['code'],
+                    is_pending=True,
+                    date=now
+                )
+                # # Create free shipping to the user who invites with their code
+                # invitation = CustomerInvitation.objects.create(
+                #     customer=customer,
+                #     history=history,
+                #     created_at=now,
+                #     expiration_date=now + timedelta(days=10)
+                # )
+                # # Create free shipping to the user who invites with their code
+                # invitation_issued = CustomerInvitation.objects.create(
+                #     customer=customer_exist,
+                #     history=history,
+                #     created_at=now,
+                #     expiration_date=now + timedelta(days=10)
+                # )
+                customer.code_used = True
+                customer.save()
+            else:
+                raise serializers.ValidationError({'detail': 'Código no valido'})
             return data
-        except Customer.DoesNotExist:
-            raise serializers.ValidationError({'detail': 'Código no valido'})
         except ValueError as ex:
             raise serializers.ValidationError({'detail': str(ex)})
         except Exception as e:
