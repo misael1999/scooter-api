@@ -8,7 +8,7 @@ from scooter.apps.common.models.status import Status
 from scooter.apps.merchants.serializers.categories import (CategoryProductsModelSerializer,
                                                            CategoryWithProductsSerializer, ProductSimpleModelSerializer)
 # Viewset
-from scooter.apps.merchants.models import CategoryProducts
+from scooter.apps.merchants.models import CategoryProducts, Product
 from scooter.utils.viewsets.scooter import ScooterViewSet
 # Mixins
 from scooter.apps.common.mixins import AddMerchantMixin
@@ -102,14 +102,23 @@ class CategoriesProductsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cr
 
     @action(detail=False, methods=['GET'])
     def products(self, request, *args, **kwargs):
+        search = request.query_params.get('search', None)
+        list_categories = []
+        products_ids = []
+        if search:
+            products = Product.objects.filter(name__icontains=search)
+            products_ids = products.values_list('id', flat=True)
+            data = {'name': 'RESULTADOS: {} ELEMENTOS'.format(products.count()),
+                    'products': ProductSimpleModelSerializer(products, many=True).data}
+            list_categories.append(data)
+
         categories = self.merchant.categoryproducts_set.filter(status__slug_name="active")
         # data = CategoryWithProductsSerializer(categories, many=True).data
-        list_categories = []
         # For filter by status, get only actives
         for category in categories:
             category_temp = CategoryWithProductsSerializer(category).data
             category_temp['products'] = ProductSimpleModelSerializer(category.products.filter(
-                status__slug_name="active"), many=True).data
+                status__slug_name="active").exclude(id__in=products_ids), many=True).data
             list_categories.append(category_temp)
 
         response = self.set_response(status=True, data=list_categories, message="Productos con sus categorias")

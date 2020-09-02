@@ -1779,7 +1779,7 @@ paths:
         '200':
           description: 'Disponibilidad actualizada'
       tags:
-        - Repartidores
+        - Comercios
   /api/v1/merchants/:
     post:
       operationId: register_merchant
@@ -1819,7 +1819,7 @@ paths:
           required: false
           in: query
           type: integer
-        - name: subctegory
+        - name: subcategory
           description: Subcategoría del comercio
           required: false
           in: query

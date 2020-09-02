@@ -30,11 +30,11 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
     serializer_class = MerchantWithAllInfoSerializer
     lookup_field = 'id'
     # Filters
-    filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
-    search_fields = ('merchant_name', 'category__name', 'subcategory__name')
-    ordering_fields = ('-reputation',)
-    ordering = ('-reputation', 'created')
-    filter_fields = ('reputation', 'category', 'subcategory')
+    filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
+    search_fields = ('merchant_name',)
+    ordering_fields = ('is_open', 'reputation', 'created')
+    ordering = ('is_open', '-reputation', 'created')
+    filter_fields = ('category', 'subcategory')
 
     def get_queryset(self):
         if self.action == 'list':
