@@ -527,7 +527,7 @@ paths:
           description: 'Listado de notificaciones'
       tags:
         - Clientes
-  /api/v1/customers/{customer_id}/invitations/:
+  /api/v1/customers/{customer_id}/promotions/:
     # GET INFO INVITATIONS CUSTOMERS
     parameters:
       - name: customer_id
@@ -535,8 +535,8 @@ paths:
         required: true
         type: string
     get:
-      operationId: get_customer_invitations
-      description: Obtener invitaciones
+      operationId: get_customer_promotions
+      description: Obtener promociones
       parameters:
         - name: limit
           in: query

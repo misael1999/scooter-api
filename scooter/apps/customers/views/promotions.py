@@ -44,8 +44,8 @@ class CustomerPromotionsViewSet(ScooterViewSet, mixins.ListModelMixin, AddCustom
     def list(self, request, *args, **kwargs):
         data = {}
         now = timezone.localtime(timezone.now())
-        available_set = self.customer.customerpromotion_set.filter(expiration_date__gte=now)
-        expiration_set = self.customer.customerpromotion_set.filter(expiration_date__lte=now)
+        available_set = self.customer.customerpromotion_set.filter(expiration_date__gte=now, used=False)
+        expiration_set = self.customer.customerpromotion_set.filter(Q(expiration_date__lte=now) | Q(used=True))
         pending_set = HistoryCustomerInvitation.objects.filter(used_by=self.customer)
         invitations_set = HistoryCustomerInvitation.objects.filter(issued_by=self.customer)
         data['history'] = HistoryCustomerModelSerializer(invitations_set, many=True).data

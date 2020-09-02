@@ -6,7 +6,7 @@ from rest_framework.routers import DefaultRouter
 from scooter.apps.customers.views import customers as customer_view
 from scooter.apps.customers.views import addresses as addresses_view
 from scooter.apps.customers.views import notifications as notifications_view
-from scooter.apps.customers.views import codes as code_view
+from scooter.apps.customers.views import promotions as code_view
 
 router = DefaultRouter()
 router.register(r'api/v1/customers', customer_view.CustomerViewSet, basename='customers')
@@ -14,8 +14,8 @@ router.register(r'api/v1/customers/(?P<customer_id>[a-zA-Z0-9_-]+)/addresses',
                 addresses_view.CustomerAddressesViewSet, basename='addresses_customer')
 router.register(r'api/v1/customers/(?P<customer_id>[a-zA-Z0-9_-]+)/notifications',
                 notifications_view.NotificationCustomerViewSet, basename='customer_notifications')
-router.register(r'api/v1/customers/(?P<customer_id>[a-zA-Z0-9_-]+)/invitations',
-                code_view.CustomerPromotionsViewSet, basename='customer_invitations')
+router.register(r'api/v1/customers/(?P<customer_id>[a-zA-Z0-9_-]+)/promotions',
+                code_view.CustomerPromotionsViewSet, basename='customer_promotions')
 urlpatterns = [
     # Views
     path('', include(router.urls))
