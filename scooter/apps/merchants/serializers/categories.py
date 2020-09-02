@@ -32,7 +32,7 @@ class ProductSimpleModelSerializer(ScooterModelSerializer):
     class Meta:
         model = Product
         fields = ('id', 'name', 'description', 'description_long', 'stock', 'category',
-                  'price', 'category_id', 'picture', 'merchant', 'status',  'menu_categories')
+                  'price', 'category_id', 'picture', 'merchant', 'status',  'menu_categories', 'is_available')
         read_only_fields = fields
 
 
