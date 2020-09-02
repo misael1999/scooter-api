@@ -231,7 +231,7 @@ class CustomerPromotionModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomerPromotion
-        fields = ('history', 'customer', 'created_at',
+        fields = ('name', 'description', 'history', 'customer', 'created_at',
                   'expiration_date', 'used', 'used_at')
 
 
