@@ -28,13 +28,13 @@ class AcceptOrderMerchantSerializer(serializers.Serializer):
             order.in_process = True
             order.save()
             details = order.details.all()
-            products_to_update = []
-            for detail in details:
-                product = Product.objects.get(pk=detail.product_id)
-                product.stock = product.stock - detail.quantity
-                products_to_update.append(product)
-
-            Product.objects.bulk_update(products_to_update, fields=['stock'])
+            # products_to_update = []
+            # for detail in details:
+            #     product = Product.objects.get(pk=detail.product_id)
+            #     product.stock = product.stock - detail.quantity
+            #     products_to_update.append(product)
+            #
+            # Product.objects.bulk_update(products_to_update, fields=['stock'])
             # Update stock
             # product.save()
             send_notification_push_order(user_id=order.user_id,

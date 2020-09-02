@@ -116,8 +116,8 @@ class CreateOrderSerializer(serializers.ModelSerializer):
                 data['distance'] = data_service['distance']
 
             if is_order_to_merchant:
-                if not self.valid_stock(details):
-                    raise ValueError('Un producto no cuenta con suficiente stock')
+                # if not self.valid_stock(details):
+                #     raise ValueError('Un producto no cuenta con suficiente stock')
                 order_status = OrderStatus.objects.get(slug_name="await_confirmation_merchant")
                 data['merchant_location'] = merchant.point
                 data['is_delivery_by_store'] = merchant.is_delivery_by_store

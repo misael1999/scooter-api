@@ -204,25 +204,26 @@ class ScanQrOrderSerializer(serializers.Serializer):
                # import pdb; pdb.set_trace()
                 # Create free shipping to the user who invites with their code
                 if history.exists():
+                    history_temp = history[0]
                     now = timezone.localtime(timezone.now())
                     invitation = CustomerPromotion.objects.create(
                         customer=customer,
-                        history=history[0],
+                        history=history_temp,
                         created_at=now,
                         expiration_date=now + timedelta(days=10)
                     )
                     # Create free shipping to the user who invites with their code
                     invitation_issued = CustomerPromotion.objects.create(
-                        customer=history[0].issued_by,
-                        history=history[0],
+                        customer=history_temp.issued_by,
+                        history=history_temp,
                         created_at=now,
                         expiration_date=now + timedelta(days=10)
                     )
-                    history[0].is_pending = False
-                    history[0].save()
+                    history.is_pending = False
+                    history.save()
 
                     # Send notifications
-                    send_notification_push_order(user_id=history[0].issued_by.user_id,
+                    send_notification_push_order(user_id=history_temp.issued_by.user_id,
                                                  title='¡Tienes un pedido gratis!',
                                                  body='{} ha utilizado tu código de referido'.format(customer.name),
                                                  sound="default",
