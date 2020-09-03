@@ -42,7 +42,7 @@ class AcceptOrderMerchantSerializer(serializers.Serializer):
                                          body='Te avisaremos cuando lo tenga listo',
                                          sound="default",
                                          android_channel_id="messages",
-                                         data={"type": "ACCEPTED_ORDER",
+                                         data={"type": "MERCHANT_ACCEPTED_ORDER",
                                                "order_id": order.id,
                                                "message": "Preparando pedido",
                                                'click_action': 'FLUTTER_NOTIFICATION_CLICK'

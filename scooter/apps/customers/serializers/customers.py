@@ -162,11 +162,12 @@ class EnterPromoCodeSerializer(serializers.Serializer):
     def update(self, customer, data):
         try:
             # Verify that the user has not used an invitation code
-            if customer.code_used:
-                raise ValueError('Ya ha usado un código de invitacíon, no puede usar otro')
+
             customer_exist_list = Customer.objects.filter(code_share=data['code'])
 
             if customer_exist_list.exists():
+                if customer.code_used:
+                    raise ValueError('Ya ha usado un código de promocion de referido, no puede usar otro')
                 customer_exist = customer_exist_list[0]
                 if customer.id == customer_exist.id:
                     raise ValueError('No es posible que usted use su propio código de invitación')
@@ -196,7 +197,7 @@ class EnterPromoCodeSerializer(serializers.Serializer):
                 customer.code_used = True
                 customer.save()
             else:
-                raise serializers.ValidationError({'detail': 'Código no valido'})
+                raise serializers.ValidationError({'detail': 'El código que ha ingresado no existe'})
             return data
         except ValueError as ex:
             raise serializers.ValidationError({'detail': str(ex)})

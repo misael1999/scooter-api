@@ -223,8 +223,8 @@ class ScanQrOrderSerializer(serializers.Serializer):
                         created_at=now,
                         expiration_date=now + timedelta(days=10)
                     )
-                    history.is_pending = False
-                    history.save()
+                    history_temp.is_pending = False
+                    history_temp.save()
 
                     # Send notifications
                     send_notification_push_order(user_id=history_temp.issued_by.user_id,
