@@ -68,10 +68,13 @@ class AcceptOrderByDeliveryManSerializer(serializers.Serializer):
             order.in_process = True
             order.save()
             # Send notification push to customer
+            type = "ACCEPTED_ORDER"
+            if order.is_order_to_merchant:
+                type = "ACCEPT_ORDER_DELIVERY"
             send_notification_push_task.delay(instance.user_id,
                                               data_message['title'],
                                               data_message['body'],
-                                              {"type": "ACCEPTED_ORDER",
+                                              {"type": type,
                                                "order_id": order.id,
                                                "message": "Puedes ver el seguimiento de tu pedido",
                                                'click_action': 'FLUTTER_NOTIFICATION_CLICK'
@@ -237,6 +240,7 @@ class ScanQrOrderSerializer(serializers.Serializer):
                                                        })
                     customer.code_used_complete = True
                     customer.save()
+
         except ValueError as e:
             print(e.args.__str__())
             raise ValueError('Error al validar la invitación')

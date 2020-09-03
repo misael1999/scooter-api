@@ -33,6 +33,7 @@ class Order(ScooterModel):
     total_order = models.FloatField(null=True, blank=True)
     is_delivery_by_store = models.BooleanField(default=False)
     is_order_to_merchant = models.BooleanField(default=False)
+    promotion = models.ForeignKey('customers.CustomerPromotion', blank=True, null=True, on_delete=models.DO_NOTHING)
 
     service_price = models.FloatField()
     indications = models.TextField(blank=True, null=True)

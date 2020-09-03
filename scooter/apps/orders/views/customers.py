@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 # Utilities
+from scooter.apps.orders.serializers.v2 import CheckPromoCodeSerializer
 from scooter.apps.orders.utils.filters import OrderFilter
 from scooter.utils.viewsets.scooter import ScooterViewSet
 # Permissions
@@ -116,6 +117,20 @@ class CustomerOrderViewSet(ScooterViewSet, mixins.CreateModelMixin, AddCustomerM
         order = serializer.save()
         data = self.set_response(status=True,
                                  data={'order_id': order},
+                                 message='Se ha enviado el pedido nuevamente')
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['POST'])
+    def check_promotion(self, request, *args, **kwargs):
+        """ Check if the promotion is valid """
+        serializer = CheckPromoCodeSerializer(
+            data=request.data,
+            context={'customer': self.customer}
+        )
+        serializer.is_valid(raise_exception=True)
+        promotion = serializer.save()
+        data = self.set_response(status=True,
+                                 data=promotion,
                                  message='Se ha enviado el pedido nuevamente')
         return Response(data=data, status=status.HTTP_200_OK)
 

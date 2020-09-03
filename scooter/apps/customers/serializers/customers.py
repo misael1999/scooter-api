@@ -157,7 +157,7 @@ class ChangePasswordCustomerSerializer(serializers.Serializer):
 
 class EnterPromoCodeSerializer(serializers.Serializer):
 
-    code = serializers.CharField(max_length=10)
+    code = serializers.CharField(max_length=20)
 
     def update(self, customer, data):
         try:
@@ -197,11 +197,13 @@ class EnterPromoCodeSerializer(serializers.Serializer):
                 customer.code_used = True
                 customer.save()
             else:
-                raise serializers.ValidationError({'detail': 'El código que ha ingresado no existe'})
+                raise ValueError('El código que ha ingresado no existe')
             return data
         except ValueError as ex:
             raise serializers.ValidationError({'detail': str(ex)})
         except Exception as e:
+            print('Error in enter promo code, please check it')
+            print(e.args.__str__())
             raise serializers.ValidationError({'detail': 'Ha ocurrido un error desconocido'})
 
 
@@ -235,7 +237,7 @@ class CustomerPromotionModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomerPromotion
-        fields = ('name', 'description', 'history', 'customer', 'created_at',
+        fields = ('id', 'name', 'description', 'history', 'customer', 'created_at',
                   'expiration_date', 'used', 'used_at')
 
 

@@ -16,7 +16,7 @@ from scooter.apps.orders.models.orders import (OrderDetail, HistoryRejectedOrder
                                                OrderDetailMenuOption)
 from scooter.apps.stations.models import Station, StationService, MemberStation
 from scooter.apps.common.models import Service, OrderStatus, Notification
-from scooter.apps.customers.models import CustomerAddress
+from scooter.apps.customers.models import CustomerAddress, CustomerPromotion
 from scooter.apps.orders.models.orders import Order
 # Functions channels
 from scooter.apps.orders.utils.orders import notify_merchants, notify_delivery_men
@@ -68,7 +68,7 @@ class CreateOrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = ('user', 'details', 'station_id', 'service_id', 'from_address_id', 'to_address_id',
                   'indications', 'approximate_price_order', 'phone_number', 'validate_qr', 'merchant_id',
-                  'is_order_to_merchant')
+                  'is_order_to_merchant', 'promotion')
 
     def validate(self, data):
         try:
@@ -94,6 +94,13 @@ class CreateOrderSerializer(serializers.ModelSerializer):
             customer = data['customer']
             station = data.get('station', None)
             merchant = data.get('merchant', None)
+            customer_promotion = data.get('promotion', None)
+            price_promotion = None
+            if customer_promotion:
+                price_promotion = valid_promotion(customer_promotion)
+                customer_promotion.used = True
+                customer_promotion.save()
+
             maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=settings.TIME_RESPONSE)
             is_safe_order = customer.is_safe_user
 
@@ -128,7 +135,10 @@ class CreateOrderSerializer(serializers.ModelSerializer):
 
             data['order_status'] = order_status
             data['qr_code'] = generate_qr_code()
-            data['service_price'] = price
+            if price_promotion is not None:
+                data['service_price'] = price_promotion['price']
+            else:
+                data['service_price'] = price
             data['is_safe_order'] = is_safe_order
             data['order_date'] = timezone.localtime(timezone.now())
             data['maximum_response_time'] = maximum_response_time
@@ -299,6 +309,23 @@ class RetryOrderSerializer(serializers.Serializer):
             raise serializers.ValidationError({'detail': 'Error al calificar la orden'})
 
 
+class CheckPromoCodeSerializer(serializers.Serializer):
+    promotion_id = serializers.PrimaryKeyRelatedField(queryset=CustomerPromotion.objects.all(), source="promotion")
+
+    def create(self, data):
+        try:
+            customer_promotion = data['promotion']
+            price_promotion = valid_promotion(customer_promotion=customer_promotion)
+
+            return price_promotion
+        except ValueError as e:
+            raise serializers.ValidationError({'detail': str(e)})
+        except Exception as ex:
+            print("Exception in rating order, please check it")
+            print(ex.args.__str__())
+            raise serializers.ValidationError({'detail': 'Error al calificar la orden'})
+
+
 class RantingOrderCustomerSerializer(serializers.Serializer):
     """ Rated order by customer """
     rating = serializers.FloatField(min_value=1, max_value=5)
@@ -312,10 +339,10 @@ class RantingOrderCustomerSerializer(serializers.Serializer):
         rating_exist = RatingOrder.objects.filter(order=order, rating_customer=customer).exists()
 
         if rating_exist:
-            raise serializers.ValidationError({'detail': 'Ya se califico esta orden'})
+            raise serializers.ValidationError({'detail': 'Ya se califico este pedido'})
 
         if order.in_process is True or order.date_delivered_order is None:
-            raise serializers.ValidationError({'detail': 'No es permitido valorar esta orden'})
+            raise serializers.ValidationError({'detail': 'No es permitido valorar este pedido'})
 
         data['rating_customer'] = customer
         data['user'] = customer.user
@@ -430,3 +457,22 @@ def get_ref_location(order):
         else:
             location_selected = order.to_address
     return location_selected
+
+
+def valid_promotion(customer_promotion):
+    try:
+        # Check that not are promo expired
+        now = timezone.localtime(timezone.now())
+        if customer_promotion.used:
+            raise ValueError('La promocion ya ha sido utilizada')
+
+        if customer_promotion.expiration_date < now:
+            raise ValueError('La promocion ha expirado')
+
+        return {'price': 0.0}
+    except ValueError as e:
+        raise ValueError(e)
+    except Exception as ex:
+        print("Exception in valid promotion, please check it")
+        print(ex.args.__str__())
+        raise ValueError(ex)

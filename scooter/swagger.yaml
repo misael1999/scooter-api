@@ -1396,6 +1396,26 @@ paths:
           description: 'Pedido enviado nuevamente'
       tags:
         - Pedidos clientes
+  /api/v1/customers/{customer_id}/orders/check_promotion/:
+    parameters:
+      - name: customer_id
+        in: path
+        required: true
+        type: number
+    post:
+      operationId: check_promotion_customer
+      description: Revisar promoción del cliente
+      parameters:
+        - name: body
+          in: body
+          description: Revisar promoción
+          schema:
+            $ref: '#/definitions/CheckPromoCode'
+      responses:
+        '200':
+          description: 'Promoción revisada'
+      tags:
+        - Pedidos clientes
   /api/v1/stations/{station_id}/orders/:
     parameters:
       - name: station_id
@@ -3064,6 +3084,10 @@ definitions:
         type: number
         description: Id de la dirección de entrega
         example: 1
+      promotion_id:
+        type: number
+        description: Id de la dirección de entrega
+        example: 1
       indications:
         type: string
         description: Indicaciones del pedido
@@ -3145,6 +3169,13 @@ definitions:
         type: number
         example: 1
         description: Id de la central
+  CheckPromoCode:
+    type: object
+    properties:
+      promotion_id:
+        type: number
+        example: 1
+        description: Id de la promoción
   RegisterMerchant:
     type: object
     properties:

@@ -82,7 +82,7 @@ def ignore_orders():
 def location_notice_not_enabled():
     """ Notice when the location is not enabled """
     now = timezone.localtime(timezone.now())
-    offset = now - timedelta(minutes=7)
+    offset = now - timedelta(minutes=20)
     delivery_men = DeliveryMan.objects.filter(delivery_status__slug_name__in=['available', 'busy'],
                                               last_time_update_location__lte=offset)
     for delivery_man in delivery_men:
@@ -96,24 +96,22 @@ def location_notice_not_enabled():
                                            'click_action': 'FLUTTER_NOTIFICATION_CLICK'})
 
 
-
-
-@periodic_task(name='disabled_location', run_every=timedelta(hours=2))
-def disabled_location():
-    """ Disabled location when are available and not send location in several minutes """
-    now = timezone.localtime(timezone.now())
-    offset = now - timedelta(minutes=30)
-    delivery_men = DeliveryMan.objects.filter(delivery_status__slug_name__in=['available', 'busy'],
-                                              last_time_update_location__lte=offset)
-    for delivery_man in delivery_men:
-        send_notification_push_order(delivery_man.user_id, title='¡¡¡¡ Importante !!!!!',
-                                     body='Has pasado mucho tiempo sin enviar tu ubicación,'
-                                          'vuelve activar tu disponibilidad para recibir pedidos',
-                                     sound="default",
-                                     android_channel_id="locations",
-                                     data={"type": "NOTICE_LOCATION",
-                                           "message": "No estamos recibiendo tu ubicación",
-                                           'click_action': 'FLUTTER_NOTIFICATION_CLICK'})
+# @periodic_task(name='disabled_location', run_every=timedelta(hours=2))
+# def disabled_location():
+#     """ Disabled location when are available and not send location in several minutes """
+#     now = timezone.localtime(timezone.now())
+#     offset = now - timedelta(minutes=30)
+#     delivery_men = DeliveryMan.objects.filter(delivery_status__slug_name__in=['available', 'busy'],
+#                                               last_time_update_location__lte=offset)
+#     for delivery_man in delivery_men:
+#         send_notification_push_order(delivery_man.user_id, title='¡¡¡¡ Importante !!!!!',
+#                                      body='Has pasado mucho tiempo sin enviar tu ubicación,'
+#                                           'vuelve activar tu disponibilidad para recibir pedidos',
+#                                      sound="default",
+#                                      android_channel_id="locations",
+#                                      data={"type": "NOTICE_LOCATION",
+#                                            "message": "No estamos recibiendo tu ubicación",
+#                                            'click_action': 'FLUTTER_NOTIFICATION_CLICK'})
 
     # delivery_men.update(delivery_status_id=3)
 
