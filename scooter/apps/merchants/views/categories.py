@@ -106,7 +106,7 @@ class CategoriesProductsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cr
         list_categories = []
         products_ids = []
         if search:
-            products = Product.objects.filter(name__icontains=search)
+            products = Product.objects.filter(name__icontains=search, status__slug_name="active")
             products_ids = products.values_list('id', flat=True)
             data = {'name': 'RESULTADOS: {} ELEMENTOS'.format(products.count()),
                     'products': ProductSimpleModelSerializer(products, many=True).data}

@@ -64,6 +64,7 @@ class RejectOrderMerchantSerializer(serializers.Serializer):
         order_status = OrderStatus.objects.get(slug_name="rejected")
         order.order_status = order_status
         order.reason_rejection = data['reason_rejection']
+        order.in_process = False
         order.save()
         send_notification_push_order(user_id=order.user_id,
                                      title='{} ha rechazado tu pedido'.format(merchant.merchant_name),
@@ -86,6 +87,7 @@ class CancelOrderMerchantSerializer(serializers.Serializer):
         order_status = OrderStatus.objects.get(slug_name="cancelled")
         order.order_status = order_status
         order.reason_rejection = data['reason_rejection']
+        order.in_process = False
         order.save()
         send_notification_push_order(user_id=order.user_id,
                                      title='{} ha cancelado tu pedido'.format(merchant.merchant_name),

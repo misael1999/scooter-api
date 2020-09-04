@@ -131,7 +131,7 @@ class CustomerOrderViewSet(ScooterViewSet, mixins.CreateModelMixin, AddCustomerM
         promotion = serializer.save()
         data = self.set_response(status=True,
                                  data=promotion,
-                                 message='Se ha enviado el pedido nuevamente')
+                                 message='Promoción')
         return Response(data=data, status=status.HTTP_200_OK)
 
 
