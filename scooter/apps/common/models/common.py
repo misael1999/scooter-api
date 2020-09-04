@@ -44,6 +44,7 @@ class AppVersion(ScooterModel):
     alias = models.CharField(max_length=30)
     comments = models.CharField(max_length=40)
     version_number = models.CharField(max_length=5)
+    build_number = models.PositiveIntegerField(default=1)
     priority = models.BooleanField(default=False)
 
     def __str__(self):
