@@ -41,7 +41,7 @@ class ProductsModelSerializer(ScooterModelSerializer):
         fields = ('id', 'name', 'description', 'description_long', 'stock', 'category',
                   'price', 'category_id', 'picture', 'merchant', 'total_sales', 'status',
                   'have_menu', 'menu_categories', 'is_available')
-        read_only_fields = ("id", "merchant", "total_sales", 'status', 'is_available')
+        read_only_fields = ("id", "merchant", "total_sales", 'status')
 
     def validate(self, data):
         merchant = self.context['merchant']
