@@ -8,7 +8,8 @@ from scooter.apps.users.serializers.token import (CustomerTokenObtainPairSeriali
                                                   StationTokenObtainPairSerializer,
                                                   DeliveryManTokenObtainPairSerializer,
                                                   MerchantTokenObtainPairSerializer,
-                                                  CustomerFacebookAuthSerializer, CustomerAppleAuthSerializer)
+                                                  CustomerFacebookAuthSerializer, CustomerAppleAuthSerializer,
+                                                  MarketerTokenObtainPairSerializer)
 import json
 # Views
 from scooter.utils.viewsets.scooter import ScooterViewSet
@@ -28,6 +29,10 @@ class DeliveryManTokenObtainPairView(TokenObtainPairView):
 
 class MerchantManTokenObtainPairView(TokenObtainPairView):
     serializer_class = MerchantTokenObtainPairSerializer
+
+
+class MarketingTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MarketerTokenObtainPairSerializer
 
 
 class CustomerFacebookAuthViewSet(ScooterViewSet, CreateModelMixin):

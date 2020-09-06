@@ -8,6 +8,9 @@ from rest_framework import serializers
 from django.utils import timezone
 # Models
 from django.conf import settings
+
+from scooter.apps.marketing.models import Marketer
+from scooter.apps.marketing.serializers import MarketerUserSimpleSerializer
 from scooter.apps.merchants.models import Merchant
 from scooter.apps.merchants.serializers import MerchantUserSimpleSerializer
 from scooter.apps.users.models import User
@@ -85,6 +88,28 @@ class CustomerTokenObtainPairSerializer(TokenObtainPairSerializer):
                                               format(email=self.user.username)})
 
         data['customer'] = CustomerUserModelSerializer(customer).data
+
+        # Add extra responses here
+        # data['user'] = UserModelSerializer(self.user).data
+        return data
+
+
+class MarketerTokenObtainPairSerializer(TokenObtainPairSerializer):
+    default_error_messages = {'no_active_account': 'Usuario o contraseña incorrectos'}
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        # Users can validate their account two days later
+        try:
+            marketer = self.user.marketer
+        except Marketer.DoesNotExist:
+            raise serializers.ValidationError({'detail': 'No tienes permisos para iniciar sesión'})
+
+        # Check the maximum time to validate
+        # if timezone.localtime(timezone.now()) > self.user.verification_deadline and not self.user.is_verified:
+        #     raise serializers.ValidationError({'detail': 'Ha expirado su tiempo de verificación'})
+
+        data['marketer'] = MarketerUserSimpleSerializer(marketer).data
 
         # Add extra responses here
         # data['user'] = UserModelSerializer(self.user).data
@@ -201,7 +226,6 @@ class CustomerAppleAuthSerializer(serializers.Serializer):
             headers = {"Content-Type": 'application/x-www-form-urlencoded'}
 
             req = requests.post(url='https://appleid.apple.com/auth/token', data=data, headers=headers)
-            import pdb; pdb.set_trace()
 
         except Exception as ex:
             print(ex.args.__str__())

@@ -20,12 +20,14 @@ class User(ScooterModel, AbstractBaseUser, PermissionsMixin):
     DELIVERY_MAN = 3
     ADMIN = 4
     MERCHANT = 5
+    MARKETER = 6
     ROLE_CHOICES = (
         (CUSTOMER, _('Cliente')),
         (STATION, _('Central')),
         (DELIVERY_MAN, _('Repartidor')),
         (ADMIN, _('Administrador')),
         (MERCHANT, _('Comerciante')),
+        (MARKETER, _('Mercadologo')),
     )
     username = models.CharField(
         unique=True,
@@ -41,6 +43,7 @@ class User(ScooterModel, AbstractBaseUser, PermissionsMixin):
     is_verified = models.BooleanField(default=False)
     auth_facebook = models.BooleanField(default=False)
     facebook_id = models.CharField(max_length=200, unique=True, blank=True, null=True)
+    apple_id = models.CharField(max_length=200, unique=True, blank=True, null=True)
 
     # Extends
     is_staff = models.BooleanField(

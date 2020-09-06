@@ -8,7 +8,7 @@ info:
   license:
     name: BSD License
   version: v1
-basePath: /appback/
+basePath: /
 consumes:
   - application/json
 produces:
@@ -306,6 +306,39 @@ paths:
         - Usuarios general
     parameters: []
   # LOGIN CUSTOMER
+  /api/v1/marketing/login/:
+    post:
+      operationId: marketing_login
+      description: Login de miembros de marketing
+      parameters:
+        - name: body
+          in: body
+          description: Login
+          schema:
+            $ref: '#/definitions/LoginToken'
+      responses:
+        '200':
+          description: 'Regresa información del cliente y su access_token'
+      tags:
+        - Marketing
+    parameters: []
+ # REGISTER CUSTOMER
+  /api/v1/marketing/:
+    post:
+      operationId: register_marketing
+      description: Registro de miembros de marketing
+      parameters:
+        - name: body
+          in: body
+          description: Registro de mieembros de marketing
+          schema:
+            $ref: '#/definitions/RegisterMarketing'
+      responses:
+        '201':
+          description: 'Información'
+      tags:
+        - Marketing
+    parameters: []
   /api/v1/customers/login/:
     post:
       operationId: customer_login
@@ -354,6 +387,7 @@ paths:
       tags:
         - Clientes
     parameters: []
+
   # REGISTER CUSTOMER
   /api/v1/customers/:
     post:
@@ -2504,6 +2538,21 @@ definitions:
       - username
       - password
       - name
+  RegisterMarketing:
+    type: object
+    properties:
+      username:
+        type: string
+        description: Correo
+      password:
+        type: string
+        description: Contraseña
+      full_name:
+        type: string
+        description: Nombre(s) del cliente
+      phone_number:
+        type: string
+        description: Numero de teléfono
   # UPDATE CUSTOMER
   UpdateCustomer:
     type: object
