@@ -8,7 +8,7 @@ from scooter.apps.users.serializers.token import (CustomerTokenObtainPairSeriali
                                                   StationTokenObtainPairSerializer,
                                                   DeliveryManTokenObtainPairSerializer,
                                                   MerchantTokenObtainPairSerializer,
-                                                  CustomerFacebookAuthSerializer)
+                                                  CustomerFacebookAuthSerializer, CustomerAppleAuthSerializer)
 import json
 # Views
 from scooter.utils.viewsets.scooter import ScooterViewSet
@@ -39,5 +39,16 @@ class CustomerFacebookAuthViewSet(ScooterViewSet, CreateModelMixin):
         serializer.is_valid(raise_exception=True)
         access = serializer.save()
         message = 'Se ha autenticado con facebook correctamnente'
+        return Response(access, status=status.HTTP_201_CREATED)
+
+
+class CustomerAppleAuthViewSet(ScooterViewSet, CreateModelMixin):
+
+    def create(self, request, *args, **kwargs):
+        """ Customer sign up """
+        serializer = CustomerAppleAuthSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        access = serializer.save()
+        message = 'Se ha autenticado con apple correctamnente'
         return Response(access, status=status.HTTP_201_CREATED)
 

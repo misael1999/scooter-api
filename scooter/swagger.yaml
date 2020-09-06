@@ -338,6 +338,22 @@ paths:
       tags:
         - Clientes
     parameters: []
+  /api/v1/customers/login/apple/:
+    post:
+      operationId: customer_login_apple
+      description: Login de clientes
+      parameters:
+        - name: body
+          in: body
+          description: Login con apple
+          schema:
+            $ref: '#/definitions/LoginCustomerApple'
+      responses:
+        '200':
+          description: 'Regresa información del cliente y su access_token'
+      tags:
+        - Clientes
+    parameters: []
   # REGISTER CUSTOMER
   /api/v1/customers/:
     post:
@@ -2423,6 +2439,14 @@ definitions:
       access_token:
         type: string
         description: Token de facebook
+    required:
+      - access_token
+  LoginCustomerApple:
+    type: object
+    properties:
+      authorization_code:
+        type: string
+        description: Código de apple
     required:
       - access_token
   # FORGOT PASSWORD

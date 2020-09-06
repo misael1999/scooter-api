@@ -254,3 +254,18 @@ FACEBOOK_APP_SECRET = '4c55431b063952e631df380e0e73a10a'
 
 URL_SERVER_BACKEND = os.environ.get('URL_SERVER_BACKEND', 'http://localhost:8000')
 URL_SERVER_FRONTEND = os.environ.get('URL_SERVER_FRONTEND', 'http://localhost:4200')
+
+# Apple Auth
+
+AUTH_APPLE_ID_CLIENT = 'com.devopsti.scooter.app'  # Your client_id com.application.your, aka "Service ID"
+AUTH_APPLE_ID_TEAM = 'P66H875VKX'  # Your Team ID, ie K2232113
+AUTH_APPLE_ID_KEY = '7AU8KB9MHL'  # Your Key ID, ie Y2P99J3N81K
+AUTH_APPLE_ID_SECRET = """
+-----BEGIN PRIVATE KEY-----
+MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQg0FB339AAWL0IF/gU
+H0YFDgqR2XPw6jq3u+t/jm+iOwWgCgYIKoZIzj0DAQehRANCAAQIE/U9Daj4cMn9
+d+P1cTSS2YlDGJrEdLAP8u2y7Qgxd87S9eet5YimIKnBfa2VT+bKFSwbyBd+afTt
+6CjJuIdk
+-----END PRIVATE KEY-----"""
+AUTH_APPLE_ID_SCOPE = ['email', 'name']
+AUTH_APPLE_ID_EMAIL_AS_USERNAME = False  # If you want to use email as username
