@@ -7,7 +7,7 @@ from scooter.utils.models.scooter import ScooterModel
 
 class Customer(ScooterModel):
     user = models.OneToOneField('users.User', on_delete=models.DO_NOTHING)
-    name = models.CharField(max_length=150)
+    name = models.CharField(max_length=150, null=True, blank=True)
     birthdate = models.DateField(blank=True, null=True)
     picture = models.ImageField(upload_to='customers/pictures/', blank=True, null=True)
     picture_url = models.CharField(max_length=300, blank=True, null=True)
