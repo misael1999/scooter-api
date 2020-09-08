@@ -2,13 +2,21 @@
 # django
 from django.contrib.gis.db import models
 # Utilities
+from django.core.validators import FileExtensionValidator
+
 from scooter.utils.models import ScooterModel
+
+
+class TypeMenuMerchant(ScooterModel):
+    name = models.CharField(max_length=30)
+    slug_name = models.CharField(max_length=30)
 
 
 class Merchant(ScooterModel):
     user = models.OneToOneField('users.User', on_delete=models.DO_NOTHING)
     contact_person = models.CharField(max_length=80)
-    picture = models.ImageField(upload_to='merchants/pictures/', blank=True, null=True)
+    picture = models.ImageField(upload_to='merchants/pictures/', blank=True, null=True,
+                                validators=[FileExtensionValidator(['jpg', 'png', 'jpeg'])])
     merchant_name = models.CharField(max_length=100)
     description = models.CharField(max_length=120, null=True, blank=True)
     phone_number = models.CharField(max_length=15)
@@ -19,11 +27,15 @@ class Merchant(ScooterModel):
     category = models.ForeignKey('common.CategoryMerchant', on_delete=models.DO_NOTHING)
     subcategory = models.ForeignKey('common.SubcategoryMerchant', on_delete=models.DO_NOTHING, null=True, blank=True)
     approximate_preparation_time = models.CharField(max_length=10, null=True)
+    from_preparation_time = models.FloatField(default=0)
+    to_preparation_time = models.FloatField(default=0)
+
     # stats
     reputation = models.FloatField(default=0)
     point = models.PointField(geography=True, blank=True, null=True)
     is_open = models.BooleanField(default=False)
     rate = models.FloatField(default=2.0)
+    type_menu = models.ForeignKey(TypeMenuMerchant, on_delete=models.DO_NOTHING, null=True, blank=True)
 
     def __str__(self):
         return self.merchant_name

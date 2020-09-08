@@ -32,7 +32,8 @@ class MerchantWithAllInfoSerializer(serializers.ModelSerializer):
         geo_field = 'point'
         fields = ('id', 'user', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
                   'information_is_complete', 'category', 'subcategory', 'reputation', 'description',
-                  'approximate_preparation_time', 'schedules', 'is_open', 'point')
+                  'approximate_preparation_time', 'schedules', 'is_open', 'point', 'from_preparation_time',
+                  'to_preparation_time', 'type_menu')
         read_only_fields = fields
 
 
@@ -46,7 +47,8 @@ class MerchantUserSimpleSerializer(serializers.ModelSerializer):
         model = Merchant
         fields = ('id', 'user', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
                   'information_is_complete', 'category', 'subcategory', 'reputation', 'description',
-                  'approximate_preparation_time', 'is_open')
+                  'approximate_preparation_time', 'is_open', 'from_preparation_time',
+                  'to_preparation_time', 'type_menu')
         read_only_fields = fields
 
 
@@ -68,6 +70,8 @@ class GeneralInfoMerchantSerializer(serializers.Serializer):
     merchant_name = serializers.CharField(max_length=80)
     description = serializers.CharField(max_length=120, required=False, allow_null=True, allow_blank=True)
     approximate_preparation_time = serializers.CharField(max_length=10)
+    from_preparation_time = serializers.FloatField()
+    to_preparation_time = serializers.FloatField()
 
 
 # Merchant Schedule

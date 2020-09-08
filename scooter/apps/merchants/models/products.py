@@ -2,6 +2,8 @@
 # django
 from django.contrib.gis.db import models
 # Utilities
+from django.core.validators import FileExtensionValidator
+
 from scooter.utils.models import ScooterModel
 
 
@@ -18,7 +20,11 @@ class Product(ScooterModel):
     is_available = models.BooleanField(default=True)
     price = models.FloatField()
     category = models.ForeignKey('merchants.CategoryProducts', on_delete=models.DO_NOTHING, related_name="products")
-    picture = models.ImageField(upload_to='merchants/products/', blank=True, null=True)
+    subcategory = models.ForeignKey('merchants.SubcategoryProducts',
+                                    on_delete=models.DO_NOTHING,
+                                    related_name="products", null=True, blank=True)
+    picture = models.ImageField(upload_to='merchants/products/', blank=True, null=True,
+                                validators=[FileExtensionValidator(['jpg', 'png', 'jpeg'])])
     merchant = models.ForeignKey('merchants.Merchant', on_delete=models.DO_NOTHING)
     # helps
     have_menu = models.BooleanField(default=False)

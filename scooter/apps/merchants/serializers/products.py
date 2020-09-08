@@ -4,7 +4,8 @@ from rest_framework import serializers
 # Models
 from scooter.apps.common.serializers import (Base64ImageField, MerchantFilteredPrimaryKeyRelatedField,
                                              StatusModelSerializer)
-from scooter.apps.merchants.models import Product, CategoryProducts, ProductMenuCategory, ProductMenuOption
+from scooter.apps.merchants.models import Product, CategoryProducts, ProductMenuCategory, ProductMenuOption, \
+    SubcategoryProducts
 # Utilities
 from scooter.apps.merchants.serializers.categories import CategoryProductsModelSerializer
 from scooter.utils.serializers.scooter import ScooterModelSerializer
@@ -32,6 +33,8 @@ class ProductsModelSerializer(ScooterModelSerializer):
     picture = Base64ImageField(required=False, allow_null=True, allow_empty_file=True)
     category_id = MerchantFilteredPrimaryKeyRelatedField(queryset=CategoryProducts.objects,
                                                          source="category")
+    subcategory_id = MerchantFilteredPrimaryKeyRelatedField(queryset=SubcategoryProducts.objects,
+                                                            source="subcategory")
     category = CategoryProductsModelSerializer(read_only=True)
     status = StatusModelSerializer(read_only=True)
     menu_categories = ProductMenuCategorySerializer(many=True, required=False)
@@ -39,7 +42,7 @@ class ProductsModelSerializer(ScooterModelSerializer):
     class Meta:
         model = Product
         fields = ('id', 'name', 'description', 'description_long', 'stock', 'category',
-                  'price', 'category_id', 'picture', 'merchant', 'total_sales', 'status',
+                  'price', 'category_id', 'subcategory_id', 'picture', 'merchant', 'total_sales', 'status',
                   'have_menu', 'menu_categories', 'is_available')
         read_only_fields = ("id", "merchant", "total_sales", 'status')
 
@@ -80,7 +83,7 @@ class ProductsModelSerializer(ScooterModelSerializer):
         except Exception as ex:
             print("Exception save product, please check it")
             print(ex.args.__str__())
-            raise serializers.ValidationError({'detail': 'Error al actualizar la información'})
+            raise serializers.ValidationError({'detail': 'Error al guardar la información'})
 
     def update(self, instance, data):
         picture = data.get('picture', None)
