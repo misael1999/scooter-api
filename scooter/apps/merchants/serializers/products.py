@@ -34,7 +34,7 @@ class ProductsModelSerializer(ScooterModelSerializer):
     category_id = MerchantFilteredPrimaryKeyRelatedField(queryset=CategoryProducts.objects,
                                                          source="category")
     subcategory_id = MerchantFilteredPrimaryKeyRelatedField(queryset=SubcategoryProducts.objects,
-                                                            source="subcategory")
+                                                            source="subcategory", required=False, allow_null=True, allow_empty=True)
     category = CategoryProductsModelSerializer(read_only=True)
     status = StatusModelSerializer(read_only=True)
     menu_categories = ProductMenuCategorySerializer(many=True, required=False)
