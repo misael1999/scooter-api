@@ -3295,6 +3295,17 @@ definitions:
       picture:
         type: string
         description: Imagen de la categoría
+      subcategories:
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+              description: Nombre de la categoría
+            picture:
+              type: string
+              description: Imagen de la categoría
     required:
       - name
   UpdateCategory:

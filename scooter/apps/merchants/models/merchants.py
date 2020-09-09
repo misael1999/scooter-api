@@ -34,8 +34,10 @@ class Merchant(ScooterModel):
     reputation = models.FloatField(default=0)
     point = models.PointField(geography=True, blank=True, null=True)
     is_open = models.BooleanField(default=False)
-    rate = models.FloatField(default=2.0)
-    type_menu = models.ForeignKey(TypeMenuMerchant, on_delete=models.DO_NOTHING, null=True, blank=True)
+    rate = models.FloatField(default=3.0)
+    type_menu = models.ForeignKey(TypeMenuMerchant,
+                                  on_delete=models.DO_NOTHING,
+                                  null=True, blank=True, default=1)
 
     def __str__(self):
         return self.merchant_name

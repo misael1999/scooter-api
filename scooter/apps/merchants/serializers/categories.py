@@ -5,7 +5,8 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from scooter.apps.common.serializers import Base64ImageField, StatusModelSerializer
-from scooter.apps.merchants.models import CategoryProducts, Product, ProductMenuOption, ProductMenuCategory
+from scooter.apps.merchants.models import CategoryProducts, Product, ProductMenuOption, ProductMenuCategory, \
+    SubcategoryProducts
 # Utilities
 from scooter.utils.serializers.scooter import ScooterModelSerializer
 
@@ -38,6 +39,13 @@ class ProductSimpleModelSerializer(ScooterModelSerializer):
         read_only_fields = fields
 
 
+class SubcategoryProductsModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SubcategoryProducts
+        fields = ('id', 'name', 'user', 'picture', 'merchant', 'category', 'status')
+        read_only_fields = ('id', 'status', 'merchant', 'category')
+
+
 class CategoryProductsModelSerializer(ScooterModelSerializer):
     name = serializers.CharField(max_length=70,
                                  validators=
@@ -47,10 +55,13 @@ class CategoryProductsModelSerializer(ScooterModelSerializer):
     picture = Base64ImageField(required=False, allow_null=True, allow_empty_file=True)
     status = StatusModelSerializer(read_only=True)
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    subcategories = SubcategoryProductsModelSerializer(serializers.ModelSerializer,
+                                                       many=True, required=False,
+                                                       allow_null=True)
 
     class Meta:
         model = CategoryProducts
-        fields = ("id", 'name', 'picture', 'status', 'user')
+        fields = ("id", 'name', 'picture', 'status', 'user', 'subcategories')
         read_only_fields = ("id", "status")
 
     def __init__(self, *args, **kwargs):
@@ -59,23 +70,23 @@ class CategoryProductsModelSerializer(ScooterModelSerializer):
         if user:
             self.fields['name'].validators[0].queryset = CategoryProducts.objects.filter(user=user.user)
 
-    def validate(self, data):
-        merchant = self.context['merchant']
-        # Send instance of category for validate of name not exist
-        # category_instance = self.context.get('category_instance', None)
-        # exist_category = CategoryProducts.objects.filter(merchant=merchant, name=data['name']).exists()
-        # if exist_category and not category_instance:
-        #     raise serializers.ValidationError(
-        #         {'detail': 'Ya se encuentra registrado una categoría con ese nombre, verifique que no este desactivada'},
-        #         code='category_exist')
-        # # When is update
-        # elif exist_category and category_instance and category_instance.name != data['name']:
-        #     raise serializers.ValidationError(
-        #         {'detail': 'Ya se encuentra registrado un categoría con ese nombre, verifique que no este desactivada'},
-        #         code='category_exist')
-
-        data['merchant'] = merchant
-        return data
+    def create(self, data):
+        try:
+            merchant = self.context['merchant']
+            data['merchant'] = merchant
+            subcategories = data.pop('subcategories', [])
+            category = CategoryProducts.objects.create(**data)
+            subcategories_to_save = []
+            for subcategory in subcategories:
+                subcategories_to_save.append(SubcategoryProducts(**subcategory,
+                                                                 user=data['user'],
+                                                                 merchant=merchant,
+                                                                 category=category))
+            SubcategoryProducts.objects.bulk_create(subcategories_to_save)
+            data['subcategories'] = subcategories
+            return data
+        except Exception as ex:
+            serializers.ValidationError({'detail': 'Ha ocurrido un error al registrar la categoría'})
 
     def update(self, instance, data):
         picture = data.get('picture', None)
