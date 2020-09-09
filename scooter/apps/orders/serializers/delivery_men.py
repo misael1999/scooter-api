@@ -19,7 +19,7 @@ from scooter.apps.orders.utils.orders import notify_station_accept
 from scooter.apps.orders.utils.orders import notify_delivery_men
 from asgiref.sync import async_to_sync
 
-from scooter.utils.functions import send_notification_push_order
+from scooter.utils.functions import send_notification_push_order, send_notification_push_order_with_sound
 
 
 class AcceptOrderByDeliveryManSerializer(serializers.Serializer):
@@ -68,17 +68,17 @@ class AcceptOrderByDeliveryManSerializer(serializers.Serializer):
             order.in_process = True
             order.save()
             # Send notification push to customer
-            type = "ACCEPTED_ORDER"
+            type_notification = "ACCEPTED_ORDER"
             if order.is_order_to_merchant:
-                type = "ACCEPT_ORDER_DELIVERY"
-            send_notification_push_task.delay(instance.user_id,
-                                              data_message['title'],
-                                              data_message['body'],
-                                              {"type": type,
-                                               "order_id": order.id,
-                                               "message": "Puedes ver el seguimiento de tu pedido",
-                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'
-                                               })
+                type_notification = "ACCEPT_ORDER_DELIVERY"
+                send_notification_push_task.delay(instance.user_id,
+                                                  data_message['title'],
+                                                  data_message['body'],
+                                                  {"type": type_notification,
+                                                   "order_id": order.id,
+                                                   "message": "Puedes ver el seguimiento de tu pedido",
+                                                   'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                                   })
             async_to_sync(notify_station_accept)(order.station_id, order.id)
             # Notify all delivery men that order was accepted
             async_to_sync(notify_delivery_men)(order.id, 'ORDER_ACCEPTED')
@@ -231,7 +231,7 @@ class ScanQrOrderSerializer(serializers.Serializer):
 
                     # Send notifications
                     send_notification_push_order(user_id=history_temp.issued_by.user_id,
-                                                 title='¡Tienes un pedido gratis!',
+                                                 title='¡Tienes un envío gratis!',
                                                  body='{} ha utilizado tu código de referido'.format(customer.name),
                                                  sound="default",
                                                  android_channel_id="messages",
@@ -286,13 +286,36 @@ def update_order_status(service, order_status, instance, data):
         instance.order_status = order_status
         instance.save()
 
-        send_notification_push_task.delay(instance.user_id,
-                                          data['title'],
-                                          data['body'],
-                                          {"type": data['type'], "order_id": instance.id,
-                                           "message": data['body'],
-                                           'click_action': 'FLUTTER_NOTIFICATION_CLICK'
-                                           })
+        if data['type'] is 'in_the_commerce' and instance.is_order_to_merchant:
+            send_notification_push_order_with_sound(user_id=instance.merchant.user_id,
+                                                    title='El repartidor esta esperando el pedido',
+                                                    body='Numero de pedido {}'.format(instance.qr_code),
+                                                    sound="claxon.mp3",
+                                                    android_channel_id="claxon",
+                                                    data={"type": "UPDATE_ORDER_STATUS",
+                                                          "order_id": instance.id,
+                                                          "message": "Esperando",
+                                                          'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                                          })
+        elif data['type'] is 'already_here':
+            send_notification_push_order_with_sound(user_id=instance.user_id,
+                                                    title='El scooter acaba de llegar ',
+                                                    body='El scooter te esta esperando'.format(instance.qr_code),
+                                                    sound="claxon.mp3",
+                                                    android_channel_id="claxon",
+                                                    data={"type": "UPDATE_ORDER_STATUS",
+                                                          "order_id": instance.id,
+                                                          "message": "Esperando",
+                                                          'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                                          })
+        else:
+            send_notification_push_task.delay(instance.user_id,
+                                              data['title'],
+                                              data['body'],
+                                              {"type": data['type'], "order_id": instance.id,
+                                               "message": data['body'],
+                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                               })
         # Notification.objects.create(user_id=instance.user_id, title="En camino al comercio",
         #                             type_notification_id=1,
         #                             body="Tu pedido ya esta en camino de ser comprado")
@@ -304,7 +327,6 @@ def update_order_status(service, order_status, instance, data):
 
 
 def get_data_notification(status_slug_name):
-
     # Switch case python
     sw_purchase = {
         'way_commerce': {
@@ -344,7 +366,6 @@ def get_data_notification(status_slug_name):
 
 
 def get_message_accept(order):
-
     if order.is_safe_order or order.is_order_to_merchant:
         return {
             'title': 'En camino al comercio',

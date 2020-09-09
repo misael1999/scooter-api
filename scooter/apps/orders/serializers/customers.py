@@ -30,7 +30,7 @@ from scooter.apps.orders.serializers.orders import (calculate_service_price,
 import random
 from string import ascii_uppercase, digits
 
-from scooter.utils.functions import send_notification_push_order
+from scooter.utils.functions import send_notification_push_order, send_notification_push_order_with_sound
 
 
 class CurrentLocationAddressSerializer(serializers.ModelSerializer):
@@ -318,7 +318,7 @@ def send_order_delivery(location_selected, station, order):
         # Get nearest delivery man
         delivery_men = get_nearest_delivery_man(location_selected=location_selected, station=station,
                                                 list_exclude=[], distance=settings.RANGE_DISTANCE,
-                                                status=['available', 'busy', 'out_service'])
+                                                status=['available', 'busy'])
 
         # Send push notification to delivery_man
         if delivery_men.count() == 0:
@@ -335,17 +335,17 @@ def send_order_delivery(location_selected, station, order):
 
         for delivery_man in delivery_men:
             user_id = delivery_man.user_id
-            send_notification_push_order(user_id=user_id,
-                                         title='Solicitud nueva',
-                                         body='Ha recibido un nuevo pedido',
-                                         sound="ringtone.mp3",
-                                         android_channel_id="alarms",
-                                         data={"type": "NEW_ORDER",
-                                               "order_id": order.id,
-                                               "ordering": "",
-                                               "message": "Pedido de nuevo",
-                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'
-                                               })
+            send_notification_push_order_with_sound(user_id=user_id,
+                                                    title='Solicitud nueva',
+                                                    body='Ha recibido un nuevo pedido',
+                                                    sound="ringtone.mp3",
+                                                    android_channel_id="alarms",
+                                                    data={"type": "NEW_ORDER",
+                                                          "order_id": order.id,
+                                                          "ordering": "",
+                                                          "message": "Pedido de nuevo",
+                                                          'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                                          })
         async_to_sync(notify_delivery_men)(order.id, 'NEW_ORDER')
 
     except ValueError as e:

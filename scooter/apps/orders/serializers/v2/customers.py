@@ -123,13 +123,16 @@ class CreateOrderSerializer(serializers.ModelSerializer):
                 data['distance'] = data_service['distance']
 
             if is_order_to_merchant:
-                # if not self.valid_stock(details):
-                #     raise ValueError('Un producto no cuenta con suficiente stock')
-                order_status = OrderStatus.objects.get(slug_name="await_confirmation_merchant")
-                data['merchant_location'] = merchant.point
-                data['is_delivery_by_store'] = merchant.is_delivery_by_store
-                if merchant.is_delivery_by_store:
-                    data.pop('station', None)
+                if merchant.is_open:
+                    # if not self.valid_stock(details):
+                    #     raise ValueError('Un producto no cuenta con suficiente stock')
+                    order_status = OrderStatus.objects.get(slug_name="await_confirmation_merchant")
+                    data['merchant_location'] = merchant.point
+                    data['is_delivery_by_store'] = merchant.is_delivery_by_store
+                    if merchant.is_delivery_by_store:
+                        data.pop('station', None)
+                else:
+                    raise ValueError('{} ha cerrado'.format(merchant.merchant_name))
             else:
                 order_status = OrderStatus.objects.get(slug_name="await_delivery_man")
 
@@ -168,9 +171,9 @@ class CreateOrderSerializer(serializers.ModelSerializer):
             if is_order_to_merchant:
                 async_to_sync(notify_merchants)(merchant.id, order.id, 'NEW_ORDER')
                 send_notification_push_order(user_id=merchant.user_id,
-                                             title='Solicitud nueva',
+                                             title='Pedido entrante',
                                              body='Ha recibido un nuevo pedido',
-                                             sound="default",
+                                             sound="alarms",
                                              android_channel_id="alarms",
                                              data={"type": "NEW_ORDER",
                                                    "order_id": order.id,

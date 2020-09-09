@@ -39,8 +39,24 @@ def generate_verification_token(user, exp, token_type):
 
 def send_notification_push_order(user_id, title, body, data, sound, android_channel_id):
     devices = FCMDevice.objects.filter(user_id=user_id)
-    if devices:
-        devices.send_message(title=title, body=body, data=data, sound=sound, android_channel_id=android_channel_id)
+    sound = 'ringtone.mp3'
+    devices.send_message(title=title, body=body, data=data, sound=sound, android_channel_id=android_channel_id)
+
+
+def send_notification_push_order_with_sound(user_id, title, body, data, sound, android_channel_id):
+    devices = FCMDevice.objects.filter(user_id=user_id)
+    if data['type'] is 'NEW_ORDER':
+        for device in devices:
+            if device.type == 'ios':
+                if sound == 'ringtone.mp3':
+                    sound = 'ringtone.aiff'
+                else:
+                    sound = 'claxon.aiff'
+            device.send_message(title=data['title'], body=data['message'], data=data['data'], sound=sound,
+                                android_channel_id="alarms")
+    else:
+        if devices:
+            devices.send_message(title=title, body=body, data=data, sound=sound, android_channel_id=android_channel_id)
 
 
 def get_date_from_querystring(request, date_find, default_value=None):
