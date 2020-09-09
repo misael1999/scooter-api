@@ -76,3 +76,16 @@ class MerchantFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField)
         if not merchant or not queryset:
             return None
         return queryset.filter(merchant=merchant)
+
+
+class CurrentCustomUserDefault(object):
+    user_id = None
+
+    def set_context(self, serializer_field):
+        self.user_id = serializer_field.context['request'].user.id
+
+    def __call__(self):
+        return self.user_id
+
+    def __repr__(self):
+        return '%s()' % self.__class__.__name__

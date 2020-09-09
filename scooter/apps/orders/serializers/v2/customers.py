@@ -96,12 +96,12 @@ class CreateOrderSerializer(serializers.ModelSerializer):
             merchant = data.get('merchant', None)
             customer_promotion = data.get('promotion', None)
             price_promotion = None
+            maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=settings.TIME_RESPONSE)
             if customer_promotion:
                 price_promotion = valid_promotion(customer_promotion)
                 customer_promotion.used = True
                 customer_promotion.save()
 
-            maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=settings.TIME_RESPONSE)
             is_safe_order = customer.is_safe_user
 
             is_order_to_merchant = data.get('is_order_to_merchant', False)

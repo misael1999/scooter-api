@@ -12,6 +12,7 @@ class CategoryProducts(ScooterModel):
     picture = models.ImageField(upload_to='merchants/categories/', blank=True, null=True,
                                 validators=[FileExtensionValidator(['jpg', 'png', 'jpeg'])])
     merchant = models.ForeignKey('merchants.Merchant', on_delete=models.DO_NOTHING)
+    user = models.ForeignKey('users.User', on_delete=models.DO_NOTHING)
     ordering = models.PositiveIntegerField(null=True)
 
     def __str__(self):
@@ -20,6 +21,8 @@ class CategoryProducts(ScooterModel):
 
 class SubcategoryProducts(ScooterModel):
     name = models.CharField(max_length=70)
+    user = models.ForeignKey('users.User',
+                             on_delete=models.DO_NOTHING, blank=True, null=True)
     picture = models.ImageField(upload_to='merchants/subcategories/', blank=True, null=True,
                                 validators=[FileExtensionValidator(['jpg', 'png', 'jpeg'])])
     merchant = models.ForeignKey('merchants.Merchant', on_delete=models.DO_NOTHING)

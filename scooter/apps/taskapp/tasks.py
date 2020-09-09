@@ -78,7 +78,7 @@ def ignore_orders():
                       reason_rejection="Pedido ignorado por el comerciante")
 
 
-@periodic_task(name='location_notice_not_enabled', run_every=timedelta(minutes=20))
+@periodic_task(name='location_notice_not_enabled', run_every=timedelta(hours=1))
 def location_notice_not_enabled():
     """ Notice when the location is not enabled """
     now = timezone.localtime(timezone.now())

@@ -14,6 +14,8 @@ class TypeOption(ScooterModel):
 
 class Product(ScooterModel):
     name = models.CharField(max_length=70)
+    user = models.ForeignKey('users.User',
+                             on_delete=models.DO_NOTHING, blank=True, null=True)
     description = models.CharField(max_length=400)
     description_long = models.TextField(null=True, blank=True)
     stock = models.PositiveIntegerField(default=100, null=True, blank=True)
