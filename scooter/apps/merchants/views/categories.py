@@ -127,7 +127,7 @@ class CategoriesProductsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cr
         return Response(data=response, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['GET'])
-    def products(self, request, *args, **kwargs):
+    def products_cat(self, request, *args, **kwargs):
         category = self.get_object()
         category_temp = CategoryWithProductsSerializer(category).data
         category_temp['products'] = ProductSimpleModelSerializer(category.products.filter(

@@ -2068,7 +2068,7 @@ paths:
           description: 'Información de la categoría'
       tags:
         - Comercios
-  /api/v1/merchants/{merchant_id}/categories/{category_id}/products/:
+  /api/v1/merchants/{merchant_id}/categories/{category_id}/products_cat/:
     parameters:
       - name: merchant_id
         in: path
