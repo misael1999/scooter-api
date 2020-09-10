@@ -25,6 +25,9 @@ class Product(ScooterModel):
     subcategory = models.ForeignKey('merchants.SubcategoryProducts',
                                     on_delete=models.DO_NOTHING,
                                     related_name="products", null=True, blank=True)
+    section = models.ForeignKey('merchants.SubcategorySectionProducts',
+                                on_delete=models.DO_NOTHING,
+                                related_name="products", null=True, blank=True)
     picture = models.ImageField(upload_to='merchants/products/', blank=True, null=True,
                                 validators=[FileExtensionValidator(['jpg', 'png', 'jpeg'])])
     merchant = models.ForeignKey('merchants.Merchant', on_delete=models.DO_NOTHING)
@@ -61,6 +64,7 @@ class ProductMenuOption(ScooterModel):
     menu = models.ForeignKey(ProductMenuCategory, on_delete=models.DO_NOTHING, related_name="options")
     name = models.CharField(max_length=90)
     price = models.FloatField(null=True, blank=True)
+    is_available = models.BooleanField(default=True)
 
     class Meta:
         get_latest_by = 'created'
@@ -68,4 +72,3 @@ class ProductMenuOption(ScooterModel):
 
     def __str__(self):
         return self.name
-

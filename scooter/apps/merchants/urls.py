@@ -11,6 +11,8 @@ router.register(r'api/v1/merchants', views.MerchantViewSet, basename='merchants'
 
 router.register(r'api/v1/merchants/(?P<merchant_id>[a-zA-Z0-9_-]+)/categories',
                 views.CategoriesProductsViewSet, basename='categories-merchants')
+router.register(r'api/v1/merchants/(?P<merchant_id>[a-zA-Z0-9_-]+)/subcategories',
+                views.SubcategoriesProductsViewSet, basename='subcategories-merchants')
 router.register(r'api/v1/merchants/(?P<merchant_id>[a-zA-Z0-9_-]+)/products',
                 views.ProductsViewSet, basename='products-merchants')
 router.register(r'api/v1/merchants/(?P<merchant_id>[a-zA-Z0-9_-]+)/customers',

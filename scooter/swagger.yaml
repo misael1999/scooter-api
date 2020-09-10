@@ -2068,6 +2068,24 @@ paths:
           description: 'Información de la categoría'
       tags:
         - Comercios
+  /api/v1/merchants/{merchant_id}/categories/{category_id}/products/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+      - name: category_id
+        in: path
+        required: true
+        type: string
+    get:
+      operationId: get_products_category
+      description: Obtener productos por categoria
+      responses:
+        '200':
+          description: 'Información de la categoría'
+      tags:
+        - Comercios
   /api/v1/merchants/{merchant_id}/categories/products/:
     parameters:
       - name: merchant_id
@@ -2077,6 +2095,178 @@ paths:
     get:
       operationId: get_categories_products_merchant
       description: Obtener los productos agrupado por categorias
+      parameters:
+        - name: limit
+          in: query
+          description: Numero de resultados por pagina
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: El índice inicial desde el que devolver los resultados.
+          required: false
+          type: integer
+        - name: status
+          description: ID Status
+          required: false
+          in: query
+          type: string
+        - name: search
+          description: Buscar por (nombre)
+          in: query
+          required: false
+          type: string
+        - name: ordering
+          description: Ordenar por
+          in: query
+          required: false
+          type: string
+          enum: ['created', 'name', '-created', '-name']
+      responses:
+        '201':
+          description: 'Obtener los productos agrupado por categorias'
+      tags:
+        - Comercios
+  /api/v1/merchants/{merchant_id}/subcategories/{subcategory_id}/products/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+      - name: subcategory_id
+        in: path
+        required: true
+        type: string
+    get:
+      operationId: get_subcategories_products_merchant
+      description: Obtener los productos de una subcategoria
+      parameters:
+        - name: limit
+          in: query
+          description: Numero de resultados por pagina
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: El índice inicial desde el que devolver los resultados.
+          required: false
+          type: integer
+        - name: status
+          description: ID Status
+          required: false
+          in: query
+          type: string
+        - name: search
+          description: Buscar por (nombre)
+          in: query
+          required: false
+          type: string
+        - name: ordering
+          description: Ordenar por
+          in: query
+          required: false
+          type: string
+          enum: ['created', 'name', '-created', '-name']
+      responses:
+        '201':
+          description: 'Obtener los productos agrupado por categorias'
+      tags:
+        - Comercios
+  /api/v1/merchants/{merchant_id}/subcategories/{subcategory_id}/products/sections/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+      - name: subcategory_id
+        in: path
+        required: true
+        type: string
+    get:
+      operationId: get_subcategories_products_sections_merchant
+      description: Obtener los productos de una subcategoria con sus secciones
+      parameters:
+        - name: limit
+          in: query
+          description: Numero de resultados por pagina
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: El índice inicial desde el que devolver los resultados.
+          required: false
+          type: integer
+        - name: status
+          description: ID Status
+          required: false
+          in: query
+          type: string
+        - name: search
+          description: Buscar por (nombre)
+          in: query
+          required: false
+          type: string
+        - name: ordering
+          description: Ordenar por
+          in: query
+          required: false
+          type: string
+          enum: ['created', 'name', '-created', '-name']
+      responses:
+        '200':
+          description: 'Obtener los productos agrupado por secciones'
+      tags:
+        - Comercios
+  /api/v1/merchants/{merchant_id}/categories/level_two/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+    get:
+      operationId: get_categories_two_merchant
+      description: Obtener unicamente las categorias
+      parameters:
+        - name: limit
+          in: query
+          description: Numero de resultados por pagina
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: El índice inicial desde el que devolver los resultados.
+          required: false
+          type: integer
+        - name: status
+          description: ID Status
+          required: false
+          in: query
+          type: string
+        - name: search
+          description: Buscar por (nombre)
+          in: query
+          required: false
+          type: string
+        - name: ordering
+          description: Ordenar por
+          in: query
+          required: false
+          type: string
+          enum: ['created', 'name', '-created', '-name']
+      responses:
+        '201':
+          description: 'Obtener los productos agrupado por categorias'
+      tags:
+        - Comercios
+  /api/v1/merchants/{merchant_id}/categories/level_three/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+    get:
+      operationId: get_categories_level_three_merchant
+      description: Obtener las categorias con las subcategorias
       parameters:
         - name: limit
           in: query
@@ -3306,6 +3496,14 @@ definitions:
             picture:
               type: string
               description: Imagen de la categoría
+            sections:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: Nombre de la categoría
     required:
       - name
   UpdateCategory:
@@ -3347,6 +3545,14 @@ definitions:
         type: number
         example: 1
         description: Id de la categoría del comercio
+      subcategory_id:
+        type: number
+        example: 1
+        description: Id de la categoría del comercio
+      section_id:
+        type: number
+        example: 1
+        description: Id de la sección
       picture:
         type: string
         description: Imagen del producto

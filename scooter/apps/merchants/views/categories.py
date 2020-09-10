@@ -5,8 +5,10 @@ from rest_framework.response import Response
 # Models
 from scooter.apps.common.models.status import Status
 # Serializers
+from scooter.apps.merchants.serializers import SubcategoryProductsModelSerializer
 from scooter.apps.merchants.serializers.categories import (CategoryProductsModelSerializer,
-                                                           CategoryWithProductsSerializer, ProductSimpleModelSerializer)
+                                                           CategoryWithProductsSerializer, ProductSimpleModelSerializer,
+                                                           CategoryWithSubcategoriesSerializer, CategoryProductsSimpleModelSerializer)
 # Viewset
 from scooter.apps.merchants.models import CategoryProducts, Product
 from scooter.utils.viewsets.scooter import ScooterViewSet
@@ -123,3 +125,31 @@ class CategoriesProductsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cr
 
         response = self.set_response(status=True, data=list_categories, message="Productos con sus categorias")
         return Response(data=response, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['GET'])
+    def products(self, request, *args, **kwargs):
+        category = self.get_object()
+        category_temp = CategoryWithProductsSerializer(category).data
+        category_temp['products'] = ProductSimpleModelSerializer(category.products.filter(
+            status__slug_name="active"), many=True).data
+        return Response(data=category_temp, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['GET'])
+    def level_two(self, request, *args, **kwargs):
+        categories = self.merchant.categoryproducts_set.filter(status__slug_name="active")
+        list_categories = CategoryProductsSimpleModelSerializer(categories, many=True).data
+        response = self.set_response(status=True, data=list_categories, message="Categorias sin paginación")
+        return Response(data=response, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['GET'])
+    def level_three(self, request, *args, **kwargs):
+        categories = self.merchant.categoryproducts_set.filter(status__slug_name="active")
+        list_categories = []
+        for category in categories:
+            category_temp = CategoryProductsSimpleModelSerializer(category).data
+            queryset_ = category.subcategories.filter(status__slug_name="active")
+            category_temp['subcategories'] = SubcategoryProductsModelSerializer(queryset_, many=True).data
+            list_categories.append(category_temp)
+        response = self.set_response(status=True, data=list_categories, message="Categorias con subcategorias")
+        return Response(data=response, status=status.HTTP_200_OK)
+

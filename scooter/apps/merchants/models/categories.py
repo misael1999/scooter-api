@@ -27,3 +27,11 @@ class SubcategoryProducts(ScooterModel):
                                 validators=[FileExtensionValidator(['jpg', 'png', 'jpeg'])])
     merchant = models.ForeignKey('merchants.Merchant', on_delete=models.DO_NOTHING)
     category = models.ForeignKey(CategoryProducts, on_delete=models.DO_NOTHING, related_name="subcategories")
+
+
+class SubcategorySectionProducts(ScooterModel):
+    name = models.CharField(max_length=70)
+    user = models.ForeignKey('users.User',
+                             on_delete=models.DO_NOTHING, blank=True, null=True)
+    merchant = models.ForeignKey('merchants.Merchant', on_delete=models.DO_NOTHING)
+    subcategory = models.ForeignKey(SubcategoryProducts, on_delete=models.DO_NOTHING, related_name="sections")
