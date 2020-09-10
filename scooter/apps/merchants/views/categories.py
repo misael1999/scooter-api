@@ -46,7 +46,7 @@ class CategoriesProductsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cr
         return self.queryset
 
     def get_permissions(self):
-        if self.action in ['create', 'products']:
+        if self.action in ['products', 'level_two', 'level_three']:
             permission_classes = [IsAuthenticated]
         else:
             permission_classes = [IsAuthenticated, IsAccountOwnerMerchant]

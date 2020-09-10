@@ -14,8 +14,6 @@ from scooter.utils.serializers.scooter import ScooterModelSerializer
 
 
 # Serializers
-
-
 class ProductMenuOptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductMenuOption
