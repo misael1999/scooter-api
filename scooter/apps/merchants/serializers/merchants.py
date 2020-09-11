@@ -60,6 +60,26 @@ class AvailabilityMerchantSerializer(serializers.Serializer):
         merchant.save()
         return merchant.is_open
 
+
+class ChangePasswordMerchantSerializer(serializers.Serializer):
+    current_password = serializers.CharField(max_length=60)
+    new_password = serializers.CharField(min_length=8, max_length=60)
+
+    def update(self, instance, data):
+        try:
+            # Check if current_password is correct
+            if not instance.user.check_password(data['current_password']):
+                raise ValueError('La contraseña actual no es correcta')
+
+            instance.user.set_password(data['new_password'])
+            instance.user.save()
+            return instance
+        except ValueError as ex:
+            raise serializers.ValidationError({'detail': str(ex)})
+        except Exception as e:
+            raise serializers.ValidationError({'detail': 'Ha ocurrido un error desconocido'})
+
+
 # ===============
 # Serializers to update info of merchant
 # ===============

@@ -14,7 +14,7 @@ from scooter.utils.viewsets import ScooterViewSet
 # Serializers
 from scooter.apps.merchants.serializers import (MerchantSignUpSerializer,
                                                 MerchantWithAllInfoSerializer, UpdateInfoMerchantSerializer,
-                                                AvailabilityMerchantSerializer)
+                                                AvailabilityMerchantSerializer, ChangePasswordMerchantSerializer)
 
 from scooter.apps.users.serializers.users import UserModelSimpleSerializer
 # Filters
@@ -93,3 +93,13 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         status_availability = serializer.save()
         return Response(self.set_response(status='ok', data={'status': status_availability},
                                           message='Cambio de disponibilidad correctamente'))
+
+    @action(detail=True, methods=('PATCH', ))
+    def change_password(self, request, *args, **kwargs):
+        customer = self.get_object()
+        partial = request.method == 'PATCH'
+        serializer = ChangePasswordMerchantSerializer(customer, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(self.set_response(status='ok', data={},
+                                          message='Contraseña actualizada correctamente'))

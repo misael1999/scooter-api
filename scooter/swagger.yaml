@@ -1850,6 +1850,26 @@ paths:
           description: 'Disponibilidad actualizada'
       tags:
         - Comercios
+  /api/v1/merchants/{merchant_id}/change_password/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+    patch:
+      operationId: change_password_merchant
+      description: Cambiar contraseña del comercio
+      parameters:
+        - name: body
+          in: body
+          description: Cambiar contraseña del comercio
+          schema:
+            $ref: '#/definitions/ChangePassword'
+      responses:
+        '201':
+          description: 'Información del comercio'
+      tags:
+        - Comercios
   /api/v1/merchants/:
     post:
       operationId: register_merchant
