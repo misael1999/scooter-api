@@ -237,7 +237,7 @@ def calculate_service_price(from_address, to_address, service, is_current_locati
             to_point, srid=4326
         ).transform(3857, clone=True)
         distance_points = (pnt.distance(pnt1) / 1000)
-        distance_points = distance_points + (distance_points * 0.30)
+        distance_points = distance_points + (distance_points * 0.20)
         # distance_points = distance.vincenty(from_point, to_point).kilometers
         # distance_points = distance_points + (distance_points * 0.45)
 

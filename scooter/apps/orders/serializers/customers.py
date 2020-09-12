@@ -349,8 +349,10 @@ def send_order_delivery(location_selected, station, order):
         async_to_sync(notify_delivery_men)(order.id, 'NEW_ORDER')
 
     except ValueError as e:
+        print(e.args.__str__())
         raise ValueError(e)
     except Exception as ex:
+        print(ex.args.__str__())
         raise ValueError('Error al mandar notificaciones')
 
 

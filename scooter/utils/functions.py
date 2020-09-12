@@ -45,7 +45,7 @@ def send_notification_push_order(user_id, title, body, data, sound, android_chan
 
 def send_notification_push_order_with_sound(user_id, title, body, data, sound, android_channel_id):
     devices = FCMDevice.objects.filter(user_id=user_id)
-    if data['type'] is 'NEW_ORDER':
+    if data['type'] == 'NEW_ORDER':
         for device in devices:
             if device.type == 'ios':
                 if sound == 'ringtone.mp3':

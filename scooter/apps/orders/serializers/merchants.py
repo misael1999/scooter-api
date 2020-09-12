@@ -105,22 +105,28 @@ class CancelOrderMerchantSerializer(serializers.Serializer):
 class OrderReadyMerchantSerializer(serializers.Serializer):
 
     def update(self, order, data):
-        merchant = self.context['merchant']
-        if not merchant.is_delivery_by_store:
-            order_status = OrderStatus.objects.get(slug_name="await_delivery_man")
-            order.order_status = order_status
-            order.save()
-            send_notification_push_order(user_id=order.user_id,
-                                         title='Tu pedido de {} esta listo'.format(merchant.merchant_name),
-                                         body='Estamos buscando al repartidor más cercano',
-                                         sound="default",
-                                         android_channel_id="messages",
-                                         data={"type": "ORDER_READY",
-                                               "order_id": order.id,
-                                               "message": "Pedido listo para ser recogido",
-                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'
-                                               })
-            send_order_delivery(location_selected=merchant.point,
-                                station=order.station,
-                                order=order)
-        return order
+        try:
+            merchant = self.context['merchant']
+            if not merchant.is_delivery_by_store:
+                order_status = OrderStatus.objects.get(slug_name="await_delivery_man")
+                order.order_status = order_status
+                order.save()
+                send_notification_push_order(user_id=order.user_id,
+                                             title='Tu pedido de {} esta listo'.format(merchant.merchant_name),
+                                             body='Estamos buscando al repartidor más cercano',
+                                             sound="default",
+                                             android_channel_id="messages",
+                                             data={"type": "ORDER_READY",
+                                                   "order_id": order.id,
+                                                   "message": "Pedido listo para ser recogido",
+                                                   'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                                   })
+                send_order_delivery(location_selected=merchant.point,
+                                    station=order.station,
+                                    order=order)
+            return order
+        except ValueError as e:
+            raise serializers.ValidationError({'details': str(e)})
+        except Exception as ex:
+            raise serializers.ValidationError({'details': 'Ha ocurrido un error desconocido'})
+
