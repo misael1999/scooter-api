@@ -286,7 +286,7 @@ def update_order_status(service, order_status, instance, data):
         instance.order_status = order_status
         instance.save()
 
-        if data['type'] is 'in_the_commerce' and instance.is_order_to_merchant:
+        if data['type'] == 'in_the_commerce' and instance.is_order_to_merchant:
             send_notification_push_order_with_sound(user_id=instance.merchant.user_id,
                                                     title='El repartidor esta esperando el pedido',
                                                     body='Numero de pedido {}'.format(instance.qr_code),
@@ -297,7 +297,7 @@ def update_order_status(service, order_status, instance, data):
                                                           "message": "Esperando",
                                                           'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                           })
-        elif data['type'] is 'already_here':
+        elif data['type'] == 'already_here':
             send_notification_push_order_with_sound(user_id=instance.user_id,
                                                     title='El scooter acaba de llegar ',
                                                     body='El scooter te esta esperando'.format(instance.qr_code),

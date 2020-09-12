@@ -32,7 +32,7 @@ from scooter.apps.orders.serializers.orders import (calculate_service_price,
 import random
 from string import ascii_uppercase, digits
 
-from scooter.utils.functions import send_notification_push_order
+from scooter.utils.functions import send_notification_push_order, send_notification_push_order_with_sound
 
 
 class CurrentLocationAddressSerializer(serializers.ModelSerializer):
@@ -112,6 +112,7 @@ class CreateOrderSerializer(serializers.ModelSerializer):
                 from_address = merchant.point
             else:
                 from_address = data['from_address'].point
+
             if station and not is_free_order(station):
                 data_service = calculate_service_price(from_address=from_address,
                                                        to_address=data['to_address'].point,
@@ -170,16 +171,16 @@ class CreateOrderSerializer(serializers.ModelSerializer):
 
             if is_order_to_merchant:
                 async_to_sync(notify_merchants)(merchant.id, order.id, 'NEW_ORDER')
-                send_notification_push_order(user_id=merchant.user_id,
-                                             title='Pedido entrante',
-                                             body='Ha recibido un nuevo pedido',
-                                             sound="alarms",
-                                             android_channel_id="alarms",
-                                             data={"type": "NEW_ORDER",
-                                                   "order_id": order.id,
-                                                   "message": "Pedido de nuevo",
-                                                   'click_action': 'FLUTTER_NOTIFICATION_CLICK'
-                                                   })
+                send_notification_push_order_with_sound(user_id=merchant.user_id,
+                                                        title='Pedido entrante',
+                                                        body='Ha recibido un nuevo pedido',
+                                                        sound="alarms",
+                                                        android_channel_id="alarms",
+                                                        data={"type": "NEW_ORDER",
+                                                              "order_id": order.id,
+                                                              "message": "Pedido de nuevo",
+                                                              'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                                              })
             else:
                 location_selected = None
                 location_selected = get_ref_location(order)
