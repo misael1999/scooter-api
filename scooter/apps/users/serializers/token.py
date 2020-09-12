@@ -32,7 +32,6 @@ from rest_framework_simplejwt.tokens import RefreshToken
 import requests
 
 
-
 class StationTokenObtainPairSerializer(TokenObtainPairSerializer):
     default_error_messages = {'no_active_account': 'Usuario o contraseña incorrectos'}
 
@@ -221,15 +220,17 @@ class CustomerAppleAuthSerializer(serializers.Serializer):
     APPLE_LAST_KEY_FETCH = 0
 
     authorization_code = serializers.CharField(max_length=400)
+    given_name = serializers.CharField(max_length=400, required=False, allow_null=True, allow_blank=True)
+    family_name = serializers.CharField(max_length=400, required=False, allow_null=True, allow_blank=True)
 
-    def validate(self, data):
+    def validate(self, valid_data):
         try:
             # Get apple info
             data = {
                 'client_id': settings.AUTH_APPLE_ID_CLIENT,
                 'client_secret': self.generate_key_secret(),
                 'grant_type': 'authorization_code',
-                'code': data['authorization_code']
+                'code': valid_data['authorization_code']
             }
 
             headers = {"Content-Type": 'application/x-www-form-urlencoded'}
@@ -240,15 +241,15 @@ class CustomerAppleAuthSerializer(serializers.Serializer):
                 raise ValueError('Error al iniciar sesión')
             json_obj = req.json()
             decode = self._decode_apple_user_token(json_obj['id_token'])
-            data['apple_id'] = decode['sub']
-            data['email'] = decode['email']
+            valid_data['apple_id'] = decode['sub']
+            valid_data['email'] = decode['email']
         except ValueError as e:
             print(e.args.__str__())
             raise serializers.ValidationError({'detail': str(e)})
         except Exception as ex:
             print(ex.args.__str__())
             raise serializers.ValidationError({'detail': 'Error al iniciar sesión con apple'})
-        return data
+        return valid_data
 
     def create(self, data):
         # is_new_user = False
@@ -277,7 +278,14 @@ class CustomerAppleAuthSerializer(serializers.Serializer):
                 user.save()
                 # Create customer
                 code_share = generate_code_to_share()
+                give_name = data.get('given_name', None)
+                family_name = data.get('family_name', '')
+                full_name = None
+                if give_name:
+                    full_name = give_name + family_name
+
                 customer = Customer.objects.create(user=user,
+                                                   name=full_name,
                                                    code_share=code_share)
 
             except ValueError as ex:
@@ -298,11 +306,8 @@ class CustomerAppleAuthSerializer(serializers.Serializer):
     def _fetch_apple_public_key(self):
         # Check to see if the public key is unset or is stale before returning
 
-        if (self.APPLE_LAST_KEY_FETCH + self.APPLE_KEY_CACHE_EXP) < int(time()) or self.APPLE_PUBLIC_KEY is None:
-            key_payload = requests.get(self.APPLE_PUBLIC_KEY_URL).json()
-            APPLE_PUBLIC_KEY = RSAAlgorithm.from_jwk(json.dumps(key_payload["keys"][0]))
-            APPLE_LAST_KEY_FETCH = int(time())
-
+        key_payload = requests.get(self.APPLE_PUBLIC_KEY_URL).json()
+        APPLE_PUBLIC_KEY = RSAAlgorithm.from_jwk(json.dumps(key_payload["keys"][0]))
         return APPLE_PUBLIC_KEY
 
     def _decode_apple_user_token(self, apple_user_token):

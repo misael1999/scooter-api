@@ -74,7 +74,7 @@ class RejectOrderMerchantSerializer(serializers.Serializer):
                                      body='{}'.format(data['reason_rejection']),
                                      sound="default",
                                      android_channel_id="messages",
-                                     data={"type": "REJECT_ORDER",
+                                     data={"type": "REJECT_ORDER_MERCHANT",
                                            "order_id": order.id,
                                            "message": "Pedido rechazado",
                                            'click_action': 'FLUTTER_NOTIFICATION_CLICK'
@@ -97,7 +97,7 @@ class CancelOrderMerchantSerializer(serializers.Serializer):
                                      body='{}'.format(data['reason_rejection']),
                                      sound="default",
                                      android_channel_id="messages",
-                                     data={"type": "REJECT_ORDER",
+                                     data={"type": "REJECT_ORDER_MERCHANT",
                                            "order_id": order.id,
                                            "message": "Pedido cancelado",
                                            'click_action': 'FLUTTER_NOTIFICATION_CLICK'
