@@ -137,7 +137,7 @@ class UserViewSet(ScooterViewSet):
     def contact(self, request, *args, **kwargs):
         """  """
         serializer = ContactSerializer(data=request.data)
-        serializer.is_valid()
+        serializer.is_valid(raise_exception=True)
         contact_true = serializer.save()
         data = {
             'status': 'ok',

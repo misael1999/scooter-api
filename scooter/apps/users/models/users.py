@@ -88,7 +88,10 @@ class User(ScooterModel, AbstractBaseUser, PermissionsMixin):
 
 class Contact(ScooterModel):
     name = models.CharField(max_length=60)
-    email = models.EmailField()
+    email = models.EmailField(null=True, blank=True)
+    merchant_name = models.CharField(max_length=120, null=True)
+    category = models.CharField(max_length=60, null=True)
+    phone_number = models.CharField(max_length=60, null=True)
     identify = models.CharField(max_length=50)
     comments = models.TextField(blank=True, null=True)
 
