@@ -151,7 +151,8 @@ class DeliveryMenOrderViewSet(ScooterViewSet, AddDeliveryManMixin,
         #
         order_in_process = Order.objects.filter(delivery_man=self.delivery_man, in_process=True)
         order_await_confirmation = Order.objects.filter(station=self.delivery_man.station,
-                                                        order_status__slug_name__in=['await_delivery_man'])
+                                                        order_status__slug_name__in=['await_delivery_man'],
+                                                        delivery_man=None)
         data = {
             'in_process': OrderWithDetailModelSerializer(order_in_process, many=True).data,
             'await_confirmation': OrderWithDetailModelSerializer(order_await_confirmation, many=True).data

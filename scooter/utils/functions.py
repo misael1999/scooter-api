@@ -39,7 +39,6 @@ def generate_verification_token(user, exp, token_type):
 
 def send_notification_push_order(user_id, title, body, data, sound, android_channel_id):
     devices = FCMDevice.objects.filter(user_id=user_id)
-    sound = 'ringtone.mp3'
     devices.send_message(title=title, body=body, data=data, sound=sound, android_channel_id=android_channel_id)
 
 
@@ -53,7 +52,7 @@ def send_notification_push_order_with_sound(user_id, title, body, data, sound, a
                 else:
                     sound = 'claxon.aiff'
             device.send_message(title=title, body=body, data=data, sound=sound,
-                                android_channel_id="alarms")
+                                android_channel_id=android_channel_id)
     else:
         if devices:
             devices.send_message(title=title, body=body, data=data, sound=sound, android_channel_id=android_channel_id)

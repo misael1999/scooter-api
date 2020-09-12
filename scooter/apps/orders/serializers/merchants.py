@@ -23,11 +23,14 @@ class AcceptOrderMerchantSerializer(serializers.Serializer):
             merchant = self.context['merchant']
             if order.order_status.slug_name is 'preparing_order':
                 raise ValueError('El pedido ya fue aceptado')
+            if order.order_status.slug_name in ['ignored', 'rejected', 'cancelled']:
+                raise ValueError('El pedido fue ignorado o rechazado')
+
             order_status = OrderStatus.objects.get(slug_name="preparing_order")
             order.order_status = order_status
             order.in_process = True
             order.save()
-            details = order.details.all()
+            # details = order.details.all()
             # products_to_update = []
             # for detail in details:
             #     product = Product.objects.get(pk=detail.product_id)

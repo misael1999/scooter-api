@@ -174,7 +174,7 @@ class CreateOrderSerializer(serializers.ModelSerializer):
                 send_notification_push_order_with_sound(user_id=merchant.user_id,
                                                         title='Pedido entrante',
                                                         body='Ha recibido un nuevo pedido',
-                                                        sound="alarms",
+                                                        sound="ringtone.mp3",
                                                         android_channel_id="alarms",
                                                         data={"type": "NEW_ORDER",
                                                               "order_id": order.id,
