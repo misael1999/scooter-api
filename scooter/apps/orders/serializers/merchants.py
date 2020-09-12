@@ -111,6 +111,9 @@ class OrderReadyMerchantSerializer(serializers.Serializer):
                 order_status = OrderStatus.objects.get(slug_name="await_delivery_man")
                 order.order_status = order_status
                 order.save()
+                send_order_delivery(location_selected=merchant.point,
+                                    station=order.station,
+                                    order=order)
                 send_notification_push_order(user_id=order.user_id,
                                              title='Tu pedido de {} esta listo'.format(merchant.merchant_name),
                                              body='Estamos buscando al repartidor más cercano',
@@ -121,9 +124,6 @@ class OrderReadyMerchantSerializer(serializers.Serializer):
                                                    "message": "Pedido listo para ser recogido",
                                                    'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                    })
-                send_order_delivery(location_selected=merchant.point,
-                                    station=order.station,
-                                    order=order)
             return order
         except ValueError as e:
             raise serializers.ValidationError({'details': str(e)})

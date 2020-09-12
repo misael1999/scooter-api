@@ -52,7 +52,7 @@ def send_notification_push_order_with_sound(user_id, title, body, data, sound, a
                     sound = 'ringtone.aiff'
                 else:
                     sound = 'claxon.aiff'
-            device.send_message(title=data['title'], body=data['message'], data=data['data'], sound=sound,
+            device.send_message(title=title, body=body, data=data, sound=sound,
                                 android_channel_id="alarms")
     else:
         if devices:
