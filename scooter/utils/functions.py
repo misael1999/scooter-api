@@ -54,8 +54,7 @@ def send_notification_push_order_with_sound(user_id, title, body, data, sound, a
             device.send_message(title=title, body=body, data=data, sound=sound,
                                 android_channel_id=android_channel_id)
     else:
-        if devices:
-            devices.send_message(title=title, body=body, data=data, sound=sound, android_channel_id=android_channel_id)
+        devices.send_message(title=title, body=body, data=data, sound=sound, android_channel_id=android_channel_id)
 
 
 def get_date_from_querystring(request, date_find, default_value=None):
