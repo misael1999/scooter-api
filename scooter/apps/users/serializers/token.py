@@ -280,7 +280,7 @@ class CustomerAppleAuthSerializer(serializers.Serializer):
                 code_share = generate_code_to_share()
                 give_name = data.get('given_name', None)
                 family_name = data.get('family_name', '')
-                full_name = 'Usuario anonimo apple'
+                full_name = 'Usuario anónimo apple'
                 if give_name:
                     full_name = give_name + family_name
 
