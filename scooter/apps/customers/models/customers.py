@@ -46,7 +46,6 @@ class CustomerAddress(ScooterModel):
 class HistoryCustomerInvitation(ScooterModel):
 
     code = models.CharField(max_length=50,
-                            unique=True,
                             help_text="Code the customer issued by")
 
     issued_by = models.ForeignKey(
