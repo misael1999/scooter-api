@@ -10,6 +10,7 @@ from scooter.apps.merchants.models import Product, CategoryProducts, ProductMenu
     SubcategoryProducts, SubcategorySectionProducts
 # Utilities
 from scooter.apps.merchants.serializers.categories import CategoryProductsModelSerializer
+from scooter.apps.merchants.serializers.subcategories import SubcategoryProductsModelSerializer, SubcategorySectionProductsSerializer
 from scooter.utils.serializers.scooter import ScooterModelSerializer
 
 
@@ -48,12 +49,15 @@ class ProductsModelSerializer(ScooterModelSerializer):
                                                         source="section", required=False, allow_null=True,
                                                         allow_empty=True)
     category = CategoryProductsModelSerializer(read_only=True)
+    subcategory = SubcategoryProductsModelSerializer(read_only=True)
+    section = SubcategorySectionProductsSerializer(read_only=True)
     status = StatusModelSerializer(read_only=True)
     menu_categories = ProductMenuCategorySerializer(many=True, required=False)
 
     class Meta:
         model = Product
-        fields = ('id', 'name', 'description', 'description_long', 'stock', 'category',
+        fields = ('id', 'name', 'description', 'description_long', 'stock', 'category', 'subcategory',
+                  'section',
                   'price', 'category_id', 'subcategory_id', 'picture', 'merchant', 'total_sales', 'status',
                   'have_menu', 'menu_categories', 'is_available', 'user', 'section_id')
         read_only_fields = ("id", "merchant", "total_sales", 'status')
