@@ -21,7 +21,7 @@ class AcceptOrderMerchantSerializer(serializers.Serializer):
     def update(self, order, data):
         try:
             merchant = self.context['merchant']
-            if order.order_status.slug_name is not 'await_confirmation_merchant':
+            if order.order_status.slug_name != 'await_confirmation_merchant':
                 raise ValueError('El pedido ya fue aceptado o ignorado')
 
             order_status = OrderStatus.objects.get(slug_name="preparing_order")
@@ -93,7 +93,7 @@ class CancelOrderMerchantSerializer(serializers.Serializer):
     def update(self, order, data):
         try:
             merchant = self.context['merchant']
-            if order.order_status.slug_name is not 'preparing_order':
+            if order.order_status.slug_name != 'await_confirmation_merchant':
                 raise ValueError('No es posible cancelar pedido, verifique que no haya sido aceptado o cancelado')
             order_status = OrderStatus.objects.get(slug_name="cancelled")
             order.order_status = order_status

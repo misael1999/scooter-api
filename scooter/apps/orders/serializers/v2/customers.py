@@ -286,14 +286,19 @@ class RetryOrderSerializer(serializers.Serializer):
         try:
             order.station = data['station']
             order.maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=settings.TIME_RESPONSE)
-            order.order_status = OrderStatus.objects.get(slug_name="await_delivery_man")
+            if order.is_order_to_merchant:
+                order.order_status = OrderStatus.objects.get(slug_name="await_confirmation_merchant")
+            else:
+                order.order_status = OrderStatus.objects.get(slug_name="await_delivery_man")
+
             order.save()
             location_selected = None
 
             if order.order_status.slug_name == "pick_up":
-                location_selected = order.from_address
+                location_selected = order.from_address.point
             else:
                 location_selected = get_ref_location(order)
+
 
             # Get list that excludes delivery men that are in the history of rejected orders
             list_exclude = HistoryRejectedOrders.objects.filter(
@@ -301,7 +306,7 @@ class RetryOrderSerializer(serializers.Serializer):
             ).values_list('delivery_man_id', flat=True)
 
             # Get nearest delivery man
-            send_order_delivery(location_selected=location_selected, station=data['station'],
+            send_order_delivery(location_selected=location_selected.point, station=data['station'],
                                 order=order)
 
             return order.id
