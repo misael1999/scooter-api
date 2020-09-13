@@ -299,15 +299,27 @@ class RetryOrderSerializer(serializers.Serializer):
             else:
                 location_selected = get_ref_location(order)
 
-
             # Get list that excludes delivery men that are in the history of rejected orders
             list_exclude = HistoryRejectedOrders.objects.filter(
                 order=order
             ).values_list('delivery_man_id', flat=True)
 
-            # Get nearest delivery man
-            send_order_delivery(location_selected=location_selected.point, station=data['station'],
-                                order=order)
+            if order.is_order_to_merchant:
+                async_to_sync(notify_merchants)(order.merchant.id, order.id, 'NEW_ORDER')
+                send_notification_push_order_with_sound(user_id=order.merchant.user_id,
+                                                        title='Pedido entrante',
+                                                        body='Ha recibido un nuevo pedido',
+                                                        sound="ringtone.mp3",
+                                                        android_channel_id="alarms",
+                                                        data={"type": "NEW_ORDER",
+                                                              "order_id": order.id,
+                                                              "message": "Pedido de nuevo",
+                                                              'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                                              })
+            else:
+                # Get nearest delivery man
+                send_order_delivery(location_selected=location_selected.point, station=data['station'],
+                                    order=order)
 
             return order.id
         except ValueError as e:
