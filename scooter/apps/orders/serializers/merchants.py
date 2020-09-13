@@ -61,50 +61,60 @@ class RejectOrderMerchantSerializer(serializers.Serializer):
     reason_rejection = serializers.CharField(max_length=100, required=True, allow_null=True)
 
     def update(self, order, data):
-        merchant = self.context['merchant']
-        if order.order_status.slug_name is not 'await_confirmation_merchant':
-            raise ValueError('El pedido ya fue aceptado o rechazado')
-        order_status = OrderStatus.objects.get(slug_name="rejected")
-        order.order_status = order_status
-        order.reason_rejection = data['reason_rejection']
-        order.in_process = False
-        order.save()
-        send_notification_push_order(user_id=order.user_id,
-                                     title='{} ha rechazado tu pedido'.format(merchant.merchant_name),
-                                     body='{}'.format(data['reason_rejection']),
-                                     sound="default",
-                                     android_channel_id="messages",
-                                     data={"type": "REJECT_ORDER_MERCHANT",
-                                           "order_id": order.id,
-                                           "message": "Pedido rechazado",
-                                           'click_action': 'FLUTTER_NOTIFICATION_CLICK'
-                                           })
-        return order
-
+        try:
+            merchant = self.context['merchant']
+            print(order.order_status.slug_name)
+            if order.order_status.slug_name != 'await_confirmation_merchant':
+                raise ValueError('El pedido ya fue aceptado o rechazado')
+            order_status = OrderStatus.objects.get(slug_name="rejected")
+            order.order_status = order_status
+            order.reason_rejection = data['reason_rejection']
+            order.in_process = False
+            order.save()
+            send_notification_push_order(user_id=order.user_id,
+                                         title='{} ha rechazado tu pedido'.format(merchant.merchant_name),
+                                         body='{}'.format(data['reason_rejection']),
+                                         sound="default",
+                                         android_channel_id="messages",
+                                         data={"type": "REJECT_ORDER_MERCHANT",
+                                               "order_id": order.id,
+                                               "message": "Pedido rechazado",
+                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                               })
+            return order
+        except ValueError as e:
+            raise serializers.ValidationError({'detail': str(e)})
+        except Exception as ex:
+            raise serializers.ValidationError({'detail': 'Error desconocido'})
 
 class CancelOrderMerchantSerializer(serializers.Serializer):
     reason_rejection = serializers.CharField(max_length=100, required=True, allow_null=True)
 
     def update(self, order, data):
-        merchant = self.context['merchant']
-        if order.order_status.slug_name is not 'preparing_order':
-            raise ValueError('No es posible cancelar pedido, verifique que no haya sido aceptado o cancelado')
-        order_status = OrderStatus.objects.get(slug_name="cancelled")
-        order.order_status = order_status
-        order.reason_rejection = data['reason_rejection']
-        order.in_process = False
-        order.save()
-        send_notification_push_order(user_id=order.user_id,
-                                     title='{} ha cancelado tu pedido'.format(merchant.merchant_name),
-                                     body='{}'.format(data['reason_rejection']),
-                                     sound="default",
-                                     android_channel_id="messages",
-                                     data={"type": "REJECT_ORDER_MERCHANT",
-                                           "order_id": order.id,
-                                           "message": "Pedido cancelado",
-                                           'click_action': 'FLUTTER_NOTIFICATION_CLICK'
-                                           })
-        return order
+        try:
+            merchant = self.context['merchant']
+            if order.order_status.slug_name is not 'preparing_order':
+                raise ValueError('No es posible cancelar pedido, verifique que no haya sido aceptado o cancelado')
+            order_status = OrderStatus.objects.get(slug_name="cancelled")
+            order.order_status = order_status
+            order.reason_rejection = data['reason_rejection']
+            order.in_process = False
+            order.save()
+            send_notification_push_order(user_id=order.user_id,
+                                         title='{} ha cancelado tu pedido'.format(merchant.merchant_name),
+                                         body='{}'.format(data['reason_rejection']),
+                                         sound="default",
+                                         android_channel_id="messages",
+                                         data={"type": "REJECT_ORDER_MERCHANT",
+                                               "order_id": order.id,
+                                               "message": "Pedido cancelado",
+                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                               })
+            return order
+        except ValueError as e:
+            raise serializers.ValidationError({'detail': str(e)})
+        except Exception as ex:
+            raise serializers.ValidationError({'detail': 'Error desconocido'})
 
 
 class OrderReadyMerchantSerializer(serializers.Serializer):
