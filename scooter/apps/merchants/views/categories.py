@@ -167,21 +167,20 @@ class CategoriesProductsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cr
         response = self.set_response(status=True, data=list_categories, message="Categorias con subcategorias")
         return Response(data=response, status=status.HTTP_200_OK)
 
-    @action(detail=False, methods=['GET'], url_path="subcategories/products")
+    @action(detail=True, methods=['GET'], url_path="subcategories/products")
     def group_subcategories(self, request, *args, **kwargs):
-        categories = self.merchant.categoryproducts_set.filter(status__slug_name="active")
+        category = self.get_object()
         list_categories = []
-        for category in categories:
-            category_temp = CategoryProductsSimpleModelSerializer(category).data
-            subcategories_set = category.subcategories.filter(status__slug_name="active")
-            subcategories_temp = []
-            for subcategory_s in subcategories_set:
-                subcategory_temp = SubcategoryProductsModelSimpleSerializer(subcategory_s).data
-                subcategory_temp['products'] = ProductSimpleModelSerializer(subcategory_s.products.filter(
-                    status__slug_name="active"), many=True).data
-                subcategories_temp.append(subcategories_temp)
-            category_temp['subcategories'] = subcategories_temp
-            list_categories.append(category_temp)
+        category_temp = CategoryProductsSimpleModelSerializer(category).data
+        subcategories_set = category.subcategories.filter(status__slug_name="active")
+        subcategories_temp = []
+        for subcategory_s in subcategories_set:
+            subcategory_temp = SubcategoryProductsModelSimpleSerializer(subcategory_s).data
+            subcategory_temp['products'] = ProductSimpleModelSerializer(subcategory_s.products.filter(
+                status__slug_name="active"), many=True).data
+            subcategories_temp.append(subcategories_temp)
+        category_temp['subcategories'] = subcategories_temp
+        list_categories.append(category_temp)
         response = self.set_response(status=True, data=list_categories, message="Productos agrupado por subcategorias")
         return Response(data=response, status=status.HTTP_200_OK)
 
