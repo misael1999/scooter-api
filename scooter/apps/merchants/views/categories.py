@@ -109,7 +109,7 @@ class CategoriesProductsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cr
         list_categories = []
         products_ids = []
         if search:
-            products = Product.objects.filter(name__icontains=search, status__slug_name="active")
+            products = Product.objects.filter(merchant=self.merchant, name__icontains=search, status__slug_name="active")
             products_ids = products.values_list('id', flat=True)
             data = {'name': 'RESULTADOS: {} ELEMENTOS'.format(products.count()),
                     'products': ProductSimpleModelSerializer(products, many=True).data}
@@ -132,7 +132,7 @@ class CategoriesProductsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cr
         search = request.query_params.get('search', None)
         list_categories = []
         if search:
-            products = Product.objects.filter(name__icontains=search, status__slug_name="active")
+            products = Product.objects.filter(merchant=self.merchant, name__icontains=search, status__slug_name="active")
             data = {'name': 'RESULTADOS: {} ELEMENTOS'.format(products.count()),
                     'products': ProductSimpleModelSerializer(products, many=True).data}
             list_categories.append(data)
