@@ -53,6 +53,14 @@ class SubcategoryProductsModelSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'status', 'merchant', 'category')
 
 
+class SubcategoryProductsModelSimpleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = SubcategoryProducts
+        fields = ('id', 'name', 'user', 'picture', 'merchant', 'category', 'status')
+        read_only_fields = ('id', 'status', 'merchant', 'category')
+
+
 class SubcategoryWithProductsSerializer(serializers.ModelSerializer):
 
     class Meta:

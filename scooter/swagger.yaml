@@ -8,7 +8,7 @@ info:
   license:
     name: BSD License
   version: v1
-basePath: /appback/
+basePath: /
 consumes:
   - application/json
 produces:
@@ -2106,6 +2106,24 @@ paths:
           description: 'Información de la categoría'
       tags:
         - Comercios
+  /api/v1/merchants/{merchant_id}/categories/{category_id}/subcategories/products/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+      - name: category_id
+        in: path
+        required: true
+        type: string
+    get:
+      operationId: get_products_subcategories_products
+      description: Obtener productos agrupadas por subcategorias
+      responses:
+        '200':
+          description: 'Información de la categoría agrupado las subcategorias'
+      tags:
+        - Comercios
   /api/v1/merchants/{merchant_id}/categories/products/:
     parameters:
       - name: merchant_id
@@ -2145,6 +2163,27 @@ paths:
       responses:
         '201':
           description: 'Obtener los productos agrupado por categorias'
+      tags:
+        - Comercios
+  /api/v1/merchants/{merchant_id}/categories/products/search/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+    get:
+      operationId: get_subcategories_products_merchant_search
+      description: Obtener los productos agrupado por subcategorias
+      parameters:
+        - name: search
+          description: Buscar por (nombre)
+          in: query
+          required: false
+          type: string
+      responses:
+        '201':
+          description: 'Obtener los productos agrupado por subcategorias,
+           filtrando unicamente los productos que coincidan con la busqueda'
       tags:
         - Comercios
   /api/v1/merchants/{merchant_id}/subcategories/{subcategory_id}/products/:

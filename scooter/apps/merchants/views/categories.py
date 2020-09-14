@@ -5,7 +5,8 @@ from rest_framework.response import Response
 # Models
 from scooter.apps.common.models.status import Status
 # Serializers
-from scooter.apps.merchants.serializers import SubcategoryProductsModelSerializer
+from scooter.apps.merchants.serializers import SubcategoryProductsModelSerializer, \
+    SubcategoryProductsModelSimpleSerializer
 from scooter.apps.merchants.serializers.categories import (CategoryProductsModelSerializer,
                                                            CategoryWithProductsSerializer, ProductSimpleModelSerializer,
                                                            CategoryWithSubcategoriesSerializer, CategoryProductsSimpleModelSerializer)
@@ -126,6 +127,19 @@ class CategoriesProductsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cr
         response = self.set_response(status=True, data=list_categories, message="Productos con sus categorias")
         return Response(data=response, status=status.HTTP_200_OK)
 
+    @action(detail=False, methods=['GET'], url_path="products/search")
+    def search(self, request, *args, **kwargs):
+        search = request.query_params.get('search', None)
+        list_categories = []
+        if search:
+            products = Product.objects.filter(name__icontains=search, status__slug_name="active")
+            data = {'name': 'RESULTADOS: {} ELEMENTOS'.format(products.count()),
+                    'products': ProductSimpleModelSerializer(products, many=True).data}
+            list_categories.append(data)
+
+        response = self.set_response(status=True, data=list_categories, message="Busqueda de solo los productos")
+        return Response(data=response, status=status.HTTP_200_OK)
+
     @action(detail=True, methods=['GET'])
     def products_cat(self, request, *args, **kwargs):
         category = self.get_object()
@@ -151,5 +165,23 @@ class CategoriesProductsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cr
             category_temp['subcategories'] = SubcategoryProductsModelSerializer(queryset_, many=True).data
             list_categories.append(category_temp)
         response = self.set_response(status=True, data=list_categories, message="Categorias con subcategorias")
+        return Response(data=response, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['GET'], url_path="subcategories/products")
+    def group_subcategories(self, request, *args, **kwargs):
+        categories = self.merchant.categoryproducts_set.filter(status__slug_name="active")
+        list_categories = []
+        for category in categories:
+            category_temp = CategoryProductsSimpleModelSerializer(category).data
+            subcategories_set = category.subcategories.filter(status__slug_name="active")
+            subcategories_temp = []
+            for subcategory_s in subcategories_set:
+                subcategory_temp = SubcategoryProductsModelSimpleSerializer(subcategory_s).data
+                subcategory_temp['products'] = ProductSimpleModelSerializer(subcategory_s.products.filter(
+                    status__slug_name="active"), many=True).data
+                subcategories_temp.append(subcategories_temp)
+            category_temp['subcategories'] = subcategories_temp
+            list_categories.append(category_temp)
+        response = self.set_response(status=True, data=list_categories, message="Productos agrupado por subcategorias")
         return Response(data=response, status=status.HTTP_200_OK)
 
