@@ -219,28 +219,29 @@ class CustomerAppleAuthSerializer(serializers.Serializer):
     APPLE_KEY_CACHE_EXP = 60 * 60 * 24
     APPLE_LAST_KEY_FETCH = 0
 
-    authorization_code = serializers.CharField(max_length=400)
+    authorization_code = serializers.CharField(max_length=1000)
     given_name = serializers.CharField(max_length=400, required=False, allow_null=True, allow_blank=True)
     family_name = serializers.CharField(max_length=400, required=False, allow_null=True, allow_blank=True)
 
     def validate(self, valid_data):
         try:
             # Get apple info
-            data = {
-                'client_id': settings.AUTH_APPLE_ID_CLIENT,
-                'client_secret': self.generate_key_secret(),
-                'grant_type': 'authorization_code',
-                'code': valid_data['authorization_code']
-            }
-
-            headers = {"Content-Type": 'application/x-www-form-urlencoded'}
-
-            req = requests.post(url='https://appleid.apple.com/auth/token', data=data, headers=headers)
-            if req.status_code >= 400:
-                print(req.json())
-                raise ValueError('Error al iniciar sesión')
-            json_obj = req.json()
-            decode = self._decode_apple_user_token(json_obj['id_token'])
+            # data = {
+            #     'client_id': settings.AUTH_APPLE_ID_CLIENT,
+            #     'client_secret': self.generate_key_secret(),
+            #     'grant_type': 'authorization_code',
+            #     'code': valid_data['authorization_code']
+            # }
+            #
+            # headers = {"Content-Type": 'application/x-www-form-urlencoded'}
+            #
+            # req = requests.post(url='https://appleid.apple.com/auth/token', data=data, headers=headers)
+            # if req.status_code >= 400:
+            #     print(req.json())
+            #     raise ValueError('Error al iniciar sesión')
+            # json_obj = req.json()
+            # decode = self._decode_apple_user_token(json_obj['id_token'])
+            decode = self._decode_apple_user_token(valid_data['authorization_code'])
             valid_data['apple_id'] = decode['sub']
             valid_data['email'] = decode['email']
         except ValueError as e:
@@ -336,7 +337,7 @@ class CustomerAppleAuthSerializer(serializers.Serializer):
         key_id = settings.AUTH_APPLE_ID_KEY
         private_key = settings.AUTH_APPLE_ID_SECRET
         TOKEN_AUDIENCE = 'https://appleid.apple.com'
-        TOKEN_TTL_SEC = 6 * 30 * 24 * 60 * 60
+        TOKEN_TTL_SEC = 3600 * 60
 
         headers = {'kid': key_id}
         payload = {
