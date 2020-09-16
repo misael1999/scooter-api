@@ -88,6 +88,7 @@ class ChangePasswordMerchantSerializer(serializers.Serializer):
 class GeneralInfoMerchantSerializer(serializers.Serializer):
     picture = Base64ImageField()
     merchant_name = serializers.CharField(max_length=80)
+    contact_person = serializers.CharField(max_length=100)
     description = serializers.CharField(max_length=120, required=False, allow_null=True, allow_blank=True)
     approximate_preparation_time = serializers.CharField(max_length=10)
     from_preparation_time = serializers.FloatField()
