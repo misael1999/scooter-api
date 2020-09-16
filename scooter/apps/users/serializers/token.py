@@ -315,14 +315,12 @@ class CustomerAppleAuthSerializer(serializers.Serializer):
         public_key = self._fetch_apple_public_key()
         try:
             token = jwt.decode(apple_user_token, public_key, audience=settings.AUTH_APPLE_ID_CLIENT, algorithm="RS256")
-            import pdb; pdb.set_trace()
         except jwt.exceptions.ExpiredSignatureError as e:
             raise Exception("That token has expired")
         except jwt.exceptions.InvalidAudienceError as e:
             raise Exception("That token's audience did not match")
         except Exception as e:
             print(e)
-            import pdb; pdb.set_trace()
             raise Exception("An unexpected error occoured")
 
         return token
