@@ -12,7 +12,7 @@ from rest_framework.validators import UniqueValidator
 # Models
 from scooter.apps.customers.serializers import PointSerializer
 from scooter.apps.users.models import User
-from scooter.apps.merchants.models.merchants import Merchant, MerchantAddress, MerchantSchedule
+from scooter.apps.merchants.models.merchants import Merchant, MerchantAddress, MerchantSchedule, TypeMenuMerchant
 from scooter.apps.common.models import Service, Schedule, CategoryMerchant, SubcategoryMerchant
 # Utilities
 from scooter.utils.functions import send_mail_verification, generate_verification_token
@@ -264,6 +264,7 @@ class MerchantSignUpSerializer(serializers.Serializer):
                                                         source="subcategory",
                                                         required=False, allow_null=True)
     is_delivery_by_store = serializers.BooleanField(default=False)
+    type_menu = serializers.PrimaryKeyRelatedField(queryset=TypeMenuMerchant.objects.all())
     merchant_name = serializers.CharField(max_length=100, validators=[UniqueValidator(
         queryset=Merchant.objects.all(),
         message='Ya existe un negocio con el mismo nombre. ¿El negocio es tuyo?,'
