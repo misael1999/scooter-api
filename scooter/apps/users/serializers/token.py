@@ -283,7 +283,7 @@ class CustomerAppleAuthSerializer(serializers.Serializer):
                 family_name = data.get('family_name', '')
                 full_name = 'Usuario anónimo apple'
                 if give_name:
-                    full_name = give_name + family_name
+                    full_name = give_name + '' + family_name
 
                 customer = Customer.objects.create(user=user,
                                                    name=full_name,
@@ -312,7 +312,7 @@ class CustomerAppleAuthSerializer(serializers.Serializer):
         return APPLE_PUBLIC_KEY
 
     def _decode_apple_user_token(self, apple_user_token):
-        # public_key = self._fetch_apple_public_key()
+        public_key = self._fetch_apple_public_key()
         try:
             token = jwt.decode(apple_user_token, '', verify=False)
         except jwt.exceptions.ExpiredSignatureError as e:
