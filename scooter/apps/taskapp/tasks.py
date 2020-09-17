@@ -38,7 +38,7 @@ def send_notification_delivery():
                                   order_status__slug_name__in=["await_delivery_man"])
     if orders:
         for order in orders:
-            send_order_delivery(location_selected=order.merchant_location,
+            send_order_delivery(location_selected=order.merchant_location.point,
                                 station=order.station,
                                 order=order)
 
