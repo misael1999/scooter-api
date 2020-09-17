@@ -55,3 +55,6 @@ geopy==1.22.0
 # Storages
 google-cloud-storage==1.15.0
 django-storages==1.9.1
+
+# Utilities
+openpyxl==3.0.5

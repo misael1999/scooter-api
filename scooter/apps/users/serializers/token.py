@@ -87,7 +87,8 @@ class CustomerTokenObtainPairSerializer(TokenObtainPairSerializer):
         # if timezone.localtime(timezone.now()) > self.user.verification_deadline and not self.user.is_verified:
         #     raise serializers.ValidationError({'detail': 'Ha expirado su tiempo de verificación'})
         if not self.user.is_verified:
-            raise serializers.ValidationError({'detail': 'Es necesario que verifique su correo electronico {email}'.
+            raise serializers.ValidationError({'detail': 'Se ha enviado un correo electronico a {email} para verificar su cuenta,'
+                                                         ' si no lo encuentra revisa en SPAM'.
                                               format(email=self.user.username)})
 
         data['customer'] = CustomerUserModelSerializer(customer).data

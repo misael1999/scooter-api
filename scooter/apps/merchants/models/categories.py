@@ -34,4 +34,5 @@ class SubcategorySectionProducts(ScooterModel):
     user = models.ForeignKey('users.User',
                              on_delete=models.DO_NOTHING, blank=True, null=True)
     merchant = models.ForeignKey('merchants.Merchant', on_delete=models.DO_NOTHING)
+    category = models.ForeignKey(CategoryProducts, on_delete=models.DO_NOTHING, blank=True, null=True)
     subcategory = models.ForeignKey(SubcategoryProducts, on_delete=models.DO_NOTHING, related_name="sections")
