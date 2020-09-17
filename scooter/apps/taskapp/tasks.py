@@ -4,8 +4,7 @@ from django.utils import timezone
 # Functions
 from scooter.apps.common.models import OrderStatus
 from scooter.apps.delivery_men.models import DeliveryMan
-from scooter.apps.orders.serializers.v2 import send_order_delivery
-from scooter.utils.functions import send_mail_verification
+from scooter.utils.functions import send_mail_verification, send_order_delivery
 # Celery
 from celery.task import task, periodic_task
 # FCM
