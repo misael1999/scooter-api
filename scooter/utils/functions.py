@@ -104,7 +104,7 @@ def send_order_delivery(location_selected, station, order):
                                                           "message": "Pedido de nuevo",
                                                           'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                           })
-        async_to_sync(notify_delivery_men)(order.id, 'NEW_ORDER')
+        # async_to_sync(notify_delivery_men)(order.id, 'NEW_ORDER')
 
     except ValueError as e:
         print(e.__str__())

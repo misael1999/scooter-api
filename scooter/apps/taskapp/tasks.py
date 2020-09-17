@@ -33,12 +33,12 @@ def send_notification_push_task(user_id, title, body, data):
 def send_notification_delivery():
     """ Send notification delivery man when no body response """
     now = timezone.localtime(timezone.now())
-    offset = now - timedelta(minutes=1)
+    offset = now - timedelta(seconds=50)
     orders = Order.objects.filter(order_ready_date__lte=offset,
                                   order_status__slug_name__in=["await_delivery_man"])
     if orders:
         for order in orders:
-            send_order_delivery(location_selected=order.merchant_location.point,
+            send_order_delivery(location_selected=order.merchant.point,
                                 station=order.station,
                                 order=order)
 
