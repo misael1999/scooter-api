@@ -29,7 +29,7 @@ def send_notification_push_task(user_id, title, body, data):
         devices.send_message(title=title, body=body, data=data)
 
 
-@task(name='send_notification_delivery', run_every=timedelta(minutes=1))
+@periodic_task(name='send_notification_delivery', run_every=timedelta(minutes=1))
 def send_notification_delivery():
     """ Send notification delivery man when no body response """
     now = timezone.localtime(timezone.now())
@@ -38,7 +38,7 @@ def send_notification_delivery():
                                   order_status__slug_name__in=["await_delivery_man"])
     if orders:
         for order in orders:
-            send_order_delivery(location_selected=order.merchant.point,
+            send_order_delivery(location_selected=order.merchant_location,
                                 station=order.station,
                                 order=order)
 
