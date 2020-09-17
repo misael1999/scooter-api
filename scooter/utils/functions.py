@@ -2,7 +2,7 @@
 from datetime import datetime
 
 from asgiref.sync import async_to_sync
-from django.contrib.gis.measure import Distance
+from django.contrib.gis.db.models.functions import Distance
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils import timezone
@@ -72,8 +72,6 @@ def get_date_from_querystring(request, date_find, default_value=None):
         return default_value
 
 
-
-
 def send_order_delivery(location_selected, station, order):
     try:
         # Get nearest delivery man
@@ -93,17 +91,17 @@ def send_order_delivery(location_selected, station, order):
                                                     status=['available', 'busy', 'out_service'])
         for delivery_man in delivery_men:
             user_id = delivery_man.user_id
-            send_notification_push_order_with_sound(user_id=user_id,
-                                                    title='Solicitud nueva',
-                                                    body='Ha recibido un nuevo pedido',
-                                                    sound="ringtone.mp3",
-                                                    android_channel_id="alarms",
-                                                    data={"type": "NEW_ORDER",
-                                                          "order_id": order.id,
-                                                          "ordering": "",
-                                                          "message": "Pedido de nuevo",
-                                                          'click_action': 'FLUTTER_NOTIFICATION_CLICK'
-                                                          })
+            send_notification_push_order(user_id=user_id,
+                                         title='Solicitud nueva',
+                                         body='Ha recibido un nuevo pedido',
+                                         sound="ringtone.mp3",
+                                         android_channel_id="alarms",
+                                         data={"type": "NEW_ORDER",
+                                               "order_id": order.id,
+                                               "ordering": "",
+                                               "message": "Pedido de nuevo",
+                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                               })
         # async_to_sync(notify_delivery_men)(order.id, 'NEW_ORDER')
 
     except ValueError as e:
@@ -126,10 +124,10 @@ def get_nearest_delivery_man(location_selected, station, list_exclude, distance,
 
     SEARCH_NUMBER_DELIVERY = settings.SEARCH_NUMBER_DELIVERY
     delivery_man = DeliveryMan.objects. \
-        exclude(id__in=list_exclude). \
-        filter(status__slug_name="active", delivery_status__slug_name__in=status, station=station) \
-        .annotate(distance=Distance('location', location_selected)) \
-        .order_by('distance')[:SEARCH_NUMBER_DELIVERY]
+                       exclude(id__in=list_exclude). \
+                       filter(status__slug_name="active", delivery_status__slug_name__in=status, station=station) \
+                       .annotate(distance=Distance('location', location_selected)) \
+                       .order_by('distance')[:SEARCH_NUMBER_DELIVERY]
     # delivery_man = DeliveryMan.objects.filter(station=station,
     #                                           location__distance_lte=(
     #                                               location_selected.point, D(km=distance))
