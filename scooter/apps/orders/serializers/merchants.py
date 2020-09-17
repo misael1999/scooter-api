@@ -1,29 +1,34 @@
 # Rest framework
+from django.utils import timezone
 from rest_framework import serializers
-# Serializers
-# Models
 from scooter.apps.common.models import OrderStatus
-from scooter.apps.delivery_men.models import DeliveryMan
-# Functions channels
-# Functions
-from scooter.apps.merchants.models import Product
 from scooter.apps.orders.serializers import send_order_delivery
-from scooter.apps.orders.serializers.orders import get_nearest_delivery_man
-# Serializers primary field
-from scooter.apps.common.serializers.common import StationFilteredPrimaryKeyRelatedField
-# Task Celery
-from scooter.apps.taskapp.tasks import send_notification_push_task
 from scooter.utils.functions import send_notification_push_order
 
 
 class AcceptOrderMerchantSerializer(serializers.Serializer):
 
+    def validate(self, data):
+        order = self.context['order']
+        merchant = self.context['merchant']
+
+        if order.order_status.slug_name in ['rejected', 'ignored']:
+            raise serializers.ValidationError({'detail': 'El pedido fue ignorado o rechazado,'
+                                                         ' el tiempo de espera culmino'},
+                                              code='order')
+
+        # Verify that the order does not have a delivery man assigned
+        if order.order_status.slug_name not in ['await_confirmation_merchant']:
+            raise serializers.ValidationError({'detail': 'El pedido ya fue aceptado'},
+                                              code='order_already')
+        data['order'] = order
+        data['merchant'] = merchant
+
+        return data
+
     def update(self, order, data):
         try:
-            merchant = self.context['merchant']
-            if order.order_status.slug_name != 'await_confirmation_merchant':
-                raise ValueError('El pedido ya fue aceptado o ignorado')
-
+            merchant = data['merchant']
             order_status = OrderStatus.objects.get(slug_name="preparing_order")
             order.order_status = order_status
             order.in_process = True
@@ -87,6 +92,7 @@ class RejectOrderMerchantSerializer(serializers.Serializer):
         except Exception as ex:
             raise serializers.ValidationError({'detail': 'Error desconocido'})
 
+
 class CancelOrderMerchantSerializer(serializers.Serializer):
     reason_rejection = serializers.CharField(max_length=100, required=True, allow_null=True)
 
@@ -125,6 +131,7 @@ class OrderReadyMerchantSerializer(serializers.Serializer):
             if not merchant.is_delivery_by_store:
                 order_status = OrderStatus.objects.get(slug_name="await_delivery_man")
                 order.order_status = order_status
+                order.order_ready_date = timezone.localtime(timezone.now())
                 order.save()
                 send_order_delivery(location_selected=merchant.point,
                                     station=order.station,
@@ -144,4 +151,3 @@ class OrderReadyMerchantSerializer(serializers.Serializer):
             raise serializers.ValidationError({'details': str(e)})
         except Exception as ex:
             raise serializers.ValidationError({'details': 'Ha ocurrido un error desconocido'})
-

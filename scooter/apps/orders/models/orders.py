@@ -40,6 +40,9 @@ class Order(ScooterModel):
     approximate_price_order = models.CharField(max_length=30, null=True, blank=True)
     date_delivered_order = models.DateTimeField(null=True, blank=True)
     order_date = models.DateTimeField()
+    order_ready_date = models.DateTimeField(null=True,
+                                            blank=True,
+                                            help_text="When the order is ready")
     qr_code = models.CharField(max_length=15, blank=True, null=True)
     order_status = models.ForeignKey('common.OrderStatus', on_delete=models.DO_NOTHING, default=1)
     # For notice to user that not response his request

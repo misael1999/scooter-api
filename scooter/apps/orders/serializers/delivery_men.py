@@ -79,6 +79,14 @@ class AcceptOrderByDeliveryManSerializer(serializers.Serializer):
                                                    "message": "Puedes ver el seguimiento de tu pedido",
                                                    'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                    })
+                send_notification_push_task.delay(instance.merchant.user_id,
+                                                  'El scooter ya va por el pedido',
+                                                  'Numero de pedido {}'.format(order.qr_code),
+                                                  {"type": type_notification,
+                                                   "order_id": order.id,
+                                                   "message": "Puedes ver el seguimiento de tu pedido",
+                                                   'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                                   })
             async_to_sync(notify_station_accept)(order.station_id, order.id)
             # Notify all delivery men that order was accepted
             async_to_sync(notify_delivery_men)(order.id, 'ORDER_ACCEPTED')

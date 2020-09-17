@@ -2,16 +2,16 @@
 from datetime import timedelta
 from django.utils import timezone
 # Functions
-from scooter.apps.common.models import OrderStatus, Notification
+from scooter.apps.common.models import OrderStatus
 from scooter.apps.delivery_men.models import DeliveryMan
-from scooter.utils.functions import send_mail_verification, generate_verification_token
+from scooter.apps.orders.serializers.v2 import send_order_delivery
+from scooter.utils.functions import send_mail_verification
 # Celery
 from celery.task import task, periodic_task
 # FCM
 from fcm_django.models import FCMDevice
 # Models
 from scooter.apps.orders.models import Order
-from django.db.models import Q
 # Functions
 from scooter.utils.functions import send_notification_push_order
 
@@ -28,6 +28,20 @@ def send_notification_push_task(user_id, title, body, data):
     devices = FCMDevice.objects.filter(user_id=user_id)
     if devices:
         devices.send_message(title=title, body=body, data=data)
+
+
+@task(name='send_notification_delivery', run_every=timedelta(minutes=1))
+def send_notification_delivery():
+    """ Send notification delivery man when no body response """
+    now = timezone.localtime(timezone.now())
+    offset = now - timedelta(minutes=1)
+    orders = Order.objects.filter(order_ready_date__lte=offset,
+                                  order_status__slug_name__in=["await_delivery_man"])
+    if orders:
+        for order in orders:
+            send_order_delivery(location_selected=order.merchant_location,
+                                station=order.station,
+                                order=order)
 
 
 @periodic_task(name='reject_orders', run_every=timedelta(hours=1))
@@ -60,7 +74,6 @@ def ignore_orders():
     now = timezone.localtime(timezone.now())
     offset = now + timedelta(seconds=0)
     orders = Order.objects.filter(maximum_response_time__lte=offset,
-                                  merchant=None,
                                   order_status__slug_name__in=["await_confirmation_merchant"])
     if orders:
         order_status = OrderStatus.objects.get(slug_name='ignored')
@@ -95,7 +108,6 @@ def location_notice_not_enabled():
                                            "message": "No estamos recibiendo tu ubicación",
                                            'click_action': 'FLUTTER_NOTIFICATION_CLICK'})
 
-
 # @periodic_task(name='disabled_location', run_every=timedelta(hours=2))
 # def disabled_location():
 #     """ Disabled location when are available and not send location in several minutes """
@@ -113,5 +125,4 @@ def location_notice_not_enabled():
 #                                            "message": "No estamos recibiendo tu ubicación",
 #                                            'click_action': 'FLUTTER_NOTIFICATION_CLICK'})
 
-    # delivery_men.update(delivery_status_id=3)
-
+# delivery_men.update(delivery_status_id=3)
