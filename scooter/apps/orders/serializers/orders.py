@@ -215,7 +215,7 @@ class InvitedCalculateServicePriceSerializer(serializers.Serializer):
             data_service = calculate_service_price(from_address=from_address,
                                                    to_address=None,
                                                    service=data['station_service'],
-                                                   is_current_location=False,
+                                                   is_current_location=True,
                                                    point=point)
             return data_service['price_service']
         except ValueError as e:
