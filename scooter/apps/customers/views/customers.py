@@ -51,7 +51,7 @@ class CustomerViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         data = self.set_response(status='ok',
                                  data={},
                                  message=message)
-        return Response(data, status=status.HTTP_201_CREATED)
+        return Response(customer, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
         try:

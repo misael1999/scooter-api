@@ -10,6 +10,8 @@ from datetime import timedelta
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 # Models
+from rest_framework_simplejwt.tokens import RefreshToken
+
 from scooter.apps.common.models import Notification
 from scooter.apps.users.models import User
 from scooter.apps.customers.models.customers import Customer, HistoryCustomerInvitation, CustomerPromotion
@@ -116,7 +118,7 @@ class CustomerSignUpSerializer(serializers.Serializer):
         code = generate_verification_token(user=user,
                                            exp=user.verification_deadline,
                                            token_type='email_confirmation')
-        subject = 'Bienvenido {name}, Verifica tu cuenta para comenzar'.format(name=customer.name)
+        subject = 'Bienvenido a Scooter Envíos {name}'.format(name=customer.name)
         # Create a notification
         # Notification.objects.create(user=user, title="Bienvenido",
         #                             type_notification_id=1,
@@ -133,7 +135,13 @@ class CustomerSignUpSerializer(serializers.Serializer):
                                             data=data)
         if not send_email:
             raise serializers.ValidationError({'detail': 'Ha ocurrido un error al enviar el correo'})
-        return customer
+
+        refresh = RefreshToken.for_user(user)
+        response = dict()
+        response['refresh'] = str(refresh)
+        response['access'] = str(refresh.access_token)
+        response['customer'] = CustomerUserModelSerializer(customer).data
+        return response
 
 
 class ChangePasswordCustomerSerializer(serializers.Serializer):
