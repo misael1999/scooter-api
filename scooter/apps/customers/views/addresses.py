@@ -63,7 +63,7 @@ class CustomerAddressesViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cre
                                  message='Se ha registrado un nuevo direccion')
         return Response(data=data, status=status.HTTP_201_CREATED)
 
-    @action(detail=False, methods=['POST'])
+    @action(detail=False, methods=['post'])
     def create_or_get(self, request, *args, **kwargs):
         """ Get or create address  """
         serializer = CreateOrGetAddressSerializer(data=request.data, context=self.get_serializer_context())
