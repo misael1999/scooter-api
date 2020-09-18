@@ -50,7 +50,9 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         return serializer_class
 
     def get_permissions(self):
-        if self.action in ['create']:
+        if self.action in ['list']:
+            permission_classes = [AllowAny]
+        elif self.action in ['create']:
             permission_classes = [IsAuthenticated]
         elif self.action in ['partial_update', 'update', 'update_info']:
             permission_classes = [IsAuthenticated, IsSameMerchant]

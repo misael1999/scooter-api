@@ -8,7 +8,7 @@ from rest_framework.decorators import action
 from scooter.apps.common.models import CategoryMerchant
 from scooter.utils.viewsets import ScooterViewSet
 # Permissions
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 # Models
 
 # Serializers
@@ -18,7 +18,7 @@ from scooter.apps.common.serializers import (CategoryMerchantModelSerializer, Su
 class CategoryMerchantViewSet(ScooterViewSet, mixins.CreateModelMixin, mixins.ListModelMixin):
     """ Return merchant categories"""
     serializer_class = CategoryMerchantModelSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
 
     def get_queryset(self):
         if self.action == 'list':
