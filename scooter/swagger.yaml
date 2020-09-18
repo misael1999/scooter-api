@@ -27,6 +27,21 @@ security:
 # ====== PATHS =======
 paths:
   # STATUS
+  /api/v1/commons/invited_service_price/:
+    post:
+      operationId: calculate_invited_service_price_customer
+      description: Calcular el precio del servicio para un invitado
+      parameters:
+        - name: body
+          in: body
+          description: Calcular el precio del servicio
+          schema:
+            $ref: '#/definitions/CalculatePriceOrderInvited'
+      responses:
+        '200':
+          description: 'Precio previo del pedido'
+      tags:
+        - Pedidos clientes
   /api/v1/commons/status/:
     get:
       operationId: general_status_get
@@ -1634,26 +1649,6 @@ paths:
       responses:
         '200':
           description: 'Pedido creado'
-      tags:
-        - Pedidos clientes
-  /api/v1/customers/{customer_id}/orders/invited_service_price/:
-    parameters:
-      - name: customer_id
-        in: path
-        required: true
-        type: string
-    post:
-      operationId: calculate_invited_service_price_customer
-      description: Calcular el precio del servicio para un invitado
-      parameters:
-        - name: body
-          in: body
-          description: Calcular el precio del servicio
-          schema:
-            $ref: '#/definitions/CalculatePriceOrderInvited'
-      responses:
-        '200':
-          description: 'Precio previo del pedido'
       tags:
         - Pedidos clientes
   /api/v1/delivery_men/{delivery_man_id}/orders/:

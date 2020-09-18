@@ -5,6 +5,7 @@ from rest_framework.response import Response
 # Custom viewset
 from scooter.apps.customers.models import CustomerAddress
 from scooter.apps.customers.serializers import AddressRecommendationsSerializer, CustomerAddressModelSerializer
+from scooter.apps.orders.serializers import InvitedCalculateServicePriceSerializer
 from scooter.utils.viewsets import ScooterViewSet
 # Permissions
 from rest_framework.permissions import IsAuthenticated
@@ -73,4 +74,15 @@ class StatusViewSet(ScooterViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         data = self.set_response(status='ok', data={}, message='Notificación enviada')
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    @action(methods=['POST'], detail=False)
+    def invited_service_price(self, request, *args, **kwargs):
+        """ Calculate price of the servive before request the service """
+        serializer = InvitedCalculateServicePriceSerializer(data=request.data, context=self.get_serializer_context())
+        serializer.is_valid(raise_exception=True)
+        obj = serializer.save()
+        data = self.set_response(status=True,
+                                 data={'price_service': obj},
+                                 message='Precio del servicio')
         return Response(data=data, status=status.HTTP_200_OK)
