@@ -91,3 +91,20 @@ class CreateCustomerAddressSerializer(serializers.ModelSerializer):
             return instance
         except Exception as ex:
             raise serializers.ValidationError({'detail': ex.args.__str__()})
+
+
+class CreateOrGetAddressSerializer(serializers.ModelSerializer):
+    point = PointSerializer()
+    type_address_id = serializers.IntegerField(default=1)
+
+    class Meta:
+        model = CustomerAddress
+        fields = ("alias", "full_address", "type_address_id", "references", "point")
+
+    def create(self, data):
+        customer = self.context['customer']
+        data['customer'] = customer
+        references = data.pop('references', None)
+        address, created = CustomerAddress.objects.get_or_create(**data)
+        address.references = references
+        return address

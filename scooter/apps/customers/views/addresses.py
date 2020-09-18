@@ -1,12 +1,13 @@
 # Django rest
 from rest_framework import mixins, status
+from rest_framework.decorators import action
 from rest_framework.response import Response
 # Models
 from scooter.apps.customers.models.customers import CustomerAddress
 from scooter.apps.common.models.status import Status
 # Serializers
 from scooter.apps.customers.serializers.addresses import (CustomerAddressModelSerializer,
-                                                          CreateCustomerAddressSerializer)
+                                                          CreateCustomerAddressSerializer, CreateOrGetAddressSerializer)
 # Viewset
 from scooter.utils.viewsets.scooter import ScooterViewSet
 # Mixins
@@ -55,6 +56,17 @@ class CustomerAddressesViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cre
     def create(self, request, *args, **kwargs):
         """ To return a custom response """
         serializer = CreateCustomerAddressSerializer(data=request.data, context=self.get_serializer_context())
+        serializer.is_valid(raise_exception=True)
+        obj = serializer.save()
+        data = self.set_response(status=True,
+                                 data=CustomerAddressModelSerializer(obj).data,
+                                 message='Se ha registrado un nuevo direccion')
+        return Response(data=data, status=status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=['POST'])
+    def create_or_get(self, request, *args, **kwargs):
+        """ Get or create address  """
+        serializer = CreateOrGetAddressSerializer(data=request.data, context=self.get_serializer_context())
         serializer.is_valid(raise_exception=True)
         obj = serializer.save()
         data = self.set_response(status=True,
