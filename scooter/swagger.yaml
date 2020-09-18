@@ -1636,6 +1636,26 @@ paths:
           description: 'Pedido creado'
       tags:
         - Pedidos clientes
+  /api/v1/customers/{customer_id}/orders/invited_service_price/:
+    parameters:
+      - name: customer_id
+        in: path
+        required: true
+        type: string
+    post:
+      operationId: calculate_invited_service_price_customer
+      description: Calcular el precio del servicio para un invitado
+      parameters:
+        - name: body
+          in: body
+          description: Calcular el precio del servicio
+          schema:
+            $ref: '#/definitions/CalculatePriceOrderInvited'
+      responses:
+        '200':
+          description: 'Precio previo del pedido'
+      tags:
+        - Pedidos clientes
   /api/v1/delivery_men/{delivery_man_id}/orders/:
     parameters:
       - name: delivery_man_id
@@ -3329,6 +3349,37 @@ definitions:
         type: number
         description: Id de la dirección de entrega
         example: 1
+    required:
+      - station_id
+      - service_id
+      - from_address_id
+      - to_address_id
+  CalculatePriceOrderInvited:
+    type: object
+    properties:
+      station_id:
+        type: number
+        description: Id de la estación
+        example: 1
+      service_id:
+        type: number
+        description: Id del servicio
+        example: 1
+      merchant_id:
+        type: number
+        description: Id del comercio
+        example: 1
+      point:
+        type: object
+        properties:
+          lat:
+            type: number
+            description: Latitude
+            example: 18.462859841665864
+          lng:
+            type: number
+            description: Longitude
+            example: -97.39279966871719
     required:
       - station_id
       - service_id

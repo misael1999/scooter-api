@@ -13,7 +13,7 @@ from scooter.apps.customers.permissions.customers import IsAccountOwnerCustomer
 # Serializers
 from scooter.apps.orders.serializers import (OrderModelSerializer,
                                              CalculateServicePriceSerializer,
-                                             OrderCurrentStatusSerializer)
+                                             OrderCurrentStatusSerializer, InvitedCalculateServicePriceSerializer)
 from scooter.apps.orders.serializers.v2 import (CreateOrderSerializer,
                                                 OrderWithDetailModelSerializer,
                                                 RantingOrderCustomerSerializer,
@@ -71,6 +71,17 @@ class CustomerOrderV2ViewSet(ScooterViewSet, mixins.CreateModelMixin, AddCustome
     def service_price(self, request, *args, **kwargs):
         """ Calculate price of the servive before request the service """
         serializer = CalculateServicePriceSerializer(data=request.data, context=self.get_serializer_context())
+        serializer.is_valid(raise_exception=True)
+        obj = serializer.save()
+        data = self.set_response(status=True,
+                                 data={'price_service': obj},
+                                 message='Precio del servicio')
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    @action(methods=['POST'], detail=False)
+    def invited_service_price(self, request, *args, **kwargs):
+        """ Calculate price of the servive before request the service to invited """
+        serializer = InvitedCalculateServicePriceSerializer(data=request.data, context=self.get_serializer_context())
         serializer.is_valid(raise_exception=True)
         obj = serializer.save()
         data = self.set_response(status=True,

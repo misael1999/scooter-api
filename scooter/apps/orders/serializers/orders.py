@@ -158,7 +158,7 @@ class CalculateServicePriceSerializer(serializers.Serializer):
             if is_order_to_merchant:
                 from_address = merchant.point
             else:
-                from_address = from_address=data['from_address'].point
+                from_address = data['from_address'].point
 
             is_current_location = data.get('is_current_location', False)
             point = data.pop('point', None)
@@ -168,10 +168,54 @@ class CalculateServicePriceSerializer(serializers.Serializer):
             else:
                 to_address = data['to_address'].point
 
-            data_service = calculate_service_price(from_address,
+            data_service = calculate_service_price(from_address=from_address,
                                                    to_address=to_address,
                                                    service=data['station_service'],
                                                    is_current_location=is_current_location,
+                                                   point=point)
+            return data_service['price_service']
+        except ValueError as e:
+            raise serializers.ValidationError({'detail': str(e)})
+        except Exception as ex:
+            print("Exception in create order, please check it")
+            print(ex.args.__str__())
+            raise serializers.ValidationError({'detail': 'Error al consultar precio de la orden'})
+
+
+class InvitedCalculateServicePriceSerializer(serializers.Serializer):
+    """ Calculate the price of the service before requesting the service to invited """
+    point = PointSerializer()
+    station_id = serializers.PrimaryKeyRelatedField(queryset=Station.objects.all(), source="station")
+    service_id = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all(), source="service")
+    merchant_id = serializers.PrimaryKeyRelatedField(queryset=Merchant.objects.all(),
+                                                     source="merchant", required=False,
+                                                     allow_null=True, allow_empty=True)
+
+    def validate(self, data):
+        # Check if the station has the requested service
+        try:
+            station = data['station']
+            exist_service = station.services.get(service=data['service'])
+            # if not exist_service:
+            #     raise serializers.ValidationError({'detail': 'La central no cuenta con el servicio solicitado'})
+            data['station_service'] = exist_service
+            data.pop('service')
+        except StationService.DoesNotExist:
+            raise serializers.ValidationError({'detail': 'La central no cuenta con el servicio solicitado'})
+
+        return data
+
+    def create(self, data):
+        try:
+            merchant = data.get('merchant', None)
+            from_address = merchant.point
+            point = data.pop('point', None)
+            point = Point(x=point['lng'], y=point['lat'], srid=4326)
+
+            data_service = calculate_service_price(from_address=from_address,
+                                                   to_address=None,
+                                                   service=data['station_service'],
+                                                   is_current_location=False,
                                                    point=point)
             return data_service['price_service']
         except ValueError as e:

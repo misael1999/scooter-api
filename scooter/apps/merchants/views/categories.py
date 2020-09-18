@@ -9,14 +9,15 @@ from scooter.apps.merchants.serializers import SubcategoryProductsModelSerialize
     SubcategoryProductsModelSimpleSerializer
 from scooter.apps.merchants.serializers.categories import (CategoryProductsModelSerializer,
                                                            CategoryWithProductsSerializer, ProductSimpleModelSerializer,
-                                                           CategoryWithSubcategoriesSerializer, CategoryProductsSimpleModelSerializer)
+                                                           CategoryWithSubcategoriesSerializer,
+                                                           CategoryProductsSimpleModelSerializer)
 # Viewset
 from scooter.apps.merchants.models import CategoryProducts, Product
 from scooter.utils.viewsets.scooter import ScooterViewSet
 # Mixins
 from scooter.apps.common.mixins import AddMerchantMixin
 # Permissions
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from scooter.apps.merchants.permissions import IsAccountOwnerMerchant
 # Filters
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -49,8 +50,11 @@ class CategoriesProductsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cr
     def get_permissions(self):
         if self.action in ['create', 'update', 'destroy']:
             permission_classes = [IsAuthenticated, IsAccountOwnerMerchant]
+        # elif self.action in ['products',
+        # 'products/search', 'products_cat', 'level_two', 'level_three', 'subcategories/products']:
+        #     permission_classes = [AllowAny]
         else:
-            permission_classes = [IsAuthenticated]
+            permission_classes = [AllowAny]
 
         return [permission() for permission in permission_classes]
 
@@ -109,7 +113,8 @@ class CategoriesProductsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cr
         list_categories = []
         products_ids = []
         if search:
-            products = Product.objects.filter(merchant=self.merchant, name__icontains=search, status__slug_name="active")
+            products = Product.objects.filter(merchant=self.merchant, name__icontains=search,
+                                              status__slug_name="active")
             products_ids = products.values_list('id', flat=True)
             data = {'name': 'RESULTADOS: {} ELEMENTOS'.format(products.count()),
                     'products': ProductSimpleModelSerializer(products, many=True).data}
@@ -132,7 +137,8 @@ class CategoriesProductsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cr
         search = request.query_params.get('search', None)
         list_categories = []
         if search:
-            products = Product.objects.filter(merchant=self.merchant, name__icontains=search, status__slug_name="active")
+            products = Product.objects.filter(merchant=self.merchant, name__icontains=search,
+                                              status__slug_name="active")
             data = {'name': 'RESULTADOS: {} ELEMENTOS'.format(products.count()),
                     'products': ProductSimpleModelSerializer(products, many=True).data}
             list_categories.append(data)
@@ -181,4 +187,3 @@ class CategoriesProductsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cr
         category_temp['subcategories'] = subcategories_temp
         response = self.set_response(status=True, data=category_temp, message="Productos agrupado por subcategorias")
         return Response(data=response, status=status.HTTP_200_OK)
-

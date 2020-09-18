@@ -92,8 +92,8 @@ def send_order_delivery(location_selected, station, order):
         for delivery_man in delivery_men:
             user_id = delivery_man.user_id
             send_notification_push_order(user_id=user_id,
-                                         title='Solicitud nueva',
-                                         body='Ha recibido un nuevo pedido',
+                                         title='¡Pedido sin responder!',
+                                         body='Hay un pedido nuevo que esta en espera',
                                          sound="ringtone.mp3",
                                          android_channel_id="alarms",
                                          data={"type": "NEW_ORDER",
@@ -102,7 +102,7 @@ def send_order_delivery(location_selected, station, order):
                                                "message": "Pedido de nuevo",
                                                'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                })
-        # async_to_sync(notify_delivery_men)(order.id, 'NEW_ORDER')
+        async_to_sync(notify_delivery_men)(order.id, 'NEW_ORDER')
 
     except ValueError as e:
         print(e.__str__())
