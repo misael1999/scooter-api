@@ -104,7 +104,12 @@ class CreateOrGetAddressSerializer(serializers.ModelSerializer):
     def create(self, data):
         customer = self.context['customer']
         data['customer'] = customer
+        point = data.pop('point', None)
+        if point:
+            point = Point(x=point['lng'], y=point['lat'], srid=4326)
         references = data.pop('references', None)
         address, created = CustomerAddress.objects.get_or_create(**data)
         address.references = references
+        address.point = point
+        address.save()
         return address
