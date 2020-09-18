@@ -8,7 +8,7 @@ from scooter.apps.customers.serializers import AddressRecommendationsSerializer,
 from scooter.apps.orders.serializers import InvitedCalculateServicePriceSerializer
 from scooter.utils.viewsets import ScooterViewSet
 # Permissions
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 # Models
 from scooter.apps.common.models.status import Status
 from scooter.apps.common.models.common import Schedule, Service, TypeAddress, TypeVehicle
@@ -25,6 +25,14 @@ class StatusViewSet(ScooterViewSet):
     """ Return status"""
     lookup_field = 'id'
     permission_classes = (IsAuthenticated,)
+
+    def get_permissions(self):
+        if self.action in ['invited_service_price']:
+            permission_classes = [AllowAny]
+        else:
+            permission_classes = [IsAuthenticated]
+
+        return [permission() for permission in permission_classes]
 
     @action(methods=['get'], detail=False, url_path="status")
     def status(self, request, *args, **kwargs):

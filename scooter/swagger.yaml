@@ -41,7 +41,7 @@ paths:
         '200':
           description: 'Precio previo del pedido'
       tags:
-        - Pedidos clientes
+        - Común
   /api/v1/commons/status/:
     get:
       operationId: general_status_get
