@@ -14,7 +14,7 @@ from scooter.utils.viewsets.scooter import ScooterViewSet
 # Mixins
 from scooter.apps.common.mixins import AddMerchantMixin
 # Permissions
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 
 class SubcategoriesProductsViewSet(ScooterViewSet, AddMerchantMixin, mixins.DestroyModelMixin):
@@ -23,6 +23,17 @@ class SubcategoriesProductsViewSet(ScooterViewSet, AddMerchantMixin, mixins.Dest
     merchant = None
     queryset = SubcategoryProducts.objects.all()
     permission_classes = (IsAuthenticated,)
+
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'destroy', 'perform_destroy', 'unlock']:
+            permission_classes = [IsAuthenticated]
+        # elif self.action in ['products',
+        # 'products/search', 'products_cat', 'level_two', 'level_three', 'subcategories/products']:
+        #     permission_classes = [AllowAny]
+        else:
+            permission_classes = [AllowAny]
+
+        return [permission() for permission in permission_classes]
 
     def perform_destroy(self, instance):
         try:
