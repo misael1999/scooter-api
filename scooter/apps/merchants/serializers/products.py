@@ -117,40 +117,6 @@ class ProductsModelSerializer(ScooterModelSerializer):
 
     def update(self, product, data):
         picture = data.get('picture', None)
-        data.pop('menu_categories', None)
-        menu_add = data.pop('menu_categories_add', [])
-        menu_update = data.pop('menu_categories_update', [])
-        menu_delete = data.pop('menu_categories_delete', [])
-        menu_option_to_save = []
-        menu_option_to_update = []
-        menu_option_to_delete = []
-
-        # Agregar nuevos menus
-        for menu in menu_add:
-            options = menu.pop('options', [])
-            menu_category = ProductMenuCategory.objects.create(**menu, product_id=product.id)
-            for option in options:
-                menu_option_to_save.append(ProductMenuOption(**option, menu_id=menu_category.id))
-        ProductMenuOption.objects.bulk_create(menu_option_to_save)
-
-        # Actualizar menús
-        for menu in menu_update:
-            options = menu.pop('options', [])
-            menu_category_temp = ProductMenuCategory.objects.filter(pk=menu['id']).update(**menu)
-            menu_category = menu_category_temp[0]
-            # Actualizar el menú de la categoria
-            # for field, value in menu.items():
-            #     setattr(menu_category, field, value)
-            # menu_category.save()
-            for option in options:
-                ProductMenuOption.objects.filter(pk=option['id']).update(**option)
-
-        # Desactivar menús
-        for menu in menu_delete:
-            menu = ProductMenuCategory.objects.get(pk=menu['id'])
-            menu.status_id = 2
-            menu_option_to_delete.append(menu)
-        ProductMenuCategory.objects.bulk_update(menu_delete, ['status'])
         # Delete previous image
         if picture:
             product.picture.delete()
