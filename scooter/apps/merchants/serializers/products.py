@@ -63,8 +63,8 @@ class ProductsModelSerializer(ScooterModelSerializer):
         fields = ('id', 'name', 'description', 'description_long', 'stock', 'category', 'subcategory',
                   'section',
                   'price', 'category_id', 'subcategory_id', 'picture', 'merchant', 'total_sales', 'status',
-                  'have_menu', 'menu_categories', 'is_available', 'user', 'section_id', 'menu_add',
-                  'menu_update', 'menu_delete')
+                  'have_menu', 'menu_categories', 'is_available', 'user', 'section_id', 'menu_categories_add',
+                  'menu_categories_update', 'menu_categories_delete')
         read_only_fields = ("id", "merchant", "total_sales", 'status')
 
     def __init__(self, *args, **kwargs):
