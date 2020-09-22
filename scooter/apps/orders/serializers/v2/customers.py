@@ -380,24 +380,27 @@ class RantingOrderCustomerSerializer(serializers.Serializer):
     def create(self, data):
         try:
             station = data['station']
-            merchant = data['merchant']
             delivery_man = data['delivery_man']
+            order = data['order']
+
             # Create new rating order
             rating_order = RatingOrder.objects.create(
                 **data
             )
 
-            # Update reputation station
-            merchant_avg = round(
-                RatingOrder.objects.filter(
-                    merchant=merchant,
-                ).aggregate(Avg('rating_merchant'))['rating_merchant__avg'],
-                1
-            )
+            if order.is_order_to_merchant:
+                merchant = order.merchant
+                # Update reputation station
+                merchant_avg = round(
+                    RatingOrder.objects.filter(
+                        merchant=merchant,
+                    ).aggregate(Avg('rating_merchant'))['rating_merchant__avg'],
+                    1
+                )
 
-            merchant.reputation = merchant_avg
-            merchant.total_grades = merchant.total_grades + 1
-            merchant.save()
+                merchant.reputation = merchant_avg
+                merchant.total_grades = merchant.total_grades + 1
+                merchant.save()
 
             # Update reputation delivery man
             delivery_man_avg = round(
