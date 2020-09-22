@@ -34,7 +34,7 @@ class RatingOrder(ScooterModel):
 
     comments = models.TextField(blank=True, null=True)
 
-    rating = models.FloatField(default=1)
+    rating = models.IntegerField(default=1)
     rating_merchant = models.FloatField(default=1, null=True, blank=True)
 
     def __str__(self):
