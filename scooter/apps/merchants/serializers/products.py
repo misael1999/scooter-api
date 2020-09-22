@@ -17,20 +17,26 @@ from scooter.utils.serializers.scooter import ScooterModelSerializer
 
 # Serializers
 class ProductMenuOptionSerializer(serializers.ModelSerializer):
+    option_id = serializers.IntegerField(required=False, allow_null=True, source="id")
+    status = StatusModelSerializer(read_only=True)
+
     class Meta:
         model = ProductMenuOption
-        fields = ('id', 'name', 'price', 'is_available')
-        read_only_fields = ('id',)
+        fields = ('option_id', 'id', 'name', 'price', 'is_available', 'status')
+        read_only_fields = ('id', 'status')
 
 
 class ProductMenuCategorySerializer(serializers.ModelSerializer):
     options = ProductMenuOptionSerializer(many=True)
+    menu_id = serializers.IntegerField(required=False, allow_null=True, source="id")
+    status = StatusModelSerializer(read_only=True)
 
     class Meta:
         model = ProductMenuCategory
-        fields = ('id', 'name', 'is_range', 'is_obligatory', 'have_quantity', 'min_quantity', 'max_quantity',
-                  'limit_options_choose', 'min_options_choose', 'max_options_choose', 'options')
-        read_only_fields = ('id',)
+        fields = ('id', 'menu_id', 'name', 'is_range', 'is_obligatory', 'have_quantity', 'min_quantity', 'max_quantity',
+                  'limit_options_choose', 'min_options_choose',
+                  'max_options_choose', 'options', 'status')
+        read_only_fields = ('status', 'id')
 
 
 class ProductsModelSerializer(ScooterModelSerializer):
@@ -57,6 +63,7 @@ class ProductsModelSerializer(ScooterModelSerializer):
     menu_categories_add = ProductMenuCategorySerializer(many=True, required=False)
     menu_categories_update = ProductMenuCategorySerializer(many=True, required=False)
     menu_categories_delete = ProductMenuCategorySerializer(many=True, required=False)
+    menu_categories_active = ProductMenuCategorySerializer(many=True, required=False)
 
     class Meta:
         model = Product
@@ -64,7 +71,7 @@ class ProductsModelSerializer(ScooterModelSerializer):
                   'section',
                   'price', 'category_id', 'subcategory_id', 'picture', 'merchant', 'total_sales', 'status',
                   'have_menu', 'menu_categories', 'is_available', 'user', 'section_id', 'menu_categories_add',
-                  'menu_categories_update', 'menu_categories_delete')
+                  'menu_categories_update', 'menu_categories_delete', 'menu_categories_active')
         read_only_fields = ("id", "merchant", "total_sales", 'status')
 
     def __init__(self, *args, **kwargs):
@@ -104,8 +111,10 @@ class ProductsModelSerializer(ScooterModelSerializer):
             if menu_categories:
                 for menu in menu_categories:
                     options = menu.pop('options', [])
+                    menu_id = menu.pop('menu_id', None)
                     menu_category = ProductMenuCategory.objects.create(**menu, product_id=product.id)
                     for option in options:
+                        option_id = option.pop('option_id', None)
                         menu_option_to_save.append(ProductMenuOption(**option, menu_id=menu_category.id))
 
                 ProductMenuOption.objects.bulk_create(menu_option_to_save)
@@ -116,6 +125,53 @@ class ProductsModelSerializer(ScooterModelSerializer):
             raise serializers.ValidationError({'detail': 'Error al guardar la información'})
 
     def update(self, product, data):
+        data.pop('menu_categories', None)
+        menu_add = data.pop('menu_categories_add', [])
+        menu_update = data.pop('menu_categories_update', [])
+        menu_delete = data.pop('menu_categories_delete', [])
+        menu_active = data.pop('menu_categories_active', [])
+        menu_option_to_save = []
+        menu_option_to_update = []
+        menu_option_to_delete = []
+
+        # Agregar nuevos menus
+        for menu in menu_add:
+            options = menu.pop('options', [])
+            menu_category = ProductMenuCategory.objects.create(**menu, product_id=product.id)
+            for option in options:
+                menu_option_to_save.append(ProductMenuOption(**option, menu_id=menu_category.id))
+        ProductMenuOption.objects.bulk_create(menu_option_to_save)
+
+        # Actualizar menús
+        for menu in menu_update:
+            options = menu.pop('options', [])
+            menu_id = menu.pop('id', None)
+            menu_category = ProductMenuCategory.objects.get(pk=menu_id)
+            # menu_category = menu_category_temp[0]
+            # Actualizar el menú de la categoria
+            for field, value in menu.items():
+                setattr(menu_category, field, value)
+            menu_category.save()
+            for option in options:
+                option_id = option.pop('id', None)
+                if option_id:
+                    ProductMenuOption.objects.filter(pk=option_id).update(**option)
+                else:
+                    ProductMenuOption.objects.create(**option, menu=menu_category)
+
+        # Desactivar menús
+        for menu in menu_delete:
+            menu = ProductMenuCategory.objects.get(pk=menu['id'])
+            menu.status_id = 2
+            menu_option_to_delete.append(menu)
+        ProductMenuCategory.objects.bulk_update(menu_option_to_delete, ['status'])
+        # Activar menús
+        for menu in menu_active:
+            menu = ProductMenuCategory.objects.get(pk=menu['id'])
+            menu.status_id = 1
+            menu_option_to_delete.append(menu)
+        ProductMenuCategory.objects.bulk_update(menu_option_to_delete, ['status'])
+
         picture = data.get('picture', None)
         # Delete previous image
         if picture:
