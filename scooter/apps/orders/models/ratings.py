@@ -20,6 +20,8 @@ class RatingOrder(ScooterModel):
 
     user = models.ForeignKey('users.User', on_delete=models.CASCADE)
 
+    merchant = models.ForeignKey('merchants.Merchant', on_delete=models.DO_NOTHING ,blank=True, null=True)
+
     delivery_man = models.ForeignKey('delivery_men.DeliveryMan', on_delete=models.CASCADE)
 
     rating_customer = models.ForeignKey(
@@ -32,7 +34,8 @@ class RatingOrder(ScooterModel):
 
     comments = models.TextField(blank=True, null=True)
 
-    rating = models.IntegerField(default=1)
+    rating = models.FloatField(default=1)
+    rating_merchant = models.FloatField(default=1, null=True, blank=True)
 
     def __str__(self):
         """Return summary."""

@@ -325,7 +325,7 @@ class RetryOrderSerializer(serializers.Serializer):
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
         except Exception as ex:
-            print("Exception in rating order, please check it")
+            print("Exception in retry order, please check it")
             print(ex.args.__str__())
             raise serializers.ValidationError({'detail': 'Error al calificar la orden'})
 
@@ -350,6 +350,11 @@ class CheckPromoCodeSerializer(serializers.Serializer):
 class RantingOrderCustomerSerializer(serializers.Serializer):
     """ Rated order by customer """
     rating = serializers.FloatField(min_value=1, max_value=5)
+    rating_merchant = serializers.FloatField(min_value=1, max_value=5)
+    merchant_id = serializers.PrimaryKeyRelatedField(allow_null=True,
+                                                     allow_empty=True,
+                                                     queryset=Merchant.objects.all(),
+                                                     source="merchant")
     comments = serializers.CharField(required=False)
 
     def validate(self, data):
@@ -375,6 +380,7 @@ class RantingOrderCustomerSerializer(serializers.Serializer):
     def create(self, data):
         try:
             station = data['station']
+            merchant = data['merchant']
             delivery_man = data['delivery_man']
             # Create new rating order
             rating_order = RatingOrder.objects.create(
@@ -382,29 +388,28 @@ class RantingOrderCustomerSerializer(serializers.Serializer):
             )
 
             # Update reputation station
-            station_avg = round(
+            merchant_avg = round(
                 RatingOrder.objects.filter(
-                    station=data['station'],
-                ).aggregate(Avg('rating'))['rating__avg'],
+                    merchant=merchant,
+                ).aggregate(Avg('rating_merchant'))['rating_merchant__avg'],
                 1
             )
-            station.reputation = station_avg
-            station.save()
+
+            merchant.reputation = merchant_avg
+            merchant.total_grades = merchant.total_grades + 1
+            merchant.save()
 
             # Update reputation delivery man
             delivery_man_avg = round(
                 RatingOrder.objects.filter(
                     delivery_man=delivery_man,
-                    station=data['station']
+                    station=station
                 ).aggregate(Avg('rating'))['rating__avg'],
                 1
             )
 
             delivery_man.reputation = delivery_man_avg
             delivery_man.save()
-
-            Notification.objects.create(user_id=station.user_id, title="Ha recibido una nueva valoración",
-                                        type_notification_id=1)
 
             return data
         except ValueError as e:

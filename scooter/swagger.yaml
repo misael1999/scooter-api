@@ -1436,6 +1436,24 @@ paths:
           description: 'Calificar pedido'
       tags:
         - Pedidos clientes
+  /api/v1/customers/{customer_id}/orders/{order_id}/:
+    parameters:
+      - name: customer_id
+        in: path
+        required: true
+        type: number
+      - name: order_id
+        in: path
+        required: true
+        type: number
+    get:
+      operationId: get_orders_customer
+      description: Obtener una orden del cliente
+      responses:
+        '200':
+          description: 'Obtener una orden del cliente'
+      tags:
+        - Pedidos clientes
 
   /api/v1/customers/{customer_id}/orders/{order_id}/retry/:
     parameters:

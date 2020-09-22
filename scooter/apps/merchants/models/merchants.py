@@ -31,6 +31,7 @@ class Merchant(ScooterModel):
     to_preparation_time = models.FloatField(default=0)
 
     # stats
+    total_grades = models.IntegerField(default=0)
     reputation = models.FloatField(default=0)
     point = models.PointField(geography=True, blank=True, null=True)
     is_open = models.BooleanField(default=False)
