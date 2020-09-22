@@ -350,11 +350,7 @@ class CheckPromoCodeSerializer(serializers.Serializer):
 class RantingOrderCustomerSerializer(serializers.Serializer):
     """ Rated order by customer """
     rating = serializers.FloatField(min_value=1, max_value=5)
-    rating_merchant = serializers.FloatField(min_value=1, max_value=5)
-    merchant_id = serializers.PrimaryKeyRelatedField(allow_null=True,
-                                                     allow_empty=True,
-                                                     queryset=Merchant.objects.all(),
-                                                     source="merchant")
+    rating_merchant = serializers.FloatField(min_value=1, max_value=5, allow_null=True)
     comments = serializers.CharField(required=False)
 
     def validate(self, data):
