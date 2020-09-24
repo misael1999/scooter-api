@@ -52,12 +52,13 @@ def send_notification_push_order_with_sound(user_id, title, body, data, sound, a
     devices = FCMDevice.objects.filter(user_id=user_id)
     if data['type'] == 'NEW_ORDER':
         for device in devices:
+            sound_temp = sound
             if device.type == 'ios':
                 if sound == 'ringtone.mp3':
-                    sound = 'ringtone.aiff'
+                    sound_temp = 'ringtone.aiff'
                 else:
-                    sound = 'claxon.aiff'
-            device.send_message(title=title, body=body, data=data, sound=sound,
+                    sound_temp = 'claxon.aiff'
+            device.send_message(title=title, body=body, data=data, sound=sound_temp,
                                 android_channel_id=android_channel_id)
     else:
         devices.send_message(title=title, body=body, data=data, sound=sound, android_channel_id=android_channel_id)
