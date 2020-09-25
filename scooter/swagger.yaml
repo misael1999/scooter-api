@@ -23,7 +23,6 @@ securityDefinitions:
 security:
   - Basic: []
   - bearerAuth: []
-
 # ====== PATHS =======
 paths:
   # STATUS
@@ -1454,7 +1453,6 @@ paths:
           description: 'Obtener una orden del cliente'
       tags:
         - Pedidos clientes
-
   /api/v1/customers/{customer_id}/orders/{order_id}/retry/:
     parameters:
       - name: customer_id
@@ -1998,6 +1996,20 @@ paths:
           description: 'Información de comercios'
       tags:
         - Comercios
+  /api/v1/merchants/{merchant_id}/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+    get:
+      operationId: get_info_merchant
+      description: Obtener información de un comercio
+      responses:
+        '201':
+          description: 'Listado de categorías por comercio'
+      tags:
+        - Comercios
 # CATEGORIES
   /api/v1/merchants/{merchant_id}/categories/:
     parameters:
@@ -2005,6 +2017,7 @@ paths:
         in: path
         required: true
         type: string
+
     # CREATE CATEGORY BY MERCHANT
     post:
       operationId: register_category

@@ -32,9 +32,10 @@ class MerchantWithAllInfoSerializer(serializers.ModelSerializer):
         geo_field = 'point'
         fields = ('id', 'user', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
                   'information_is_complete', 'category', 'subcategory', 'reputation', 'description',
-                  'approximate_preparation_time', 'schedules', 'is_open', 'point', 'from_preparation_time',
-                  'to_preparation_time', 'type_menu')
+                  'approximate_preparation_time', 'is_open', 'point', 'from_preparation_time',
+                  'to_preparation_time')
         read_only_fields = fields
+
 
 
 class MerchantUserSimpleSerializer(serializers.ModelSerializer):
@@ -112,6 +113,19 @@ class MerchantAddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = MerchantAddress
         fields = ('full_address', 'references', 'point')
+
+
+class MerchantInfoSerializer(serializers.ModelSerializer):
+    schedules = MerchantScheduleSerializer(many=True)
+
+    class Meta:
+        model = Merchant
+        geo_field = 'point'
+        fields = ('id', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
+                  'information_is_complete', 'reputation', 'description', 'total_grades',
+                  'approximate_preparation_time', 'is_open', 'point', 'from_preparation_time',
+                  'to_preparation_time', 'schedules', 'full_address')
+        read_only_fields = fields
 
 
 # Update info of merchant

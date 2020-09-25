@@ -29,7 +29,7 @@ class Merchant(ScooterModel):
     approximate_preparation_time = models.CharField(max_length=10, null=True)
     from_preparation_time = models.FloatField(default=0)
     to_preparation_time = models.FloatField(default=0)
-
+    full_address = models.TextField(blank=True, null=True)
     # stats
     total_grades = models.IntegerField(default=0)
     reputation = models.FloatField(default=0)
@@ -51,6 +51,7 @@ class MerchantSchedule(ScooterModel):
     to_hour = models.TimeField()
 
     class Meta:
+        ordering = ['schedule_id']
         unique_together = ('merchant', 'schedule')
 
 

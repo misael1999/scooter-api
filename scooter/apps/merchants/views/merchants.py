@@ -14,7 +14,8 @@ from scooter.utils.viewsets import ScooterViewSet
 # Serializers
 from scooter.apps.merchants.serializers import (MerchantSignUpSerializer,
                                                 MerchantWithAllInfoSerializer, UpdateInfoMerchantSerializer,
-                                                AvailabilityMerchantSerializer, ChangePasswordMerchantSerializer)
+                                                AvailabilityMerchantSerializer, ChangePasswordMerchantSerializer,
+                                                MerchantInfoSerializer)
 
 from scooter.apps.users.serializers.users import UserModelSimpleSerializer
 # Filters
@@ -45,12 +46,14 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         serializer_class = self.serializer_class
         if self.action == 'create':
             serializer_class = MerchantSignUpSerializer
-        if self.action in ['list', 'retrieve']:
+        if self.action == 'retrieve':
+            serializer_class = MerchantInfoSerializer
+        if self.action in ['list']:
             serializer_class = MerchantWithAllInfoSerializer
         return serializer_class
 
     def get_permissions(self):
-        if self.action in ['list']:
+        if self.action in ['list', 'retrieve']:
             permission_classes = [AllowAny]
         elif self.action in ['create']:
             permission_classes = [IsAuthenticated]
