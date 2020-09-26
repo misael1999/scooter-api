@@ -37,7 +37,6 @@ class MerchantWithAllInfoSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
-
 class MerchantUserSimpleSerializer(serializers.ModelSerializer):
 
     category = serializers.StringRelatedField(read_only=True)
@@ -233,8 +232,6 @@ class UpdateInfoMerchantSerializer(serializers.Serializer):
 
         """ Save all data if everything goes well """
         try:
-            instance.information_is_complete = True
-            instance.save()
             MerchantSchedule.objects.bulk_create(schedules_to_save)
             MerchantSchedule.objects.bulk_update(schedules_to_update, fields=["from_hour", "to_hour"])
 
@@ -249,7 +246,9 @@ class UpdateInfoMerchantSerializer(serializers.Serializer):
                 else:
                     MerchantAddress(**address_to_save, merchant=instance).save()
                 instance.point = address_to_save['point']
-                instance.save()
+            instance.full_address = address_to_save['full_address']
+            instance.information_is_complete = True
+            instance.save()
 
             return instance
         except IntegrityError as iex:
