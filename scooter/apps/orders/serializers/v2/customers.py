@@ -351,7 +351,7 @@ class RantingOrderCustomerSerializer(serializers.Serializer):
     """ Rated order by customer """
     rating = serializers.FloatField(min_value=1, max_value=5)
     rating_merchant = serializers.FloatField(min_value=1, max_value=5, allow_null=True)
-    comments = serializers.CharField(required=False)
+    comments = serializers.CharField(required=False, allow_null=True, allow_blank=True)
 
     def validate(self, data):
 
@@ -378,6 +378,10 @@ class RantingOrderCustomerSerializer(serializers.Serializer):
             station = data['station']
             delivery_man = data['delivery_man']
             order = data['order']
+            merchant = None
+            if order.is_order_to_merchant:
+                merchant = order.merchant
+                data['merchant'] = merchant
 
             # Create new rating order
             rating_order = RatingOrder.objects.create(
@@ -385,8 +389,7 @@ class RantingOrderCustomerSerializer(serializers.Serializer):
             )
 
             if order.is_order_to_merchant:
-                merchant = order.merchant
-                # Update reputation station
+                # Update reputation merchant
                 merchant_avg = round(
                     RatingOrder.objects.filter(
                         merchant=merchant,

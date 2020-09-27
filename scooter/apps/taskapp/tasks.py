@@ -82,7 +82,7 @@ def ignore_orders():
                                          body='No hubo respuesta por parte del comercio',
                                          sound="default",
                                          android_channel_id="messages",
-                                         data={"type": "IGNORE_ORDER",
+                                         data={"type": "REJECT_ORDER",
                                                "order_id": order.id,
                                                "message": "No hubo respuesta del comerciante",
                                                'click_action': 'FLUTTER_NOTIFICATION_CLICK'})

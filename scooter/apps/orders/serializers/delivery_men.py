@@ -44,6 +44,8 @@ class AcceptOrderByDeliveryManSerializer(serializers.Serializer):
     def update(self, instance, data):
         try:
             delivery_man = data['delivery_man']
+            if order.delivery_man == delivery_man:
+                return data
             order = data['order']
             # Update status delivery man
             delivery_status = DeliveryManStatus.objects.get(slug_name='busy')
