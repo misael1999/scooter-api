@@ -116,11 +116,12 @@ class MerchantAddressSerializer(serializers.ModelSerializer):
 
 class MerchantInfoSerializer(serializers.ModelSerializer):
     schedules = MerchantScheduleSerializer(many=True)
+    user = UserModelSimpleSerializer()
 
     class Meta:
         model = Merchant
         geo_field = 'point'
-        fields = ('id', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
+        fields = ('id', 'user', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
                   'information_is_complete', 'reputation', 'description', 'total_grades',
                   'approximate_preparation_time', 'is_open', 'point', 'from_preparation_time',
                   'to_preparation_time', 'schedules', 'full_address')
