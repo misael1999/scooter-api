@@ -247,7 +247,8 @@ class UpdateInfoMerchantSerializer(serializers.Serializer):
                 else:
                     MerchantAddress(**address_to_save, merchant=instance).save()
                 instance.point = address_to_save['point']
-            instance.full_address = address_to_save['full_address']
+                instance.full_address = address_to_save['full_address']
+
             instance.information_is_complete = True
             instance.save()
 
