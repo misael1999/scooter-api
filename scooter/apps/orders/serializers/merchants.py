@@ -55,7 +55,7 @@ class AcceptOrderMerchantSerializer(serializers.Serializer):
                                                'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                })
 
-            send_notice_order_delivery.delay(order)
+            send_notice_order_delivery.delay(order.id)
             return order
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})

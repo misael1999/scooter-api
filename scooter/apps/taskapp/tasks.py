@@ -31,7 +31,8 @@ def send_notification_push_task(user_id, title, body, data):
 
 
 @task(name='send_notice_order_delivery', max_retries=3)
-def send_notice_order_delivery(order):
+def send_notice_order_delivery(order_id):
+    order = Order.objects.get(pk=order_id)
     """ Send push notifications in all delivery  """
     send_notice_order_delivery(location_selected=order.merchant_location,
                                station=order.station,
