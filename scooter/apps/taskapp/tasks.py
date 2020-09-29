@@ -13,7 +13,7 @@ from fcm_django.models import FCMDevice
 from scooter.apps.orders.models import Order
 # Functions
 from scooter.utils.functions import send_notification_push_order
-from scooter.utils.functions import send_notice_order_delivery
+from scooter.utils.functions import send_notice_order_delivery_fn
 
 
 @task(name='send_email_task', max_retries=3)
@@ -34,9 +34,9 @@ def send_notification_push_task(user_id, title, body, data):
 def send_notice_order_delivery(order_id):
     order = Order.objects.get(pk=order_id)
     """ Send push notifications in all delivery  """
-    send_notice_order_delivery(location_selected=order.merchant_location,
-                               station=order.station,
-                               order=order)
+    send_notice_order_delivery_fn(location_selected=order.merchant_location,
+                                  station=order.station,
+                                  order=order)
 
 
 @periodic_task(name='send_notification_delivery', run_every=timedelta(minutes=1))

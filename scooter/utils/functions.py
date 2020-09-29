@@ -113,7 +113,7 @@ def send_order_delivery(location_selected, station, order):
         raise ValueError('Error al mandar notificaciones de pedido')
 
 
-def send_notice_order_delivery(location_selected, station, order):
+def send_notice_order_delivery_fn(location_selected, station, order):
     try:
         # Get nearest delivery man
         delivery_men = get_nearest_delivery_man(location_selected=location_selected, station=station,
