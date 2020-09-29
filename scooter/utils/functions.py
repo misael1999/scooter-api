@@ -132,8 +132,9 @@ def send_notice_order_delivery_fn(location_selected, station, order):
                                                     status=['available', 'busy', 'out_service'])
         for delivery_man in delivery_men:
             user_id = delivery_man.user_id
-            merchant_name = order.merchant.merchant_name
-            full_address = order.merchant.full_address
+            merchant = order.merchant
+            merchant_name = merchant.merchant_name
+            full_address = merchant.full_address
             send_notification_push_order(user_id=user_id,
                                          title='Pedido próximo en {}'.format(merchant_name),
                                          body='Pedido próximo en esta ubicación {}'.format(full_address),

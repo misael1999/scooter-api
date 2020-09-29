@@ -28,6 +28,12 @@ class AcceptOrderByDeliveryManSerializer(serializers.Serializer):
         order = self.context['order']
         delivery_man = self.context['delivery_man']
 
+        data['order'] = order
+        data['delivery_man'] = delivery_man
+
+        if order.delivery_man == delivery_man:
+            return data
+
         if order.order_status.slug_name == 'rejected':
             raise serializers.ValidationError({'detail': 'El pedido fue rechazado, el tiempo de espera culmino'},
                                               code='order_already_delivery_man')
@@ -36,8 +42,6 @@ class AcceptOrderByDeliveryManSerializer(serializers.Serializer):
         if order.delivery_man is not None:
             raise serializers.ValidationError({'detail': 'El pedido ya tiene un repartidor asignado'},
                                               code='order_already_delivery_man')
-        data['order'] = order
-        data['delivery_man'] = delivery_man
 
         return data
 
