@@ -4,6 +4,7 @@ from rest_framework import serializers
 from scooter.apps.common.models import OrderStatus
 from scooter.apps.orders.serializers import send_order_delivery
 from scooter.utils.functions import send_notification_push_order
+from scooter.apps.taskapp.tasks import send_notice_order_delivery
 
 
 class AcceptOrderMerchantSerializer(serializers.Serializer):
@@ -53,6 +54,8 @@ class AcceptOrderMerchantSerializer(serializers.Serializer):
                                                "message": "Preparando pedido",
                                                'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                })
+
+            send_notice_order_delivery.delay(order)
             return order
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})

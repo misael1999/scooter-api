@@ -113,6 +113,46 @@ def send_order_delivery(location_selected, station, order):
         raise ValueError('Error al mandar notificaciones de pedido')
 
 
+def send_notice_order_delivery(location_selected, station, order):
+    try:
+        # Get nearest delivery man
+        delivery_men = get_nearest_delivery_man(location_selected=location_selected, station=station,
+                                                list_exclude=[], distance=settings.RANGE_DISTANCE,
+                                                status=['available'])
+
+        # Send push notification to delivery_man
+        # if delivery_men.count() == 0:
+        #     delivery_men = get_nearest_delivery_man(location_selected=location_selected, station=station,
+        #                                             list_exclude=[], distance=settings.RANGE_DISTANCE,
+        #                                             status=['available', 'busy'])
+
+        if delivery_men.count() == 0:
+            delivery_men = get_nearest_delivery_man(location_selected=location_selected, station=station,
+                                                    list_exclude=[], distance=settings.RANGE_DISTANCE,
+                                                    status=['available', 'busy', 'out_service'])
+        for delivery_man in delivery_men:
+            user_id = delivery_man.user_id
+            merchant_name = order.merchant.merchant_name
+            full_address = order.merchant.full_address
+            send_notification_push_order(user_id=user_id,
+                                         title='Pedido próximo en {}'.format(merchant_name),
+                                         body='Pedido próximo en esta ubicación {}'.format(full_address),
+                                         sound="default",
+                                         android_channel_id="locations",
+                                         data={"type": "NOTICE_ORDER",
+                                               "order_id": order.id,
+                                               "ordering": "",
+                                               "message": "Pedido de nuevo",
+                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                               })
+    except ValueError as e:
+        print(e.__str__())
+        raise ValueError(e)
+    except Exception as ex:
+        print(ex.args.__str__())
+        raise ValueError('Error al mandar notificaciones de pedido')
+
+
 # Methods helpers
 def get_nearest_delivery_man(location_selected, station, list_exclude, distance, status):
     """ Get nearest delivery man and exclude who are in the history of rejected orders """
