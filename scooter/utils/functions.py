@@ -50,18 +50,21 @@ def send_notification_push_order(user_id, title, body, data, sound, android_chan
 
 def send_notification_push_order_with_sound(user_id, title, body, data, sound, android_channel_id):
     devices = FCMDevice.objects.filter(user_id=user_id)
-    if data['type'] == 'NEW_ORDER':
-        for device in devices:
-            sound_temp = sound
-            if device.type == 'ios':
-                if sound == 'ringtone.mp3':
-                    sound_temp = 'ringtone.aiff'
-                else:
-                    sound_temp = 'claxon.aiff'
-            device.send_message(title=title, body=body, data=data, sound=sound_temp,
-                                android_channel_id=android_channel_id)
-    else:
-        devices.send_message(title=title, body=body, data=data, sound=sound, android_channel_id=android_channel_id)
+    for device in devices:
+        sound_temp = sound
+        if device.type is 'ios':
+            print(device.type)
+            print(device.registration_id)
+            if sound == 'ringtone.mp3':
+                sound_temp = 'ringtone.aiff'
+            else:
+                sound_temp = 'claxon.aiff'
+        device.send_message(title=title, body=body, data=data, sound=sound_temp,
+                            android_channel_id=android_channel_id)
+    # if data['type'] is 'NEW_ORDER':
+    #
+    # else:
+    #     devices.send_message(title=title, body=body, data=data, sound=sound, android_channel_id=android_channel_id)
 
 
 def get_date_from_querystring(request, date_find, default_value=None):

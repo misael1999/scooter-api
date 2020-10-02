@@ -170,8 +170,8 @@ class ScanQrOrderSerializer(serializers.Serializer):
     def update(self, instance, data):
         try:
             data_notification = {
-                "title": 'Pedido entregado',
-                "body": 'Tu pedido ha sido entregado',
+                "title": 'Deja una valoración',
+                "body": 'Tu pedido ha sido entregado, por favor deja una valoración',
                 "type": "ORDER_DELIVERED"
             }
             # Update member station
@@ -300,7 +300,7 @@ def update_order_status(service, order_status, instance, data):
         instance.order_status = order_status
         instance.save()
 
-        if data['type'] == 'in_the_commerce' and instance.is_order_to_merchant:
+        if order_status.slug_name == 'in_the_commerce' and instance.is_order_to_merchant:
             send_notification_push_order_with_sound(user_id=instance.merchant.user_id,
                                                     title='El repartidor esta esperando el pedido',
                                                     body='Numero de pedido {}'.format(instance.qr_code),
@@ -311,7 +311,14 @@ def update_order_status(service, order_status, instance, data):
                                                           "message": "Esperando",
                                                           'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                           })
-        elif data['type'] == 'already_here':
+            send_notification_push_task.delay(instance.user_id,
+                                              data['title'],
+                                              data['body'],
+                                              {"type": data['type'], "order_id": instance.id,
+                                               "message": data['body'],
+                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                               })
+        elif order_status.slug_name == 'already_here':
             send_notification_push_order_with_sound(user_id=instance.user_id,
                                                     title='El scooter acaba de llegar ',
                                                     body='El scooter te esta esperando'.format(instance.qr_code),
