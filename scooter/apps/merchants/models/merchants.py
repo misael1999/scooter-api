@@ -39,6 +39,8 @@ class Merchant(ScooterModel):
     type_menu = models.ForeignKey(TypeMenuMerchant,
                                   on_delete=models.DO_NOTHING,
                                   null=True, blank=True, default=1)
+    area = models.ForeignKey('common.Area', default=1, on_delete=models.DO_NOTHING)
+    zone = models.ForeignKey('common.Zone', blank=True, null=True, on_delete=models.DO_NOTHING)
 
     def __str__(self):
         return self.merchant_name

@@ -2,6 +2,7 @@
 # Django rest framework
 from rest_framework import serializers
 # Models
+from scooter.apps.common.models import Area
 from scooter.apps.common.serializers import TypeAddressModelSerializer
 from scooter.apps.customers.models import CustomerAddress
 # Serializers
@@ -74,7 +75,10 @@ class CreateCustomerAddressSerializer(serializers.ModelSerializer):
         point = data.pop('point', None)
         if point:
             data['point'] = Point(x=point['lng'], y=point['lat'], srid=4326)
-
+            areas = Area.objects.filter(poly__contains=data['point'])
+            if len(areas) == 0:
+                raise serializers.ValidationError('Por el momento no estamos disponibles en tu zona')
+            data['area'] = areas[0]
         data['customer'] = customer
         return data
 
@@ -99,17 +103,27 @@ class CreateOrGetAddressSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomerAddress
-        fields = ("alias", "full_address", "type_address_id", "references", "point")
+        fields = ("alias", "full_address", "type_address_id", "references", "point", 'area', 'zone')
 
     def create(self, data):
-        customer = self.context['customer']
-        data['customer'] = customer
-        point = data.pop('point', None)
-        if point:
-            point = Point(x=point['lng'], y=point['lat'], srid=4326)
-        references = data.pop('references', None)
-        address, created = CustomerAddress.objects.get_or_create(**data)
-        address.references = references
-        address.point = point
-        address.save()
-        return address
+        try:
+            customer = self.context['customer']
+            data['customer'] = customer
+            point = data.pop('point', None)
+            if point:
+                point = Point(x=point['lng'], y=point['lat'], srid=4326)
+                areas = Area.objects.filter(poly__contains=point)
+                if len(areas) == 0:
+                    raise ValueError('Por el momento no estamos disponibles en tu zona')
+                data['area'] = areas[0]
+            references = data.pop('references', None)
+            address, created = CustomerAddress.objects.get_or_create(**data)
+            address.references = references
+            address.point = point
+            address.save()
+            return address
+        except ValueError as e:
+            raise serializers.ValidationError({'detail': str(e)})
+        except Exception as ex:
+            raise serializers.ValidationError({'detail': 'Error desconocido'})
+

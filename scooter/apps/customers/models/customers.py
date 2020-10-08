@@ -35,6 +35,8 @@ class CustomerAddress(ScooterModel):
     point = models.PointField(blank=True, null=True)
     type_address = models.ForeignKey('common.TypeAddress', on_delete=models.DO_NOTHING,
                                      default=1)
+    area = models.ForeignKey('common.Area', default=1, on_delete=models.DO_NOTHING)
+    zone = models.ForeignKey('common.Zone', blank=True, null=True, on_delete=models.DO_NOTHING)
 
     class Meta:
         db_table = 'customers_customer_address'

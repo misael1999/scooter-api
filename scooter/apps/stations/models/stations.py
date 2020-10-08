@@ -30,6 +30,8 @@ class Station(ScooterModel):
     total_delivery_man = models.PositiveIntegerField(default=0)
     total_messages_support = models.PositiveIntegerField(default=0)
 
+    area = models.ForeignKey('common.Area', default=1, on_delete=models.DO_NOTHING)
+
     def __str__(self):
         return self.station_name
 
