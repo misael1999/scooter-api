@@ -2664,6 +2664,24 @@ paths:
           description: 'Cancelar pedido'
       tags:
         - Pedidos comercios
+  /api/v1/merchants/{merchant_id}/orders/{order_id}/current_status/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: number
+      - name: order_id
+        in: path
+        required: true
+        type: number
+    get:
+      operationId: get_order_status_merchant
+      description: Obtener el estado actual de la orden
+      responses:
+        '200':
+          description: 'Estado actual del pedido'
+      tags:
+        - Pedidos comercios
   /api/v1/merchants/{merchant_id}/orders/{order_id}/order_ready/:
     parameters:
       - name: merchant_id

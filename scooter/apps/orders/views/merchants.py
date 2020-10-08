@@ -17,7 +17,7 @@ from scooter.apps.orders.serializers import (OrderModelSerializer,
                                              AcceptOrderMerchantSerializer,
                                              RejectOrderMerchantSerializer,
                                              CancelOrderMerchantSerializer,
-                                             OrderReadyMerchantSerializer)
+                                             OrderReadyMerchantSerializer, OrderCurrentStatusSerializer)
 from scooter.apps.orders.serializers.v2 import (OrderWithDetailModelSerializer,)
 # Models
 from scooter.apps.orders.models.orders import Order
@@ -93,6 +93,15 @@ class MerchantOrderViewSet(ScooterViewSet, AddMerchantMixin,
         data = self.set_response(status=True,
                                  data={},
                                  message='Solicitud rechazada')
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    @action(methods=['GET'], detail=True)
+    def current_status(self, request, *args, **kwargs):
+        """ Get info the order status """
+        order = self.get_object()
+        data = self.set_response(status=True,
+                                 data=OrderCurrentStatusSerializer(order).data,
+                                 message='Estatus actual del pedido')
         return Response(data=data, status=status.HTTP_200_OK)
 
     @action(methods=['put'], detail=True)
