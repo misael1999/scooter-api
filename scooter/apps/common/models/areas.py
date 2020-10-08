@@ -11,7 +11,7 @@ from django.contrib.gis.geos import GEOSGeometry, WKTWriter
 class Area(ScooterModel):
     name = models.CharField(max_length=50, blank=True, null=True)
     description = models.CharField(max_length=150, blank=True, null=True)
-    poly = models.GeometryField(blank=True, null=True, geography=True)
+    poly = models.GeometryField(blank=True, null=True)
 
 
 class Zone(ScooterModel):
