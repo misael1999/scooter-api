@@ -8,6 +8,7 @@ from scooter.apps.common.models import DeliveryManStatus
 from scooter.apps.common.serializers import Base64ImageField
 from scooter.apps.delivery_men.models.delivery_men import DeliveryMan
 # Utilities
+from scooter.apps.stations.serializers import VehicleModelSerializer
 from scooter.utils.serializers.scooter import ScooterModelSerializer
 # Serializers
 from scooter.apps.users.serializers.users import UserModelSimpleSerializer
@@ -44,6 +45,7 @@ class DeliveryManModelSerializer(ScooterModelSerializer):
 class DeliveryManOrderSerializer(serializers.ModelSerializer):
 
     picture = Base64ImageField(use_url=True)
+    vehicle = VehicleModelSerializer()
 
     class Meta:
         model = DeliveryMan
@@ -56,6 +58,7 @@ class DeliveryManOrderSerializer(serializers.ModelSerializer):
             'phone_number',
             'reputation',
             'location',
+            'vehicle'
         )
         read_only_fields = fields
 

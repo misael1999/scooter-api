@@ -33,7 +33,7 @@ class MerchantWithAllInfoSerializer(serializers.ModelSerializer):
         fields = ('id', 'user', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
                   'information_is_complete', 'category', 'total_grades', 'subcategory', 'reputation', 'description',
                   'approximate_preparation_time', 'is_open', 'point', 'from_preparation_time',
-                  'to_preparation_time', 'type_menu')
+                  'to_preparation_time', 'type_menu', 'zone', 'area')
         read_only_fields = fields
 
 
@@ -48,7 +48,7 @@ class MerchantUserSimpleSerializer(serializers.ModelSerializer):
         fields = ('id', 'user', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
                   'information_is_complete', 'category', 'subcategory', 'reputation', 'description',
                   'approximate_preparation_time', 'is_open', 'from_preparation_time',
-                  'to_preparation_time', 'type_menu')
+                  'to_preparation_time', 'type_menu', 'area', 'zone')
         read_only_fields = fields
 
 
@@ -78,7 +78,6 @@ class ChangePasswordMerchantSerializer(serializers.Serializer):
             raise serializers.ValidationError({'detail': str(ex)})
         except Exception as e:
             raise serializers.ValidationError({'detail': 'Ha ocurrido un error desconocido'})
-
 
 # ===============
 # Serializers to update info of merchant
@@ -124,7 +123,7 @@ class MerchantInfoSerializer(serializers.ModelSerializer):
         fields = ('id', 'user', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
                   'information_is_complete', 'reputation', 'description', 'total_grades',
                   'approximate_preparation_time', 'is_open', 'point', 'from_preparation_time',
-                  'to_preparation_time', 'schedules', 'full_address')
+                  'to_preparation_time', 'schedules', 'full_address', 'zone', 'serializer')
         read_only_fields = fields
 
 

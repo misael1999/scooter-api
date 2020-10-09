@@ -170,8 +170,8 @@ class ScanQrOrderSerializer(serializers.Serializer):
     def update(self, instance, data):
         try:
             data_notification = {
-                "title": 'Deja una valoración',
-                "body": 'Tu pedido ha sido entregado, por favor deja una valoración',
+                "title": 'Pedido entregado, por favor califica tu pedido 🛵 🛴',
+                "body": 'Tu pedido ha sido entregado, deja un comentario 👍🏻',
                 "type": "ORDER_DELIVERED"
             }
             # Update member station
