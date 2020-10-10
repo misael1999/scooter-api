@@ -123,7 +123,7 @@ class MerchantInfoSerializer(serializers.ModelSerializer):
         fields = ('id', 'user', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
                   'information_is_complete', 'reputation', 'description', 'total_grades',
                   'approximate_preparation_time', 'is_open', 'point', 'from_preparation_time',
-                  'to_preparation_time', 'schedules', 'full_address', 'zone', 'serializer')
+                  'to_preparation_time', 'schedules', 'full_address', 'zone', 'area')
         read_only_fields = fields
 
 
