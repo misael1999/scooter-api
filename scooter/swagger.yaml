@@ -1955,7 +1955,7 @@ paths:
           in: query
           required: false
           type: string
-          enum: ['nearest', 'delivery_price', '-reputation']
+          enum: ['nearest', 'is_delivery_free', '-reputation']
         - name: lat
           description: Latitude
           in: query
