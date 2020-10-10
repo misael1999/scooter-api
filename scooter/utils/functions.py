@@ -52,9 +52,7 @@ def send_notification_push_order_with_sound(user_id, title, body, data, sound, a
     devices = FCMDevice.objects.filter(user_id=user_id)
     for device in devices:
         sound_temp = sound
-        if device.type is 'ios':
-            print(device.type)
-            print(device.registration_id)
+        if device.type == 'ios':
             if sound == 'ringtone.mp3':
                 sound_temp = 'ringtone.aiff'
             else:
