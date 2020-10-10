@@ -33,7 +33,7 @@ class Merchant(ScooterModel):
     # stats
     total_grades = models.IntegerField(default=0)
     reputation = models.FloatField(default=0)
-    point = models.PointField(geography=True, blank=True, null=True)
+    point = models.PointField(blank=True, null=True, srid=4326)
     is_open = models.BooleanField(default=False)
     rate = models.FloatField(default=3.0)
     type_menu = models.ForeignKey(TypeMenuMerchant,
@@ -41,6 +41,7 @@ class Merchant(ScooterModel):
                                   null=True, blank=True, default=1)
     area = models.ForeignKey('common.Area', default=1, on_delete=models.DO_NOTHING)
     zone = models.ForeignKey('common.Zone', blank=True, null=True, on_delete=models.DO_NOTHING)
+    is_delivery_free = models.BooleanField(default=False)
 
     def __str__(self):
         return self.merchant_name

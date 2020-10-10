@@ -1,4 +1,5 @@
 # Django rest
+from django.contrib.gis.geos import Point
 from rest_framework import status, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -21,6 +22,8 @@ from scooter.apps.users.serializers.users import UserModelSimpleSerializer
 # Filters
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
+from django.contrib.gis.db.models.functions import Distance
+
 
 
 class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
@@ -39,8 +42,21 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
 
     def get_queryset(self):
         if self.action == 'list':
-            return Merchant.objects.filter(status__slug_name='active', information_is_complete=True)
+            merchants = Merchant.objects.filter(status__slug_name='active', information_is_complete=True)
+            return merchants
         return self.queryset
+
+    def filter_queryset(self, queryset):
+        order_by = self.request.query_params.get('order_by', None)
+        if order_by:
+            if order_by == 'nearest':
+                lat = self.request.query_params.get('lat', 18.462938)
+                lng = self.request.query_params.get('lng', -97.392701)
+                point = Point(x=float(lng), y=float(lat), srid=4326)
+                queryset = queryset.annotate(distance=Distance('point', point)).order_by('distance')
+            else:
+                queryset = queryset.order_by(order_by)
+        return queryset
 
     def get_serializer_class(self):
         serializer_class = self.serializer_class
