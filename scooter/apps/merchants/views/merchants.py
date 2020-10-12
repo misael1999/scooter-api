@@ -56,7 +56,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
                 queryset = queryset.annotate(distance=Distance('point', point)).order_by('distance')
             else:
                 queryset = queryset.order_by(order_by)
-        return queryset
+        return super(MerchantViewSet, self).filter_queryset(queryset=queryset)
 
     def get_serializer_class(self):
         serializer_class = self.serializer_class
