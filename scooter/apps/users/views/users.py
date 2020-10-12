@@ -37,7 +37,7 @@ class UserViewSet(ScooterViewSet):
             permission_classes = [AllowAny]
         elif self.action in ['retrieve', 'client', 'merchant', 'test_notifications']:
             permission_classes = [IsAuthenticated, IsAccountOwner]
-        elif self.action in ['contact', 'check_version']:
+        elif self.action in ['contact', 'check_version', 'check_version_merchant']:
             permission_classes = [AllowAny]
         else:
             permission_classes = [IsAuthenticated]
