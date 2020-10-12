@@ -102,7 +102,7 @@ class CreateOrderSerializer(serializers.ModelSerializer):
                 customer_promotion.used = True
                 customer_promotion.save()
 
-            is_safe_order = customer.is_safe_user
+            is_safe_order = True
 
             is_order_to_merchant = data.get('is_order_to_merchant', False)
 

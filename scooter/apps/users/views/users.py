@@ -1,4 +1,6 @@
 # Django rest
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from rest_framework.decorators import action
 from rest_framework import status
 from rest_framework.response import Response
@@ -146,8 +148,16 @@ class UserViewSet(ScooterViewSet):
         }
         return Response(data, status=status.HTTP_201_CREATED)
 
+    @method_decorator(cache_page(14400))
     @action(detail=False, methods=['GET'])
     def check_version(self, request, *argsm, **kwargs):
         """ Last number version of app """
-        version = AppVersion.objects.last()
+        version = AppVersion.objects.get(app="customers")
+        return Response(data=AppVersionSerializer(version).data, status=status.HTTP_200_OK)
+
+    @method_decorator(cache_page(14400))
+    @action(detail=False, methods=['GET'])
+    def check_version_merchant(self, request, *argsm, **kwargs):
+        """ Last number version of merchants app """
+        version = AppVersion.objects.get(app="merchants")
         return Response(data=AppVersionSerializer(version).data, status=status.HTTP_200_OK)

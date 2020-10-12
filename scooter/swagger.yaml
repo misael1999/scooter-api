@@ -319,6 +319,17 @@ paths:
       tags:
         - Usuarios general
     parameters: []
+  /api/v1/users/check_version_merchant/:
+    get:
+      operationId: get_current_version_merchant_app
+      description: Version reciente de la app.
+      parameters: []
+      responses:
+        '200':
+          description: 'Regresa la ultima version de la app de comercios'
+      tags:
+        - Usuarios general
+    parameters: []
   # LOGIN CUSTOMER
   /api/v1/marketing/login/:
     post:
