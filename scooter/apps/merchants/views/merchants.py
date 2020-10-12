@@ -47,16 +47,18 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         return self.queryset
 
     def filter_queryset(self, queryset):
+        queryset = super(MerchantViewSet, self).filter_queryset(queryset=queryset)
         order_by = self.request.query_params.get('order_by', None)
         if order_by:
             if order_by == 'nearest':
                 lat = self.request.query_params.get('lat', 18.462938)
                 lng = self.request.query_params.get('lng', -97.392701)
                 point = Point(x=float(lng), y=float(lat), srid=4326)
-                queryset = queryset.annotate(distance=Distance('point', point)).order_by('distance')
+                queryset = queryset.annotate(distance=Distance('point', point)).order_by('-is_open', 'distance',
+                                                                                         '-reputation', 'created')
             else:
-                queryset = queryset.order_by(order_by)
-        return super(MerchantViewSet, self).filter_queryset(queryset=queryset)
+                queryset = queryset.order_by('-is_open', order_by)
+        return queryset
 
     def get_serializer_class(self):
         serializer_class = self.serializer_class

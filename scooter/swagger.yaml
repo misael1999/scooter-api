@@ -8,7 +8,7 @@ info:
   license:
     name: BSD License
   version: v1
-basePath: /appback/
+basePath: /
 consumes:
   - application/json
 produces:
@@ -1966,7 +1966,7 @@ paths:
           in: query
           required: false
           type: string
-          enum: ['nearest', 'is_delivery_free', '-reputation']
+          enum: ['nearest', '-is_delivery_free', '-reputation', 'reputation']
         - name: lat
           description: Latitude
           in: query
