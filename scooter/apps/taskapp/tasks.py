@@ -53,7 +53,7 @@ def send_notification_delivery():
                                 order=order)
 
 
-@periodic_task(name='reject_orders', run_every=timedelta(hours=1))
+@periodic_task(name='reject_orders', run_every=timedelta(minutes=1))
 def reject_orders():
     """ Verify orders and reject when nobody responds """
     now = timezone.localtime(timezone.now())
