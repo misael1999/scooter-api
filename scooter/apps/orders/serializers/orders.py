@@ -49,7 +49,7 @@ class OrderCurrentStatusSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ('order_status', 'delivery_man')
+        fields = ('order_status', 'delivery_man', 'date_update_order')
         read_only_fields = fields
 
 
