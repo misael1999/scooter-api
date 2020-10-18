@@ -64,7 +64,8 @@ class OrderModelSerializer(serializers.ModelSerializer):
                   "indications", "approximate_price_order", 'maximum_response_time',
                   "date_delivered_order", "qr_code", "order_status", "order_date", 'validate_qr',
                   'is_safe_order', 'merchant_location',
-                  'order_price', 'total_order', 'is_delivery_by_store', 'is_order_to_merchant')
+                  'order_price', 'total_order', 'is_delivery_by_store',
+                  'is_order_to_merchant', 'date_update_order')
 
 
 # For customer history orders
@@ -84,7 +85,8 @@ class OrderWithDetailSimpleSerializer(serializers.ModelSerializer):
                   "order_date", "date_delivered_order", "qr_code", "order_status",
                   "customer", "delivery_man", "station", 'details', 'maximum_response_time',
                   'validate_qr', 'rated_order', 'in_process', 'is_safe_order', 'merchant_location',
-                  'order_price', 'total_order', 'is_delivery_by_store', 'is_order_to_merchant')
+                  'order_price', 'total_order', 'is_delivery_by_store',
+                  'is_order_to_merchant', 'date_update_order')
         read_only_fields = fields
 
 
@@ -110,7 +112,7 @@ class OrderWithDetailModelSerializer(serializers.ModelSerializer):
                   "order_date", "date_delivered_order", "qr_code", "order_status",
                   "customer", "delivery_man", "station", 'details', 'maximum_response_time', 'validate_qr',
                   'rated_order', 'in_process', 'service_id', 'is_safe_order', 'station_object', 'merchant_location',
-                  'order_price', 'total_order', 'is_delivery_by_store', 'is_order_to_merchant',
+                  'order_price', 'total_order', 'is_delivery_by_store', 'is_order_to_merchant', 'date_update_order'
                   )
         read_only_fields = fields
 

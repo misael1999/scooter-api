@@ -32,6 +32,7 @@ class AcceptOrderMerchantSerializer(serializers.Serializer):
             merchant = data['merchant']
             order_status = OrderStatus.objects.get(slug_name="preparing_order")
             order.order_status = order_status
+            order.date_update_order = timezone.localtime(timezone.now())
             order.in_process = True
             order.save()
             # details = order.details.all()
@@ -131,10 +132,16 @@ class OrderReadyMerchantSerializer(serializers.Serializer):
     def update(self, order, data):
         try:
             merchant = self.context['merchant']
+
+            if order.order_status.slug_name not in ['preparing_order']:
+                return order
+
             if not merchant.is_delivery_by_store:
+                now = timezone.localtime(timezone.now())
                 order_status = OrderStatus.objects.get(slug_name="await_delivery_man")
                 order.order_status = order_status
-                order.order_ready_date = timezone.localtime(timezone.now())
+                order.order_ready_date = now
+                order.date_update_order = now
                 order.save()
                 send_order_delivery(location_selected=merchant.point,
                                     station=order.station,

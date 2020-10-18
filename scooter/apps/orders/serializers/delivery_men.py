@@ -308,6 +308,7 @@ def update_order_status(service, order_status, instance, data):
         # Update order status
         # order_status = OrderStatus.objects.get(slug)
         instance.order_status = order_status
+        instance.date_update_order = timezone.localtime(timezone.now())
         instance.save()
 
         if order_status.slug_name == 'in_the_commerce' and instance.is_order_to_merchant:

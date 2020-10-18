@@ -39,6 +39,7 @@ class Order(ScooterModel):
     indications = models.TextField(blank=True, null=True)
     approximate_price_order = models.CharField(max_length=30, null=True, blank=True)
     date_delivered_order = models.DateTimeField(null=True, blank=True)
+    date_update_order = models.DateTimeField(null=True, blank=True)
     order_date = models.DateTimeField()
     order_ready_date = models.DateTimeField(null=True,
                                             blank=True,
