@@ -2232,6 +2232,26 @@ paths:
           description: 'Obtener los productos agrupado por categorias'
       tags:
         - Comercios
+  /api/v1/merchants/{merchant_id}/statistics/summary/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+    get:
+      operationId: get_statistics_summary_merchants
+      description: Obtener resumen del mes por comercio
+      parameters:
+        - name: month
+          description: mes
+          in: query
+          required: true
+          type: string
+      responses:
+        '201':
+          description: 'Obtener los productos agrupado por categorias'
+      tags:
+        - Comercios
   /api/v1/merchants/{merchant_id}/categories/products/search/:
     parameters:
       - name: merchant_id

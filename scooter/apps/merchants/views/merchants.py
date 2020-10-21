@@ -36,7 +36,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
     filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
     search_fields = ('merchant_name',)
     ordering_fields = ('is_open', 'reputation', 'created')
-    ordering = ('-is_open', '-reputation', 'created')
+    ordering = ('-is_open', 'created')
     filter_fields = ('category', 'subcategory', 'area', 'zone')
 
     def get_queryset(self):

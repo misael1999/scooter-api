@@ -36,6 +36,7 @@ class Merchant(ScooterModel):
     point = models.PointField(blank=True, null=True, srid=4326)
     is_open = models.BooleanField(default=False)
     rate = models.FloatField(default=3.0)
+    have_rate = models.BooleanField(default=True)
     type_menu = models.ForeignKey(TypeMenuMerchant,
                                   on_delete=models.DO_NOTHING,
                                   null=True, blank=True, default=1)
