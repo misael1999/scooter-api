@@ -9,17 +9,10 @@ from rest_framework.permissions import IsAuthenticated
 # Models
 
 # Serializers
-from scooter.apps.common.serializers import (NotifyAllCustomersSerializer, NotifyAllMerchantsSerializer)
+from scooter.apps.common.serializers import (NotifyAllSerializer)
 
 
-class NotificationViewSet(ScooterViewSet, mixins.CreateModelMixin ):
+class NotificationViewSet(ScooterViewSet, mixins.CreateModelMixin):
     """ Return status"""
-    serializer_class = NotifyAllCustomersSerializer
+    serializer_class = NotifyAllSerializer
     permission_classes = (IsAuthenticated,)
-
-    @action(detail=False, methods=['POST'])
-    def merchants(self, request, *args, **kwargs):
-        serializer = NotifyAllMerchantsSerializer(request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(data={'message': 'Notificación envíada correctamente'}, status=status.HTTP_200_OK)
