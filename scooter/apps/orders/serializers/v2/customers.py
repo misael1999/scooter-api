@@ -19,7 +19,7 @@ from scooter.apps.common.models import Service, OrderStatus, Notification
 from scooter.apps.customers.models import CustomerAddress, CustomerPromotion
 from scooter.apps.orders.models.orders import Order
 # Functions channels
-from scooter.apps.orders.utils.orders import notify_merchants, notify_delivery_men
+from scooter.apps.orders.utils.orders import notify_merchants, notify_delivery_men, send_order_to_station_channel
 from asgiref.sync import async_to_sync
 # Serializers primary field
 from scooter.apps.common.serializers.common import CustomerFilteredPrimaryKeyRelatedField
@@ -197,6 +197,7 @@ class CreateOrderSerializer(serializers.ModelSerializer):
             #                             type_notification_id=1,
             #                             body="Has recibido una nueva solicitud")
 
+            async_to_sync(send_order_to_station_channel)(station.id, order.id)
             return order.id
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})

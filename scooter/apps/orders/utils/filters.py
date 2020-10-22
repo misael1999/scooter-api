@@ -8,7 +8,7 @@ class OrderFilter(FilterSet):
 
     class Meta:
         model = Order
-        fields = ['order_status', 'in_process']
+        fields = ['order_status', 'in_process', 'is_order_to_merchant']
 
     def filter_by_ids(self, queryset, name, value):
         order_status_ids = value.strip().split(',')

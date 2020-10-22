@@ -55,7 +55,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
                 point = Point(x=float(lng), y=float(lat), srid=4326)
                 queryset = queryset.annotate(distance=Distance('point', point)).order_by('-is_open', 'distance')
             else:
-                queryset = queryset.order_by('-is_open', order_by)
+                queryset = queryset.order_by('-is_open', order_by, '-total_grades')
         return queryset
 
     def get_serializer_class(self):

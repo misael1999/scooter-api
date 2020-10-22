@@ -16,7 +16,8 @@ from scooter.apps.orders.serializers import (OrderModelSerializer,
                                              RejectOrderByDeliverySerializer,
                                              OrderWithDetailModelSerializer,
                                              RejectOrderStationSerializer, AssignDeliveryManStationSerializer,
-                                             )
+                                             AcceptOrderMerchantSerializer, RejectOrderMerchantSerializer,
+                                             CancelOrderMerchantSerializer)
 # Models
 from scooter.apps.orders.models.orders import Order
 # Mixin
@@ -42,7 +43,7 @@ class StationOrderViewSet(ScooterViewSet, AddStationMixin,
 
     def get_queryset(self):
         if self.action == 'list':
-            return Order.objects.filter(station=self.station)
+            return self.station.order_set.all()
         return self.queryset
 
     def get_serializer_class(self):
@@ -91,7 +92,55 @@ class StationOrderViewSet(ScooterViewSet, AddStationMixin,
         order = serializer.save()
         data = self.set_response(status=True,
                                  data={},
-                                 message='Pedido asignado correctamente')
+                                 message='Pedido aceptado correctamente')
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    @action(methods=['PUT'], detail=True)
+    def accept_order_merchant(self, request, *args, **kwargs):
+        order = self.get_object()
+        serializer = AcceptOrderMerchantSerializer(
+            order,
+            data=request.data,
+            context={'merchant': order.merchant, 'order': order},
+            partial=False
+        )
+        serializer.is_valid(raise_exception=True)
+        order = serializer.save()
+        data = self.set_response(status=True,
+                                 data={},
+                                 message='Pedido aceptado correctamente')
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    @action(methods=['PUT'], detail=True)
+    def reject_order_merchant(self, request, *args, **kwargs):
+        order = self.get_object()
+        serializer = RejectOrderMerchantSerializer(
+            order,
+            data=request.data,
+            context={'merchant': order.merchant, 'order': order},
+            partial=False
+        )
+        serializer.is_valid(raise_exception=True)
+        order = serializer.save()
+        data = self.set_response(status=True,
+                                 data={},
+                                 message='Solicitud rechazada correctamente')
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    @action(methods=['put'], detail=True)
+    def cancel_order_merchant(self, request, *args, **kwargs):
+        order = self.get_object()
+        serializer = CancelOrderMerchantSerializer(
+            order,
+            data=request.data,
+            context={'merchant': order.merchant, 'order': order},
+            partial=False
+        )
+        serializer.is_valid(raise_exception=True)
+        order = serializer.save()
+        data = self.set_response(status=True,
+                                 data={},
+                                 message='El Pedido ha sido cancelado correctamente')
         return Response(data=data, status=status.HTTP_200_OK)
 
     @action(methods=['put'], detail=True)
