@@ -3,8 +3,6 @@ from rest_framework.decorators import action
 from rest_framework import status
 from rest_framework.response import Response
 # Custom viewset
-from scooter.apps.customers.models import CustomerAddress
-from scooter.apps.customers.serializers import AddressRecommendationsSerializer, CustomerAddressModelSerializer
 from scooter.apps.orders.serializers import InvitedCalculateServicePriceSerializer
 from scooter.utils.viewsets import ScooterViewSet
 # Permissions
@@ -17,8 +15,9 @@ from scooter.apps.common.models.orders import OrderStatus
 from scooter.apps.common.serializers import (StatusModelSerializer,
                                              TypeVehicleSerializer,
                                              OrderStatusModelSerializer,
+                                             NotifyAllSerializer,
                                              ScheduleModelSerializer, ServiceModelSerializer,
-                                             TypeAddressModelSerializer, NotifyAllCustomersSerializer)
+                                             TypeAddressModelSerializer)
 
 
 class StatusViewSet(ScooterViewSet):
@@ -77,8 +76,8 @@ class StatusViewSet(ScooterViewSet):
         return Response(data=data, status=status.HTTP_200_OK)
 
     @action(methods=['post'], detail=False)
-    def notifications_customers(self, request, *args, **kwargs):
-        serializer = NotifyAllCustomersSerializer(data=request.data)
+    def notifications(self, request, *args, **kwargs):
+        serializer = NotifyAllSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         data = self.set_response(status='ok', data={}, message='Notificación enviada')
