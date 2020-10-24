@@ -44,6 +44,11 @@ class Merchant(ScooterModel):
     zone = models.ForeignKey('common.Zone', blank=True, null=True, on_delete=models.DO_NOTHING)
     is_delivery_free = models.BooleanField(default=False)
 
+    # Delivery rules
+    pay_delivery = models.BooleanField(default=False)
+    from_price_pay_delivery = models.FloatField(default=0)
+    delivery_payment = models.FloatField(default=0)
+
     def __str__(self):
         return self.merchant_name
 

@@ -22,7 +22,6 @@ from scooter.apps.common.serializers import Base64ImageField
 
 
 class MerchantWithAllInfoSerializer(serializers.ModelSerializer):
-
     category = serializers.StringRelatedField(read_only=True)
     subcategory = serializers.StringRelatedField(read_only=True)
     user = UserModelSimpleSerializer()
@@ -33,12 +32,12 @@ class MerchantWithAllInfoSerializer(serializers.ModelSerializer):
         fields = ('id', 'user', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
                   'information_is_complete', 'category', 'total_grades', 'subcategory', 'reputation', 'description',
                   'approximate_preparation_time', 'full_address', 'is_open', 'point', 'from_preparation_time',
-                  'to_preparation_time', 'type_menu', 'zone', 'area')
+                  'to_preparation_time', 'type_menu', 'zone', 'area', 'pay_delivery', 'from_price_pay_delivery',
+                  'delivery_payment')
         read_only_fields = fields
 
 
 class MerchantUserSimpleSerializer(serializers.ModelSerializer):
-
     category = serializers.StringRelatedField(read_only=True)
     subcategory = serializers.StringRelatedField(read_only=True)
     user = UserModelSimpleSerializer()
@@ -48,7 +47,8 @@ class MerchantUserSimpleSerializer(serializers.ModelSerializer):
         fields = ('id', 'user', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
                   'information_is_complete', 'category', 'subcategory', 'reputation', 'description',
                   'approximate_preparation_time', 'is_open', 'from_preparation_time',
-                  'to_preparation_time', 'type_menu', 'area', 'zone', 'full_address')
+                  'to_preparation_time', 'type_menu', 'area', 'zone', 'full_address', 'pay_delivery',
+                  'from_price_pay_delivery', 'delivery_payment')
         read_only_fields = fields
 
 
@@ -78,6 +78,7 @@ class ChangePasswordMerchantSerializer(serializers.Serializer):
             raise serializers.ValidationError({'detail': str(ex)})
         except Exception as e:
             raise serializers.ValidationError({'detail': 'Ha ocurrido un error desconocido'})
+
 
 # ===============
 # Serializers to update info of merchant
@@ -123,7 +124,8 @@ class MerchantInfoSerializer(serializers.ModelSerializer):
         fields = ('id', 'user', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
                   'information_is_complete', 'reputation', 'description', 'total_grades',
                   'approximate_preparation_time', 'is_open', 'point', 'from_preparation_time',
-                  'to_preparation_time', 'schedules', 'full_address', 'zone', 'area')
+                  'to_preparation_time', 'schedules', 'full_address', 'zone', 'area', 'pay_delivery',
+                  'from_price_pay_delivery', 'delivery_payment')
         read_only_fields = fields
 
 
@@ -226,7 +228,6 @@ class UpdateInfoMerchantSerializer(serializers.Serializer):
             print("Exception save merchant address, please check it")
             print(ex.args.__str__())
             raise ValueError(str(ex))
-
 
     def save_all_models(self, instance, schedules_to_save, schedules_to_update, address_to_save):
 

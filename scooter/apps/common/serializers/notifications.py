@@ -29,7 +29,7 @@ class NotifyAllSerializer(serializers.Serializer):
 
     def create(self, data):
         try:
-            query_set = Merchant.objects.all()
+            query_set = Customer.objects.all()
             if data['type'] == 2:
                 query_set = DeliveryMan.objects.filter(status__slug_name="active")
             elif data['type'] == 3:
