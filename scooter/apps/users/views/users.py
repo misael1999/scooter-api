@@ -161,3 +161,10 @@ class UserViewSet(ScooterViewSet):
         """ Last number version of merchants app """
         version = AppVersion.objects.get(app="merchants")
         return Response(data=AppVersionSerializer(version).data, status=status.HTTP_200_OK)
+
+    @method_decorator(cache_page(14400))
+    @action(detail=False, methods=['GET'])
+    def check_version_delivery(self, request, *argsm, **kwargs):
+        """ Last number version of delivery app """
+        version = AppVersion.objects.get(app="delivery")
+        return Response(data=AppVersionSerializer(version).data, status=status.HTTP_200_OK)
