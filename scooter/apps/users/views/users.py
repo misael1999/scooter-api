@@ -37,7 +37,7 @@ class UserViewSet(ScooterViewSet):
             permission_classes = [AllowAny]
         elif self.action in ['retrieve', 'client', 'merchant', 'test_notifications']:
             permission_classes = [IsAuthenticated, IsAccountOwner]
-        elif self.action in ['contact', 'check_version', 'check_version_merchant']:
+        elif self.action in ['contact', 'check_version', 'check_version_merchant', 'check_version_delivery']:
             permission_classes = [AllowAny]
         else:
             permission_classes = [IsAuthenticated]
@@ -150,21 +150,21 @@ class UserViewSet(ScooterViewSet):
 
     @method_decorator(cache_page(14400))
     @action(detail=False, methods=['GET'])
-    def check_version(self, request, *argsm, **kwargs):
+    def check_version(self, request, *args, **kwargs):
         """ Last number version of app """
         version = AppVersion.objects.get(app="customers")
         return Response(data=AppVersionSerializer(version).data, status=status.HTTP_200_OK)
 
     @method_decorator(cache_page(14400))
     @action(detail=False, methods=['GET'])
-    def check_version_merchant(self, request, *argsm, **kwargs):
+    def check_version_merchant(self, request, *args, **kwargs):
         """ Last number version of merchants app """
         version = AppVersion.objects.get(app="merchants")
         return Response(data=AppVersionSerializer(version).data, status=status.HTTP_200_OK)
 
     @method_decorator(cache_page(14400))
     @action(detail=False, methods=['GET'])
-    def check_version_delivery(self, request, *argsm, **kwargs):
+    def check_version_delivery(self, request, *args, **kwargs):
         """ Last number version of delivery app """
         version = AppVersion.objects.get(app="delivery")
         return Response(data=AppVersionSerializer(version).data, status=status.HTTP_200_OK)
