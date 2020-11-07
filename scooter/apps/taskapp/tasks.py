@@ -7,6 +7,8 @@ from scooter.apps.delivery_men.models import DeliveryMan
 from scooter.utils.functions import send_mail_verification, send_order_delivery
 # Celery
 from celery.task import task, periodic_task
+from celery.schedules import crontab
+
 # FCM
 from fcm_django.models import FCMDevice
 # Models
@@ -14,6 +16,7 @@ from scooter.apps.orders.models import Order
 # Functions
 from scooter.utils.functions import send_notification_push_order
 from scooter.utils.functions import send_notice_order_delivery_fn
+
 
 
 @task(name='send_email_task', max_retries=3)
@@ -51,6 +54,12 @@ def send_notification_delivery():
             send_order_delivery(location_selected=order.merchant_location,
                                 station=order.station,
                                 order=order)
+
+
+# Period Task with crontab
+# @periodic_task(name='reject_orders', run_every=crontab(hour=7, minute=30, day_of_week=1))
+# def create_view_schedules():
+#     pass
 
 
 @periodic_task(name='reject_orders', run_every=timedelta(minutes=1))
