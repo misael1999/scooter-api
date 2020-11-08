@@ -120,7 +120,7 @@ def send_notice_order_delivery_fn(location_selected, station, order):
         # delivery_men = get_nearest_delivery_man(location_selected=location_selected, station=station,
         #                                         list_exclude=[], distance=settings.RANGE_DISTANCE,
         #                                         status=['available'])
-        delivery_men = DeliveryMan.objects.filters(status__slug_name='active')
+        delivery_men = DeliveryMan.objects.filter(status_id=1)
 
         # Send push notification to delivery_man
         # if delivery_men.count() == 0:
