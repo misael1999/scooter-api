@@ -16,6 +16,7 @@ class AssignDeliveryManStationSerializer(serializers.Serializer):
     def update(self, instance, data):
         try:
             delivery_man = data['delivery_man']
+
             send_notification_push_task.delay(delivery_man.user.id, 'Solicitud nueva por la central',
                                               'Pedido de compra', {"type": "NEW_ORDER", "order_id": instance.id})
             return instance

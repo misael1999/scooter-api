@@ -29,7 +29,8 @@ def send_notification_push_task(user_id, title, body, data):
     """ Send push notifications in all user """
     devices = FCMDevice.objects.filter(user_id=user_id)
     if devices:
-        devices.send_message(title=title, body=body, data=data)
+        devices.send_message(title=title, body=body, data=data, sound="ringtone.mp3",
+                             android_channel_id="alarms", )
 
 
 @task(name='send_notice_order_delivery', max_retries=3)
