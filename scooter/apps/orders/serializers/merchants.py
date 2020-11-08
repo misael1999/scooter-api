@@ -5,6 +5,8 @@ from scooter.apps.common.models import OrderStatus
 from scooter.apps.orders.serializers import send_order_delivery
 from scooter.utils.functions import send_notification_push_order
 from scooter.apps.taskapp.tasks import send_notice_order_delivery
+from scooter.apps.orders.utils.orders import notify_merchants, notify_delivery_men, send_order_to_station_channel
+from asgiref.sync import async_to_sync
 
 
 class AcceptOrderMerchantSerializer(serializers.Serializer):
@@ -142,20 +144,24 @@ class OrderReadyMerchantSerializer(serializers.Serializer):
                 order.order_status = order_status
                 order.order_ready_date = now
                 order.date_update_order = now
+                station = order.station
                 order.save()
                 send_order_delivery(location_selected=merchant.point,
                                     station=order.station,
                                     order=order)
-                send_notification_push_order(user_id=order.user_id,
-                                             title='Tu pedido de {} esta listo'.format(merchant.merchant_name),
-                                             body='Estamos buscando al repartidor más cercano',
-                                             sound="default",
-                                             android_channel_id="messages",
-                                             data={"type": "ORDER_READY",
-                                                   "order_id": order.id,
-                                                   "message": "Pedido listo para ser recogido",
-                                                   'click_action': 'FLUTTER_NOTIFICATION_CLICK'
-                                                   })
+                if station.assign_delivery_manually:
+                    async_to_sync(notify_merchants)(merchant.id, order.id, 'NEW_ORDER')
+                else:
+                    send_notification_push_order(user_id=order.user_id,
+                                                 title='Tu pedido de {} esta listo'.format(merchant.merchant_name),
+                                                 body='Estamos buscando al repartidor más cercano',
+                                                 sound="default",
+                                                 android_channel_id="messages",
+                                                 data={"type": "ORDER_READY",
+                                                       "order_id": order.id,
+                                                       "message": "Pedido listo para ser recogido",
+                                                       'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                                       })
             return order
         except ValueError as e:
             raise serializers.ValidationError({'details': str(e)})

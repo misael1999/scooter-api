@@ -184,9 +184,13 @@ class CreateOrderSerializer(serializers.ModelSerializer):
             else:
                 location_selected = None
                 location_selected = get_ref_location(order)
-                send_order_delivery(location_selected=location_selected.point,
-                                    station=station,
-                                    order=order)
+                if station.assign_delivery_manually:
+                    async_to_sync(send_order_to_station_channel)(station.id, order.id)
+                else:
+                    async_to_sync(notify_merchants)(merchant.id, order.id, 'NEW_ORDER')
+                    send_order_delivery(location_selected=location_selected.point,
+                                        station=station,
+                                        order=order)
             # Get nearest delivery
 
             # user_id = delivery_man.user_id
@@ -197,7 +201,6 @@ class CreateOrderSerializer(serializers.ModelSerializer):
             #                             type_notification_id=1,
             #                             body="Has recibido una nueva solicitud")
 
-            async_to_sync(send_order_to_station_channel)(station.id, order.id)
             return order.id
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
