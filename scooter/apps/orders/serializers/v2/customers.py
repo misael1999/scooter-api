@@ -171,6 +171,7 @@ class CreateOrderSerializer(serializers.ModelSerializer):
 
             if is_order_to_merchant:
                 async_to_sync(notify_merchants)(merchant.id, order.id, 'NEW_ORDER')
+                async_to_sync(send_order_to_station_channel)(station.id, order.id)
                 send_notification_push_order_with_sound(user_id=merchant.user_id,
                                                         title='Pedido entrante',
                                                         body='Ha recibido un nuevo pedido',
