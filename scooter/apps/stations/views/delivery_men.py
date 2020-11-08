@@ -122,3 +122,13 @@ class DeliveryMenStationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
                                  data=DeliveryManModelSerializer(obj, many=True).data,
                                  message='Listado de repartidores mas cercanos')
         return Response(data=data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['PUT'])
+    def unlock(self, request, *args, **kwargs):
+        delivery_man = self.get_object()
+        sts = Status.objects.get(slug_name='active')
+        # Send instance of vehicle for validate of name not exist
+        delivery_man.status = sts
+        delivery_man.save()
+        data = self.set_response(status=True, data={}, message="Repartidor desbloqueado correctamente")
+        return Response(data=data, status=status.HTTP_200_OK)
