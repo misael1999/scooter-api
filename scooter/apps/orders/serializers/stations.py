@@ -24,7 +24,7 @@ class AssignDeliveryManStationSerializer(serializers.Serializer):
         except Exception as ex:
             print("Exception in reject order, please check it")
             print(ex.args.__str__())
-            raise serializers.ValidationError({'detail': 'Error al rechazar el pedido'})
+            raise serializers.ValidationError({'detail': 'Error al asignar el pedido'})
 
 
 class RejectOrderStationSerializer(serializers.Serializer):

@@ -18,7 +18,6 @@ from scooter.utils.functions import send_notification_push_order
 from scooter.utils.functions import send_notice_order_delivery_fn
 
 
-
 @task(name='send_email_task', max_retries=3)
 def send_email_task(subject, to_user, path_template, data):
     """ Send email in background """
@@ -42,7 +41,7 @@ def send_notice_order_delivery(order_id):
                                   order=order)
 
 
-@periodic_task(name='send_notification_delivery', run_every=timedelta(minutes=1))
+@periodic_task(name='send_notification_delivery', run_every=timedelta(minutes=2))
 def send_notification_delivery():
     """ Send notification delivery man when nobody response """
     now = timezone.localtime(timezone.now())
@@ -109,7 +108,7 @@ def ignore_orders():
                       reason_rejection="Pedido ignorado por el comerciante")
 
 
-@periodic_task(name='location_notice_not_enabled', run_every=timedelta(hours=1))
+@periodic_task(name='location_notice_not_enabled', run_every=timedelta(hours=2))
 def location_notice_not_enabled():
     """ Notice when the location is not enabled """
     now = timezone.localtime(timezone.now())
