@@ -4,6 +4,7 @@ from django.contrib.gis.db import models
 # Utilities
 from django.core.validators import FileExtensionValidator
 
+from scooter.apps.merchants.managers import MerchantManager
 from scooter.utils.models import ScooterModel
 
 
@@ -42,15 +43,27 @@ class Merchant(ScooterModel):
                                   null=True, blank=True, default=1)
     area = models.ForeignKey('common.Area', default=1, on_delete=models.DO_NOTHING)
     zone = models.ForeignKey('common.Zone', blank=True, null=True, on_delete=models.DO_NOTHING)
-    is_delivery_free = models.BooleanField(default=False)
-
-    # Delivery rules
-    pay_delivery = models.BooleanField(default=False)
-    from_price_pay_delivery = models.FloatField(default=0)
-    delivery_payment = models.FloatField(default=0)
+    merchant_level = models.PositiveIntegerField(default=1)
+    # Managers
+    objects = MerchantManager()
 
     def __str__(self):
         return self.merchant_name
+
+
+class MerchantDeliveryRule(ScooterModel):
+    merchant = models.OneToOneField(Merchant, on_delete=models.DO_NOTHING, related_name="delivery_rules")
+    # General rules
+    available_delivery = models.BooleanField(default=False, help_text="Si tiene el envio disponible")
+    is_traceable = models.BooleanField(default=False)
+    is_free_delivery = models.BooleanField(default=False)
+    is_manage_zones = models.BooleanField(default=False)
+
+    pay_delivery = models.BooleanField(default=False)
+    # Conditions
+    is_minimum_price_sale = models.BooleanField(default=False)
+    from_price_pay_delivery = models.FloatField(default=0)
+    delivery_payment = models.FloatField(default=0)
 
 
 class MerchantSchedule(ScooterModel):

@@ -32,8 +32,7 @@ class MerchantWithAllInfoSerializer(serializers.ModelSerializer):
         fields = ('id', 'user', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
                   'information_is_complete', 'category', 'total_grades', 'subcategory', 'reputation', 'description',
                   'approximate_preparation_time', 'full_address', 'is_open', 'point', 'from_preparation_time',
-                  'to_preparation_time', 'type_menu', 'zone', 'area', 'pay_delivery', 'from_price_pay_delivery',
-                  'delivery_payment')
+                  'to_preparation_time', 'type_menu', 'zone', 'area', 'delivery_rules', 'merchant_level')
         read_only_fields = fields
 
 
@@ -47,8 +46,7 @@ class MerchantUserSimpleSerializer(serializers.ModelSerializer):
         fields = ('id', 'user', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
                   'information_is_complete', 'category', 'subcategory', 'reputation', 'description',
                   'approximate_preparation_time', 'is_open', 'from_preparation_time',
-                  'to_preparation_time', 'type_menu', 'area', 'zone', 'full_address', 'pay_delivery',
-                  'from_price_pay_delivery', 'delivery_payment')
+                  'to_preparation_time', 'type_menu', 'area', 'zone', 'full_address', 'delivery_rules', 'merchant_level')
         read_only_fields = fields
 
 
@@ -124,8 +122,7 @@ class MerchantInfoSerializer(serializers.ModelSerializer):
         fields = ('id', 'user', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
                   'information_is_complete', 'reputation', 'description', 'total_grades',
                   'approximate_preparation_time', 'is_open', 'point', 'from_preparation_time',
-                  'to_preparation_time', 'schedules', 'full_address', 'zone', 'area', 'pay_delivery',
-                  'from_price_pay_delivery', 'delivery_payment')
+                  'to_preparation_time', 'schedules', 'full_address', 'zone', 'area', 'delivery_rules', 'merchant_level')
         read_only_fields = fields
 
 
