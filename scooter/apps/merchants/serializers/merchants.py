@@ -12,7 +12,8 @@ from rest_framework.validators import UniqueValidator
 # Models
 from scooter.apps.customers.serializers import PointSerializer
 from scooter.apps.users.models import User
-from scooter.apps.merchants.models.merchants import Merchant, MerchantAddress, MerchantSchedule, TypeMenuMerchant
+from scooter.apps.merchants.models.merchants import Merchant, MerchantAddress, MerchantSchedule, TypeMenuMerchant, \
+    MerchantDeliveryRule
 from scooter.apps.common.models import Service, Schedule, CategoryMerchant, SubcategoryMerchant
 # Utilities
 from scooter.utils.functions import send_mail_verification, generate_verification_token
@@ -21,10 +22,18 @@ from scooter.apps.users.serializers.users import UserModelSimpleSerializer
 from scooter.apps.common.serializers import Base64ImageField
 
 
+class MerchantDeliveryRuleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = MerchantDeliveryRule
+        fields = '__all__'
+
+
 class MerchantWithAllInfoSerializer(serializers.ModelSerializer):
     category = serializers.StringRelatedField(read_only=True)
     subcategory = serializers.StringRelatedField(read_only=True)
     user = UserModelSimpleSerializer()
+    delivery_rules = MerchantDeliveryRuleSerializer(read_only=True)
 
     class Meta:
         model = Merchant
@@ -40,13 +49,15 @@ class MerchantUserSimpleSerializer(serializers.ModelSerializer):
     category = serializers.StringRelatedField(read_only=True)
     subcategory = serializers.StringRelatedField(read_only=True)
     user = UserModelSimpleSerializer()
+    delivery_rules = MerchantDeliveryRuleSerializer(read_only=True)
 
     class Meta:
         model = Merchant
         fields = ('id', 'user', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
                   'information_is_complete', 'category', 'subcategory', 'reputation', 'description',
                   'approximate_preparation_time', 'is_open', 'from_preparation_time',
-                  'to_preparation_time', 'type_menu', 'area', 'zone', 'full_address', 'delivery_rules', 'merchant_level')
+                  'to_preparation_time', 'type_menu', 'area', 'zone', 'full_address', 'delivery_rules',
+                  'merchant_level')
         read_only_fields = fields
 
 
@@ -115,6 +126,7 @@ class MerchantAddressSerializer(serializers.ModelSerializer):
 class MerchantInfoSerializer(serializers.ModelSerializer):
     schedules = MerchantScheduleSerializer(many=True)
     user = UserModelSimpleSerializer()
+    delivery_rules = MerchantDeliveryRuleSerializer(read_only=True)
 
     class Meta:
         model = Merchant
@@ -122,7 +134,8 @@ class MerchantInfoSerializer(serializers.ModelSerializer):
         fields = ('id', 'user', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
                   'information_is_complete', 'reputation', 'description', 'total_grades',
                   'approximate_preparation_time', 'is_open', 'point', 'from_preparation_time',
-                  'to_preparation_time', 'schedules', 'full_address', 'zone', 'area', 'delivery_rules', 'merchant_level')
+                  'to_preparation_time', 'schedules', 'full_address', 'zone', 'area', 'delivery_rules',
+                  'merchant_level')
         read_only_fields = fields
 
 

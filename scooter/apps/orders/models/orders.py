@@ -1,6 +1,7 @@
 """ Order models """
 from django.contrib.gis.db import models
 # utilities
+from scooter.apps.orders.managers import OrderManager
 from scooter.utils.models.scooter import ScooterModel
 
 
@@ -54,6 +55,8 @@ class Order(ScooterModel):
     in_process = models.BooleanField(default=False)
     validate_qr = models.BooleanField(default=False)
     is_safe_order = models.BooleanField(default=False)
+
+    objects = OrderManager()
 
     def __str__(self):
         return self.qr_code
