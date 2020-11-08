@@ -27,8 +27,10 @@ class DeliveryManModelSerializer(ScooterModelSerializer):
         fields = '__all__'
         read_only_fields = (
             'user', 'station', 'name', 'last_name',
-            'phone_number', 'total_orders', 'reputation', 'location',
-            'delivery_status'
+            'phone_number', 'reputation', 'location',
+            'delivery_status', 'vehicle_plate', 'vehicle_model',
+            'vehicle_year', 'vehicle_color', 'vehicle_type',
+            'last_time_update_location', 'from_merchant'
         )
 
     def update(self, instance, data):
@@ -45,20 +47,22 @@ class DeliveryManModelSerializer(ScooterModelSerializer):
 class DeliveryManOrderSerializer(serializers.ModelSerializer):
 
     picture = Base64ImageField(use_url=True)
-    vehicle = VehicleModelSerializer()
 
     class Meta:
         model = DeliveryMan
         geofield = 'location'
         fields = (
             'id',
+            'name', 'last_name',
             'station',
+            'merchant',
             'picture',
-            'name',
             'phone_number',
             'reputation',
             'location',
-            'vehicle'
+            'vehicle_plate', 'vehicle_model',
+            'vehicle_year', 'vehicle_color', 'vehicle_type',
+            'from_merchant', 'last_time_update_location'
         )
         read_only_fields = fields
 

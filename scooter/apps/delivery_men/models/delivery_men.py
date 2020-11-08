@@ -7,7 +7,8 @@ from django.core.validators import RegexValidator
 
 class DeliveryMan(ScooterModel):
     user = models.OneToOneField('users.User', on_delete=models.DO_NOTHING)
-    station = models.ForeignKey('stations.Station', on_delete=models.CASCADE)
+    station = models.ForeignKey('stations.Station', on_delete=models.CASCADE, null=True, blank=True)
+    merchant = models.ForeignKey('merchants.Merchant', on_delete=models.DO_NOTHING, null=True, blank=True)
     name = models.CharField(max_length=60)
     last_name = models.CharField(max_length=60)
     phone_regex = RegexValidator(
@@ -16,15 +17,19 @@ class DeliveryMan(ScooterModel):
     )
     phone_number = models.CharField(validators=[phone_regex], max_length=20, blank=True, null=True)
     picture = models.ImageField(upload_to='deliveryman/pictures/', blank=True, null=True)
-    salary_per_order = models.FloatField(default=0)
-
     # stats
-    total_orders = models.PositiveIntegerField(default=0)
     reputation = models.FloatField(default=0)
     location = models.PointField(blank=True, null=True, geography=True)
-    vehicle = models.OneToOneField('stations.Vehicle', on_delete=models.DO_NOTHING, blank=True, null=True)
     delivery_status = models.ForeignKey('common.DeliveryManStatus', on_delete=models.DO_NOTHING, default=1)
     last_time_update_location = models.DateTimeField(null=True, blank=True)
+    # Vehicle data
+    vehicle_plate = models.CharField(max_length=10, null=True, blank=True)
+    vehicle_model = models.CharField(max_length=30, null=True, blank=True)
+    vehicle_year = models.CharField(max_length=10, null=True, blank=True)
+    vehicle_color = models.CharField(max_length=15, null=True, blank=True)
+    vehicle_type = models.ForeignKey('common.TypeVehicle', on_delete=models.DO_NOTHING, default=1)
+
+    from_merchant = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'delivery_men_delivery_man'
