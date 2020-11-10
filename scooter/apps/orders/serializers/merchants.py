@@ -4,7 +4,7 @@ from rest_framework import serializers
 from scooter.apps.common.models import OrderStatus
 from scooter.apps.orders.serializers import send_order_delivery
 from scooter.utils.functions import send_notification_push_order
-from scooter.apps.taskapp.tasks import send_notice_order_delivery
+from scooter.apps.taskapp.tasks import send_notice_order_delivery, send_notification_push_task
 from scooter.apps.orders.utils.orders import notify_merchants, notify_delivery_men, send_order_to_station_channel
 from asgiref.sync import async_to_sync
 
@@ -32,6 +32,7 @@ class AcceptOrderMerchantSerializer(serializers.Serializer):
     def update(self, order, data):
         try:
             merchant = data['merchant']
+            station = order.station
             order_status = OrderStatus.objects.get(slug_name="preparing_order")
             order.order_status = order_status
             order.date_update_order = timezone.localtime(timezone.now())
@@ -58,7 +59,19 @@ class AcceptOrderMerchantSerializer(serializers.Serializer):
                                                'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                })
 
-            send_notice_order_delivery.delay(order.id)
+            if station.assign_delivery_manually:
+                send_notification_push_task.delay(station.user_id,
+                                                  'Solicitud nueva',
+                                                  'Ha recibido una nueva solicitud',
+                                                  {"type": "NEW_ORDER",
+                                                   "order_id": order.id,
+                                                   "message": "Ha recibido una nueva solicitud",
+                                                   'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                                   })
+                # Send message by django channel
+                async_to_sync(send_order_to_station_channel)(station.id, order.id)
+            else:
+                send_notice_order_delivery.delay(order.id)
             return order
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
