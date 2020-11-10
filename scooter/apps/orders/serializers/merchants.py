@@ -148,9 +148,16 @@ class OrderReadyMerchantSerializer(serializers.Serializer):
                 order.date_update_order = now
                 station = order.station
                 order.save()
-                send_order_delivery(location_selected=merchant.point,
-                                    station=order.station,
-                                    order=order)
+                send_notification_push_order(user_id=order.user_id,
+                                             title='Tu pedido de {} esta listo'.format(merchant.merchant_name),
+                                             body='Estamos buscando al repartidor más cercano',
+                                             sound="default",
+                                             android_channel_id="messages",
+                                             data={"type": "ORDER_READY",
+                                                   "order_id": order.id,
+                                                   "message": "Pedido listo para ser recogido",
+                                                   'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                                   })
                 if station.assign_delivery_manually:
                     send_notification_push_task.delay(station.user_id,
                                                       'Solicitud nueva',
@@ -163,16 +170,9 @@ class OrderReadyMerchantSerializer(serializers.Serializer):
                     # Send message by django channel
                     async_to_sync(send_order_to_station_channel)(station.id, order.id)
                 else:
-                    send_notification_push_order(user_id=order.user_id,
-                                                 title='Tu pedido de {} esta listo'.format(merchant.merchant_name),
-                                                 body='Estamos buscando al repartidor más cercano',
-                                                 sound="default",
-                                                 android_channel_id="messages",
-                                                 data={"type": "ORDER_READY",
-                                                       "order_id": order.id,
-                                                       "message": "Pedido listo para ser recogido",
-                                                       'click_action': 'FLUTTER_NOTIFICATION_CLICK'
-                                                       })
+                    send_order_delivery(location_selected=merchant.point,
+                                        station=order.station,
+                                        order=order)
             return order
         except ValueError as e:
             raise serializers.ValidationError({'details': str(e)})
