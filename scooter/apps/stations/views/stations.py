@@ -4,6 +4,9 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 # Permissions
 from rest_framework.permissions import AllowAny, IsAuthenticated
+
+from scooter.apps.common.models import Area
+from scooter.apps.common.serializers import AreaModelSerializer
 from scooter.apps.users.permissions import IsAccountOwner
 # Utilities
 from scooter.utils.viewsets import ScooterViewSet
@@ -112,6 +115,20 @@ class StationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             data = self.get_queryset_pagination(queryset=queryset,
                                                 serialize_class=MembersStationModelSerializer)
             return Response(data, status=status.HTTP_200_OK)
+        except Exception as ex:
+            return Response(
+                self.set_error_response(status=False, field='Detail', message='Error al consultar los clientes'))
+
+    @action(detail=True, methods=['GET'])
+    def area(self, request, *args, **kwargs):
+        try:
+            station = self.get_object()
+            area = station.area
+            data = AreaModelSerializer(area).data
+            return Response(data, status=status.HTTP_200_OK)
+        except Area.DoesNotExist:
+            return Response(
+                self.set_error_response(status=False, field='Detail', message='No existe el área'))
         except Exception as ex:
             return Response(
                 self.set_error_response(status=False, field='Detail', message='Error al consultar los clientes'))
