@@ -18,7 +18,9 @@ class AssignDeliveryManStationSerializer(serializers.Serializer):
             delivery_man = data['delivery_man']
 
             send_notification_push_task.delay(delivery_man.user.id, 'Solicitud nueva por la central',
-                                              'Pedido de compra', {"type": "NEW_ORDER", "order_id": instance.id})
+                                              'Pedido de compra', {"type": "NEW_ORDER",
+                                                                   "order_id": instance.id,
+                                                                   'click_action': 'FLUTTER_NOTIFICATION_CLICK'})
             return instance
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
