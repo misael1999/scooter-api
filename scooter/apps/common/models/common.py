@@ -4,6 +4,15 @@ from django.db import models
 from scooter.utils.models.scooter import ScooterModel
 
 
+class TypeZone(ScooterModel):
+
+    name = models.CharField(max_length=60)
+    slug_name = models.CharField(max_length=60)
+
+    def __str__(self):
+        return self.name
+
+
 class Service(ScooterModel):
     name = models.CharField(max_length=30)
     slug_name = models.CharField(max_length=30)

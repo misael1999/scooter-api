@@ -1,6 +1,7 @@
 # django
 from django.contrib.gis.db import models
 # Utilities
+from scooter.apps.delivery_men.managers import DeliveryManManager
 from scooter.utils.models import ScooterModel
 from django.core.validators import RegexValidator
 
@@ -30,6 +31,7 @@ class DeliveryMan(ScooterModel):
     vehicle_type = models.ForeignKey('common.TypeVehicle', on_delete=models.DO_NOTHING, default=1)
 
     from_merchant = models.BooleanField(default=False)
+    objects = DeliveryManManager()
 
     class Meta:
         db_table = 'delivery_men_delivery_man'

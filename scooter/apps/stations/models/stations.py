@@ -18,6 +18,7 @@ class Station(ScooterModel):
     allow_cancellations = models.BooleanField(default=True)
     quantity_safe_order = models.PositiveIntegerField(default=3)
     # Free orders
+    promotions_zones_activated = models.BooleanField(default=False)
     free_orders_activated = models.BooleanField(default=False)
     from_hour_free_order = models.TimeField(blank=True, null=True)
     to_hour_free_order = models.TimeField(blank=True, null=True)
@@ -60,6 +61,7 @@ class StationPhoneNumbers(ScooterModel):
 
 class StationSchedule(ScooterModel):
     station = models.ForeignKey(Station, on_delete=models.CASCADE, related_name="schedules")
+    is_open = models.BooleanField(default=True)
     schedule = models.ForeignKey('common.Schedule', on_delete=models.DO_NOTHING)
     from_hour = models.TimeField()
     to_hour = models.TimeField()

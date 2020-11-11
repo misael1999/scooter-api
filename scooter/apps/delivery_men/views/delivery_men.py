@@ -14,14 +14,14 @@ from scooter.apps.delivery_men.serializers.delivery_men import (DeliveryManModel
 from scooter.utils.viewsets.scooter import ScooterViewSet
 # Permissions
 from rest_framework.permissions import IsAuthenticated
-from scooter.apps.delivery_men.permissions import IsSameDeliveryMan
+from scooter.apps.delivery_men.permissions import IsSameDeliveryMan, IsActiveDeliveryMan
 
 
 class DeliveryMenViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
                          mixins.UpdateModelMixin):
     serializer_class = DeliveryManModelSerializer
     queryset = DeliveryMan.objects.all()
-    permission_classes = (IsAuthenticated, IsSameDeliveryMan)
+    permission_classes = (IsAuthenticated, IsActiveDeliveryMan, IsSameDeliveryMan)
     lookup_field = 'pk'
 
     def get_object(self):
