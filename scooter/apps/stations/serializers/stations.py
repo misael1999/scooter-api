@@ -166,6 +166,8 @@ class StationConfigSerializer(serializers.Serializer):
     free_orders_activated = serializers.BooleanField(required=False)
     from_hour_free_order = serializers.TimeField(required=False)
     to_hour_free_order = serializers.TimeField(required=False)
+    promotions_zones_activated = serializers.BooleanField(required=False)
+    restricted_zones_activated = serializers.BooleanField(required=False)
 
 
 # Update configuration of station
