@@ -151,7 +151,8 @@ class StationWithAllInfoSerializer(serializers.ModelSerializer):
             "assign_delivery_manually", 'phone_number',
             "cancellation_policies",
             "allow_cancellations", 'quantity_safe_order', 'free_orders_activated',
-            'from_hour_free_order', 'to_hour_free_order'
+            'from_hour_free_order', 'to_hour_free_order', 'promotions_zones_activated',
+            'restricted_zones_activated'
         )
         read_only_fields = fields
 

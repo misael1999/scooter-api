@@ -19,6 +19,7 @@ class Station(ScooterModel):
     quantity_safe_order = models.PositiveIntegerField(default=3)
     # Free orders
     promotions_zones_activated = models.BooleanField(default=False)
+    restricted_zones_activated = models.BooleanField(default=False)
     free_orders_activated = models.BooleanField(default=False)
     from_hour_free_order = models.TimeField(blank=True, null=True)
     to_hour_free_order = models.TimeField(blank=True, null=True)
