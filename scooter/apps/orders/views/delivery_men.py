@@ -12,7 +12,7 @@ from scooter.utils.viewsets.scooter import ScooterViewSet
 # Permissions
 from rest_framework.permissions import IsAuthenticated
 from scooter.apps.orders.permissions import IsOrderDeliveryManStationOwner, IsOrderDeliveryManOwner
-from scooter.apps.delivery_men.permissions import IsAccountOwnerDeliveryMan, IsActiveDeliveryMan
+from scooter.apps.delivery_men.permissions import IsAccountOwnerDeliveryMan
 # Serializers
 from scooter.apps.orders.serializers import (OrderModelSerializer,
                                              RejectOrderByDeliverySerializer,
@@ -43,7 +43,7 @@ class DeliveryMenOrderViewSet(ScooterViewSet, AddDeliveryManMixin,
 
     def get_permissions(self):
         """Assign permission based on action."""
-        permissions = [IsAuthenticated, IsActiveDeliveryMan, IsAccountOwnerDeliveryMan]
+        permissions = [IsAuthenticated, IsAccountOwnerDeliveryMan]
         if self.action in ['reject_order', 'accept_order', 'retrieve', 'is_owner']:
             permissions.append(IsOrderDeliveryManStationOwner)
         elif self.action in ['list', 'current_orders']:

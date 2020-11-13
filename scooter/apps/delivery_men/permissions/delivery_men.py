@@ -35,5 +35,10 @@ class IsAccountOwnerDeliveryMan(BasePermission):
         return delivery_man == view.delivery_man
 
 
+class IsActiveDeliveryMan(BasePermission):
+
+    def has_permission(self, request, view):
+        return view.delivery_man.status.slug_name == 'active'
+
 
 
