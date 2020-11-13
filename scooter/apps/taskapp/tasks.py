@@ -25,12 +25,12 @@ def send_email_task(subject, to_user, path_template, data):
 
 
 @task(name='send_notification_push_task', max_retries=3)
-def send_notification_push_task(user_id, title, body, data):
+def send_notification_push_task(user_id, title, body, data, android_channel_id, sound):
     """ Send push notifications in all user """
     devices = FCMDevice.objects.filter(user_id=user_id)
     if devices:
-        devices.send_message(title=title, body=body, data=data, sound="ringtone.mp3",
-                             android_channel_id="alarms", )
+        devices.send_message(title=title, body=body, data=data, sound=sound,
+                             android_channel_id=android_channel_id, )
 
 
 @task(name='send_notice_order_delivery', max_retries=3)

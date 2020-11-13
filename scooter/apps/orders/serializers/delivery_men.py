@@ -77,33 +77,28 @@ class AcceptOrderByDeliveryManSerializer(serializers.Serializer):
             type_notification = "ACCEPTED_ORDER"
             if order.is_order_to_merchant:
                 type_notification = "ACCEPT_ORDER_DELIVERY"
-                send_notification_push_task.delay(instance.user_id,
-                                                  data_message['title'],
-                                                  data_message['body'],
-                                                  {"type": type_notification,
-                                                   "order_id": order.id,
-                                                   "message": "Puedes ver el seguimiento de tu pedido",
-                                                   'click_action': 'FLUTTER_NOTIFICATION_CLICK'
-                                                   })
-                send_notification_push_task.delay(instance.merchant.user_id,
-                                                  'El scooter ya va por el pedido',
-                                                  'Numero de pedido {}'.format(order.qr_code),
-                                                  {"type": type_notification,
-                                                   "order_id": order.id,
-                                                   "message": "Puedes ver el seguimiento de tu pedido",
-                                                   'click_action': 'FLUTTER_NOTIFICATION_CLICK'
-                                                   })
-            else:
-                send_notification_push_task.delay(instance.user_id,
-                                                  data_message['title'],
-                                                  data_message['body'],
-                                                  {"type": type_notification,
-                                                   "order_id": order.id,
-                                                   "message": "Puedes ver el seguimiento de tu pedido",
-                                                   'click_action': 'FLUTTER_NOTIFICATION_CLICK'
-                                                   })
+                send_notification_push_task.delay(user_id=instance.merchant.user_id,
+                                                  title='El scooter ya va por el pedido',
+                                                  body='Numero de pedido {}'.format(order.qr_code),
+                                                  sound="default",
+                                                  android_channel_id="messages",
+                                                  data={"type": type_notification,
+                                                        "order_id": order.id,
+                                                        "message": "Pedido de nuevo",
+                                                        'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                                        })
 
-            async_to_sync(notify_station_accept)(order.station_id, order.id)
+            send_notification_push_task.delay(user_id=instance.user_id,
+                                              title=data_message['title'],
+                                              body=data_message['body'],
+                                              sound="default",
+                                              android_channel_id="messages",
+                                              data={"type": type_notification,
+                                                    "order_id": order.id,
+                                                    "message": "Pedido de nuevo",
+                                                    'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                                    })
+            # async_to_sync(notify_station_accept)(order.station_id, order.id)
             # Notify all delivery men that order was accepted
             async_to_sync(notify_delivery_men)(order.id, 'ORDER_ACCEPTED')
 
@@ -322,13 +317,16 @@ def update_order_status(service, order_status, instance, data):
                                                           "message": "Esperando",
                                                           'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                           })
-            send_notification_push_task.delay(instance.user_id,
-                                              data['title'],
-                                              data['body'],
-                                              {"type": data['type'], "order_id": instance.id,
-                                               "message": data['body'],
-                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'
-                                               })
+            send_notification_push_task.delay(user_id=instance.user_id,
+                                              title=data['title'],
+                                              body=data['body'],
+                                              sound="default",
+                                              android_channel_id="messages",
+                                              data={"type": data['type'],
+                                                    "order_id": instance.id,
+                                                    "message": "Pedido de nuevo",
+                                                    'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                                    })
         elif order_status.slug_name == 'already_here':
             send_notification_push_order_with_sound(user_id=instance.user_id,
                                                     title='El scooter acaba de llegar ',
@@ -341,13 +339,16 @@ def update_order_status(service, order_status, instance, data):
                                                           'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                           })
         else:
-            send_notification_push_task.delay(instance.user_id,
-                                              data['title'],
-                                              data['body'],
-                                              {"type": data['type'], "order_id": instance.id,
-                                               "message": data['body'],
-                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'
-                                               })
+            send_notification_push_task.delay(user_id=instance.user_id,
+                                              title=data['title'],
+                                              body=data['body'],
+                                              sound="default",
+                                              android_channel_id="messages",
+                                              data={"type": data['type'],
+                                                    "order_id": instance.id,
+                                                    "message": "Pedido de nuevo",
+                                                    'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                                    })
         # Notification.objects.create(user_id=instance.user_id, title="En camino al comercio",
         #                             type_notification_id=1,
         #                             body="Tu pedido ya esta en camino de ser comprado")

@@ -174,14 +174,14 @@ class CreateOrderSerializer(serializers.Serializer):
 
             # Is assign delivery manually is true, then send notification
             if station.assign_delivery_manually:
-                send_notification_push_task.delay(station.user_id,
-                                                  'Solicitud nueva',
-                                                  'Ha recibido una nueva solicitud',
-                                                  {"type": "NEW_ORDER",
-                                                   "order_id": order.id,
-                                                   "message": "Ha recibido una nueva solicitud",
-                                                   'click_action': 'FLUTTER_NOTIFICATION_CLICK'
-                                                   })
+                # send_notification_push_task.delay(station.user_id,
+                #                                   'Solicitud nueva',
+                #                                   'Ha recibido una nueva solicitud',
+                #                                   {"type": "NEW_ORDER",
+                #                                    "order_id": order.id,
+                #                                    "message": "Ha recibido una nueva solicitud",
+                #                                    'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                #                                    })
                 # Send message by django channel
                 async_to_sync(send_order_to_station_channel)(station.id, order.id)
             else:

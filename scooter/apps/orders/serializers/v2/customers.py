@@ -170,8 +170,8 @@ class CreateOrderSerializer(serializers.ModelSerializer):
             # else:
 
             if is_order_to_merchant:
-                async_to_sync(notify_merchants)(merchant.id, order.id, 'NEW_ORDER')
-                async_to_sync(send_order_to_station_channel)(station.id, order.id)
+                # async_to_sync(notify_merchants)(merchant.id, order.id, 'NEW_ORDER')
+                # async_to_sync(send_order_to_station_channel)(station.id, order.id)
                 send_notification_push_order_with_sound(user_id=merchant.user_id,
                                                         title='Pedido entrante',
                                                         body='Ha recibido un nuevo pedido',
@@ -182,20 +182,34 @@ class CreateOrderSerializer(serializers.ModelSerializer):
                                                               "message": "Pedido de nuevo",
                                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                               })
+                send_notification_push_task.delay(user_id=station.user_id,
+                                                  title='Pedido próximo',
+                                                  body='Un nuevo pedido en {} sin responder'.format(
+                                                      merchant.merchant_name),
+                                                  sound="preorder.mp3",
+                                                  android_channel_id="preorder",
+                                                  data={"type": "PREORDER",
+                                                        "order_id": order.id,
+                                                        "message": "Pedido de nuevo",
+                                                        'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                                        })
             else:
                 location_selected = None
                 location_selected = get_ref_location(order)
                 if station.assign_delivery_manually:
-                    send_notification_push_task.delay(station.user_id,
-                                                      'Solicitud nueva',
-                                                      'Ha recibido una nueva solicitud',
-                                                      {"type": "NEW_ORDER",
-                                                       "order_id": order.id,
-                                                       "message": "Ha recibido una nueva solicitud",
-                                                       'click_action': 'FLUTTER_NOTIFICATION_CLICK'
-                                                       })
+
+                    send_notification_push_task.delay(user_id=station.user_id,
+                                                      title='Pedido nuevo',
+                                                      body='Solicitud nueva',
+                                                      sound="alarms.mp3",
+                                                      android_channel_id="alarms",
+                                                      data={"type": "NEW_ORDER",
+                                                            "order_id": order.id,
+                                                            "message": "Pedido de nuevo",
+                                                            'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                                            })
                     # Send message by django channel
-                    async_to_sync(send_order_to_station_channel)(station.id, order.id)
+                    # async_to_sync(send_order_to_station_channel)(station.id, order.id)
                 else:
                     # async_to_sync(send_order_to_station_channel)(station.id, order.id)
                     send_order_delivery(location_selected=location_selected.point,

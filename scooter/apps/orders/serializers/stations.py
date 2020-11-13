@@ -16,11 +16,15 @@ class AssignDeliveryManStationSerializer(serializers.Serializer):
     def update(self, instance, data):
         try:
             delivery_man = data['delivery_man']
+            send_notification_push_task.delay(user_id=delivery_man.user.id,
+                                              title='Solicitud nueva por la central',
+                                              body='Tienes un nuevo pedido asignado',
+                                              sound="default",
+                                              data={"type": "NEW_ORDER",
+                                                    "order_id": instance.id,
+                                                    'click_action': 'FLUTTER_NOTIFICATION_CLICK'},
+                                              android_channel_id="messages")
 
-            send_notification_push_task.delay(delivery_man.user.id, 'Solicitud nueva por la central',
-                                              'Pedido de compra', {"type": "NEW_ORDER",
-                                                                   "order_id": instance.id,
-                                                                   'click_action': 'FLUTTER_NOTIFICATION_CLICK'})
             return instance
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
@@ -41,11 +45,14 @@ class RejectOrderStationSerializer(serializers.Serializer):
             order_sts = OrderStatus.objects.get(slug_name="rejected")
             instance.order_status = order_sts
             instance.save()
-            send_notification_push_task.delay(customer.user.id, 'Pedido rechazado',
-                                              'Se ha rechazado tu pedido',
-                                              {"type": "REJECT_ORDER",
-                                               "order_id": instance.id,
-                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'})
+            send_notification_push_task.delay(user_id=customer.user.id,
+                                              title='Pedido rechazado',
+                                              body='Se ha rechazado tu pedido',
+                                              sound="default",
+                                              data={"type": "REJECT_ORDER",
+                                                    "order_id": instance.id,
+                                                    'click_action': 'FLUTTER_NOTIFICATION_CLICK'},
+                                              android_channel_id="messages")
             return instance
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
@@ -53,4 +60,3 @@ class RejectOrderStationSerializer(serializers.Serializer):
             print("Exception in reject order, please check it")
             print(ex.args.__str__())
             raise serializers.ValidationError({'detail': 'Error al rechazar el pedido'})
-
