@@ -11,6 +11,8 @@ router.register(r'api/v1/commons/categories', view_set.CategoryMerchantViewSet, 
 # router.register(r'api/v1/commons/notifications', view_set.StatusViewSet, basename='notifications')
 router.register(r'api/v1/commons/addresses', view_set.RecommendationsAddressesViewSet,
                 basename='common-addresses')
+router.register(r'api/v1/commons/zones', view_set.ZonesViewSet,
+                basename='common-zones')
 
 urlpatterns = [
     # Users

@@ -111,6 +111,26 @@ paths:
           description: 'Listado de categorías'
       tags:
         - Común
+  /api/v1/commons/zones/check_location:
+    get:
+      operationId: check_location
+      description: Revisar ubicación.
+      parameters:
+        - name: lat
+          in: query
+          description: Latitude
+          required: true
+          type: double
+        - name: lng
+          in: query
+          description: Longitude
+          required: true
+          type: double
+      responses:
+        '200':
+          description: 'Zona'
+      tags:
+        - Común
   /api/v1/commons/type_addresses/:
     get:
       operationId: type_addresses_get

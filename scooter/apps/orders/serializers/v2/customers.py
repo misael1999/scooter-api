@@ -403,6 +403,7 @@ class RantingOrderCustomerSerializer(serializers.Serializer):
 
     def create(self, data):
         try:
+            data.pop('merchant', None)
             station = data['station']
             delivery_man = data['delivery_man']
             order = data['order']

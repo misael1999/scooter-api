@@ -3,6 +3,8 @@ from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
+# Mixins
+from scooter.apps.common.mixins import AddDeliveryManMixin
 # Models
 from scooter.apps.customers.serializers import ChangePasswordCustomerSerializer
 from scooter.apps.delivery_men.models.delivery_men import DeliveryMan
@@ -17,12 +19,13 @@ from rest_framework.permissions import IsAuthenticated
 from scooter.apps.delivery_men.permissions import IsSameDeliveryMan, IsActiveDeliveryMan
 
 
-class DeliveryMenViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
+class DeliveryMenViewSet(ScooterViewSet, AddDeliveryManMixin,  mixins.RetrieveModelMixin,
                          mixins.UpdateModelMixin):
     serializer_class = DeliveryManModelSerializer
     queryset = DeliveryMan.objects.all()
     permission_classes = (IsAuthenticated, IsActiveDeliveryMan, IsSameDeliveryMan)
     lookup_field = 'pk'
+    delivery_man = None
 
     def get_object(self):
         obj = get_object_or_404(DeliveryMan,

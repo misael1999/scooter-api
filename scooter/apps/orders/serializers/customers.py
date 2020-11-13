@@ -260,8 +260,8 @@ class RantingOrderCustomerSerializer(serializers.Serializer):
         if rating_exist:
             raise serializers.ValidationError({'detail': 'Ya se califico esta orden'})
 
-        if order.in_process is True or order.date_delivered_order is None:
-            raise serializers.ValidationError({'detail': 'No es permitido valorar esta orden'})
+        # if order.in_process is True or order.date_delivered_order is None:
+        #     raise serializers.ValidationError({'detail': 'No es permitido valorar esta orden'})
 
         data['rating_customer'] = customer
         data['user'] = customer.user
@@ -301,8 +301,8 @@ class RantingOrderCustomerSerializer(serializers.Serializer):
             delivery_man.reputation = delivery_man_avg
             delivery_man.save()
 
-            Notification.objects.create(user_id=station.user_id, title="Ha recibido una nueva valoración",
-                                        type_notification_id=1)
+            # Notification.objects.create(user_id=station.user_id, title="Ha recibido una nueva valoración",
+            #                             type_notification_id=1)
 
             return data
         except ValueError as e:

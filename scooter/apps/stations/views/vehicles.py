@@ -81,7 +81,7 @@ class VehiclesViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.CreateModelM
         except Status.DoesNotExist:
             error = self.set_error_response(status=False, field='status',
                                             message='Ha ocurrido un error al borrar el vehiculo')
-            return Responase(data=error, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(data=error, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @action(detail=True, methods=['PATCH'])
     def unlock(self, request, *args, **kwargs):
