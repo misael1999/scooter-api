@@ -19,13 +19,12 @@ from rest_framework.permissions import IsAuthenticated
 from scooter.apps.delivery_men.permissions import IsSameDeliveryMan
 
 
-class DeliveryMenViewSet(ScooterViewSet, AddDeliveryManMixin,  mixins.RetrieveModelMixin,
+class DeliveryMenViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
                          mixins.UpdateModelMixin):
     serializer_class = DeliveryManModelSerializer
     queryset = DeliveryMan.objects.all()
     permission_classes = (IsAuthenticated, IsSameDeliveryMan)
     lookup_field = 'pk'
-    delivery_man = None
 
     def get_object(self):
         obj = get_object_or_404(DeliveryMan,
