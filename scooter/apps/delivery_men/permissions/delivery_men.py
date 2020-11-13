@@ -16,8 +16,8 @@ class IsSameDeliveryMan(BasePermission):
         """ Verify delivery man is the same that in the obj """
         try:
             delivery_man = request.user.deliveryman
-
-            return obj == delivery_man
+            is_active = delivery_man.status.slug_name == 'active'
+            return obj == delivery_man and is_active
         except DeliveryMan.DoesNotExist:
             return False
 
@@ -34,11 +34,6 @@ class IsAccountOwnerDeliveryMan(BasePermission):
         # Customer
         return delivery_man == view.delivery_man
 
-
-class IsActiveDeliveryMan(BasePermission):
-
-    def has_permission(self, request, view):
-        return view.delivery_man.status.slug_name == 'active'
 
 
 
