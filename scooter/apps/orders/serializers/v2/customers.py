@@ -183,8 +183,8 @@ class CreateOrderSerializer(serializers.ModelSerializer):
                                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                               })
                 send_notification_push_task.delay(user_id=station.user_id,
-                                                  title='Pedido próximo',
-                                                  body='Un nuevo pedido en {} sin responder'.format(
+                                                  title='Pedido a comercio',
+                                                  body='Un nuevo pedido en {}'.format(
                                                       merchant.merchant_name),
                                                   sound="preorder.mp3",
                                                   android_channel_id="preorder",
