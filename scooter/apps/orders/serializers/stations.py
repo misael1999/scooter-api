@@ -44,6 +44,7 @@ class RejectOrderStationSerializer(serializers.Serializer):
             # Filter for type_service
             order_sts = OrderStatus.objects.get(slug_name="rejected")
             instance.order_status = order_sts
+            instance.in_process = False
             instance.save()
             send_notification_push_task.delay(user_id=customer.user.id,
                                               title='Pedido rechazado',
