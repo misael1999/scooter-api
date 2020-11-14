@@ -19,11 +19,11 @@ class AssignDeliveryManStationSerializer(serializers.Serializer):
             send_notification_push_task.delay(user_id=delivery_man.user.id,
                                               title='Solicitud nueva por la central',
                                               body='Tienes un nuevo pedido asignado',
-                                              sound="default",
+                                              sound="ringtone.mp3",
                                               data={"type": "NEW_ORDER",
                                                     "order_id": instance.id,
                                                     'click_action': 'FLUTTER_NOTIFICATION_CLICK'},
-                                              android_channel_id="messages")
+                                              android_channel_id="alarms")
 
             return instance
         except ValueError as e:
