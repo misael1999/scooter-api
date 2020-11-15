@@ -43,7 +43,7 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
             lat = self.request.query_params.get('lat', 18.462938)
             lng = self.request.query_params.get('lng', -97.392701)
             point = Point(x=float(lng), y=float(lat), srid=4326)
-            station = Station.objects.first()
+            station = Station.objects.get(pk=id)
             areas = Area.objects.filter(poly__contains=point)
             # Verificar si hay cobertura en su area
             if len(areas) == 0:
@@ -56,7 +56,7 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
             if station.restricted_zones_activated:
                 zones = station.stationzone_set.filter(type__slug_name="restricted_zone", poly__contains=point)
                 # Si hay un punto en esa zona restringida, entonces regresamos una respuesta
-                if zones.count() > 0:
+                if len(zones) > 0:
                     return Response({
                         'status': False,
                         'zone': StationZoneSerializer(zones.last()).data,
