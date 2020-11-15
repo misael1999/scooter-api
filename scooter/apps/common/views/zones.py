@@ -38,7 +38,7 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
     # filter_fields = ('category',)
 
     @action(detail=False, methods=['GET'])
-    def check_location(self):
+    def check_location(self, request, *args, **kwargs):
         try:
             lat = self.request.query_params.get('lat', 18.462938)
             lng = self.request.query_params.get('lng', -97.392701)
