@@ -14,6 +14,15 @@ from scooter.apps.stations.models import Vehicle, StationZone
 from scooter.utils.serializers.scooter import ScooterModelSerializer
 
 
+class StationZoneSimpleSerializer(serializers.ModelSerializer):
+    type_id = serializers.IntegerField()
+    type = serializers.StringRelatedField()
+
+    class Meta:
+        model = StationZone
+        exclude = ('poly',)
+
+
 class StationZoneSerializer(serializers.ModelSerializer):
 
     kml_file = serializers.FileField(required=False)

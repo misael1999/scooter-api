@@ -12,7 +12,7 @@ from scooter.apps.customers.serializers.addresses import (CustomerAddressModelSe
                                                           AddressRecommendationsSerializer)
 # Viewset
 from scooter.apps.stations.models import StationZone, Station
-from scooter.apps.stations.serializers import StationZoneSerializer
+from scooter.apps.stations.serializers import StationZoneSerializer, StationZoneSimpleSerializer
 from scooter.utils.viewsets.scooter import ScooterViewSet
 # Permissions
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -40,10 +40,10 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
     @action(detail=False, methods=['GET'])
     def check_location(self, request, *args, **kwargs):
         try:
-            lat = self.request.query_params.get('lat', 18.462938)
-            lng = self.request.query_params.get('lng', -97.392701)
+            lat = request.query_params.get('lat', 18.462938)
+            lng = request.query_params.get('lng', -97.392701)
             point = Point(x=float(lng), y=float(lat), srid=4326)
-            station = Station.objects.get(pk=id)
+            station = Station.objects.get(pk=1)
             areas = Area.objects.filter(poly__contains=point)
             # Verificar si hay cobertura en su area
             if len(areas) == 0:
@@ -59,7 +59,7 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
                 if len(zones) > 0:
                     return Response({
                         'status': False,
-                        'zone': StationZoneSerializer(zones.last()).data,
+                        'zone': StationZoneSimpleSerializer(zones.last()).data,
                         'type': 2,
                         'message': 'Por el momento en tu zona no hay servicios de restaurantes o supermercados'
                     }, status=status.HTTP_200_OK)
@@ -70,8 +70,10 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
                 'message': 'Si hay cobertura'
             }, status=status.HTTP_200_OK)
         except ValueError as e:
+            print(e.__str__())
             error = self.set_error_response(status=False, message="Error al revisar la ubicación", field="detail")
             return Response(error, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
+        except Exception as ex:
+            print(ex.__str__())
             error = self.set_error_response(status=False, message="Error al revisar la ubicación", field="detail")
             return Response(error, status=status.HTTP_400_BAD_REQUEST)

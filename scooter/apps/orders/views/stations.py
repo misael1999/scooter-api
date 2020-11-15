@@ -17,7 +17,7 @@ from scooter.apps.orders.serializers import (OrderModelSerializer,
                                              OrderWithDetailModelSerializer,
                                              RejectOrderStationSerializer, AssignDeliveryManStationSerializer,
                                              AcceptOrderMerchantSerializer, RejectOrderMerchantSerializer,
-                                             CancelOrderMerchantSerializer)
+                                             CancelOrderMerchantSerializer, CancelOrderStationSerializer)
 # Models
 from scooter.apps.orders.models.orders import Order
 # Mixin
@@ -157,4 +157,20 @@ class StationOrderViewSet(ScooterViewSet, AddStationMixin,
         data = self.set_response(status=True,
                                  data={},
                                  message='Pedido rechazado correctamente')
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    @action(methods=['put'], detail=True)
+    def cancel_order(self, request, *args, **kwargs):
+        order = self.get_object()
+        serializer = CancelOrderStationSerializer(
+            order,
+            data=request.data,
+            context={'station': self.station, 'order': order},
+            partial=False
+        )
+        serializer.is_valid(raise_exception=True)
+        order = serializer.save()
+        data = self.set_response(status=True,
+                                 data={},
+                                 message='Pedido cancelado correctamente')
         return Response(data=data, status=status.HTTP_200_OK)

@@ -61,3 +61,32 @@ class RejectOrderStationSerializer(serializers.Serializer):
             print("Exception in reject order, please check it")
             print(ex.args.__str__())
             raise serializers.ValidationError({'detail': 'Error al rechazar el pedido'})
+
+
+class CancelOrderStationSerializer(serializers.Serializer):
+    reason_rejection = serializers.CharField(max_length=100)
+
+    def update(self, instance, data):
+        try:
+            customer = instance.customer
+            instance.reason_rejection = data['reason_rejection']
+            # Filter for type_service
+            order_sts = OrderStatus.objects.get(slug_name="cancelled")
+            instance.order_status = order_sts
+            instance.in_process = False
+            instance.save()
+            send_notification_push_task.delay(user_id=customer.user.id,
+                                              title='Pedido cancelado por la central',
+                                              body='Se ha cancelo tu pedido por {}'.format(data['reason_rejection']),
+                                              sound="default",
+                                              data={"type": "REJECT_ORDER",
+                                                    "order_id": instance.id,
+                                                    'click_action': 'FLUTTER_NOTIFICATION_CLICK'},
+                                              android_channel_id="messages")
+            return instance
+        except ValueError as e:
+            raise serializers.ValidationError({'detail': str(e)})
+        except Exception as ex:
+            print("Exception in reject order, please check it")
+            print(ex.args.__str__())
+            raise serializers.ValidationError({'detail': 'Error al rechazar el pedido'})

@@ -68,6 +68,17 @@ class AcceptOrderMerchantSerializer(serializers.Serializer):
                                                     "message": "Pedido de nuevo",
                                                     'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                     })
+            send_notification_push_task.delay(user_id=merchant.user_id,
+                                              title='Recuerda {}'.format(merchant.merchant_name),
+                                              body='Termina 10 minutos antes el pedido para'
+                                                   ' que nuestro repartidor llegue a tiempo',
+                                              sound="default",
+                                              android_channel_id="messages",
+                                              data={"type": "PREORDER",
+                                                    "order_id": order.id,
+                                                    "message": "Pedido de nuevo",
+                                                    'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                                    })
 
             # send_notice_order_delivery.delay(order.id)
             return order
