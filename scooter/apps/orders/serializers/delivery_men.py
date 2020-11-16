@@ -51,56 +51,7 @@ class AcceptOrderByDeliveryManSerializer(serializers.Serializer):
             order = data['order']
             if order.delivery_man == delivery_man:
                 return data
-            # Update status delivery man
-            delivery_status = DeliveryManStatus.objects.get(slug_name='busy')
-            delivery_man.delivery_status = delivery_status
-            delivery_man.save()
-
-            # Update status order
-            if order.service.slug_name == 'pick_up':
-                order_status = OrderStatus.objects.get(slug_name='pick_up')
-                data_message = {
-                    'title': "Repartidor en camino",
-                    'body': "Tu scooter ya va en camino a recolectar tu pedido"
-                }
-            else:
-                # Check if it is a safe order
-                data_message = get_message_accept(order)
-                order_status = OrderStatus.objects.get(slug_name=data_message['status_slug'])
-
-            order.order_status = order_status
-            # Assign order to delivery man
-            order.delivery_man = delivery_man
-            order.in_process = True
-            order.save()
-            # Send notification push to customer
-            type_notification = "ACCEPTED_ORDER"
-            if order.is_order_to_merchant:
-                type_notification = "ACCEPT_ORDER_DELIVERY"
-                send_notification_push_task.delay(user_id=instance.merchant.user_id,
-                                                  title='El scooter ya va por el pedido',
-                                                  body='Numero de pedido {}'.format(order.qr_code),
-                                                  sound="default",
-                                                  android_channel_id="messages",
-                                                  data={"type": type_notification,
-                                                        "order_id": order.id,
-                                                        "message": "Pedido de nuevo",
-                                                        'click_action': 'FLUTTER_NOTIFICATION_CLICK'
-                                                        })
-
-            send_notification_push_task.delay(user_id=instance.user_id,
-                                              title=data_message['title'],
-                                              body=data_message['body'],
-                                              sound="default",
-                                              android_channel_id="messages",
-                                              data={"type": type_notification,
-                                                    "order_id": order.id,
-                                                    "message": "Pedido de nuevo",
-                                                    'click_action': 'FLUTTER_NOTIFICATION_CLICK'
-                                                    })
-            # async_to_sync(notify_station_accept)(order.station_id, order.id)
-            # Notify all delivery men that order was accepted
-            async_to_sync(notify_delivery_men)(order.id, 'ORDER_ACCEPTED')
+            accept_order_devivery(order=order, delivery_man=delivery_man)
 
             return data
         except ValueError as e:
@@ -411,3 +362,56 @@ def get_message_accept(order):
             'body': 'El repartidor ya va en camino a recoger el dinero para la compra',
             'status_slug': 'go_money'
         }
+
+
+def accept_order_devivery(order, delivery_man):
+    # Update status delivery man
+    delivery_status = DeliveryManStatus.objects.get(slug_name='busy')
+    delivery_man.delivery_status = delivery_status
+    delivery_man.save()
+
+    # Update status order
+    if order.service.slug_name == 'pick_up':
+        order_status = OrderStatus.objects.get(slug_name='pick_up')
+        data_message = {
+            'title': "Repartidor en camino",
+            'body': "Tu scooter ya va en camino a recolectar tu pedido"
+        }
+    else:
+        # Check if it is a safe order
+        data_message = get_message_accept(order)
+        order_status = OrderStatus.objects.get(slug_name=data_message['status_slug'])
+
+    order.order_status = order_status
+    # Assign order to delivery man
+    order.delivery_man = delivery_man
+    order.in_process = True
+    order.save()
+    # Send notification push to customer
+    type_notification = "ACCEPTED_ORDER"
+    if order.is_order_to_merchant:
+        type_notification = "ACCEPT_ORDER_DELIVERY"
+        send_notification_push_task.delay(user_id=order.merchant.user_id,
+                                          title='El scooter ya va por el pedido',
+                                          body='Numero de pedido {}'.format(order.qr_code),
+                                          sound="default",
+                                          android_channel_id="messages",
+                                          data={"type": type_notification,
+                                                "order_id": order.id,
+                                                "message": "Pedido de nuevo",
+                                                'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                                })
+
+    send_notification_push_task.delay(user_id=order.user_id,
+                                      title=data_message['title'],
+                                      body=data_message['body'],
+                                      sound="default",
+                                      android_channel_id="messages",
+                                      data={"type": type_notification,
+                                            "order_id": order.id,
+                                            "message": "Pedido de nuevo",
+                                            'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                            })
+    # async_to_sync(notify_station_accept)(order.station_id, order.id)
+    # Notify all delivery men that order was accepted
+    async_to_sync(notify_delivery_men)(order.id, 'ORDER_ACCEPTED')

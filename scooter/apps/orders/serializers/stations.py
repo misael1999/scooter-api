@@ -1,11 +1,12 @@
 # Rest framework
 from rest_framework import serializers
 # Models
-from scooter.apps.common.models import OrderStatus
+from scooter.apps.common.models import OrderStatus, DeliveryManStatus
 from scooter.apps.delivery_men.models import DeliveryMan
 # Serializers primary field
 from scooter.apps.common.serializers.common import StationFilteredPrimaryKeyRelatedField
 # Task Celery
+from scooter.apps.orders.serializers import get_message_accept, accept_order_devivery
 from scooter.apps.taskapp.tasks import send_notification_push_task
 
 
@@ -13,19 +14,22 @@ class AssignDeliveryManStationSerializer(serializers.Serializer):
     delivery_man_id = StationFilteredPrimaryKeyRelatedField(queryset=DeliveryMan.objects,
                                                             source="delivery_man")
 
-    def update(self, instance, data):
+    def update(self, order, data):
         try:
             delivery_man = data['delivery_man']
+            if order.delivery_man:
+                raise ValueError('El pedido ya tiene repartidor')
+            accept_order_devivery(order=order, delivery_man=delivery_man)
             send_notification_push_task.delay(user_id=delivery_man.user.id,
-                                              title='Solicitud nueva por la central',
-                                              body='Tienes un nuevo pedido asignado',
+                                              title='Pedido asignado por la central',
+                                              body='Revisa tu lista de pedidos',
                                               sound="ringtone.mp3",
-                                              data={"type": "NEW_ORDER",
-                                                    "order_id": instance.id,
+                                              data={"type": "ORDER_ASSIGNED",
+                                                    "order_id": order.id,
                                                     'click_action': 'FLUTTER_NOTIFICATION_CLICK'},
                                               android_channel_id="alarms")
 
-            return instance
+            return order
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
         except Exception as ex:
@@ -89,4 +93,4 @@ class CancelOrderStationSerializer(serializers.Serializer):
         except Exception as ex:
             print("Exception in reject order, please check it")
             print(ex.args.__str__())
-            raise serializers.ValidationError({'detail': 'Error al rechazar el pedido'})
+            raise serializers.ValidationError({'detail': 'Error al cancelar el pedido'})
