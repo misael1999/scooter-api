@@ -47,7 +47,7 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
                     'message': 'Por el momento en tu zona no hay servicios de restaurantes o supermercados'
                 }, status=status.HTTP_200_OK)
             # Verificar si aun hay servicio disponible en el horario de la central
-            if station.open_to < current_hour > station.close_to:
+            if str(station.open_to) < current_hour > str(station.close_to):
                 message = 'La central no tiene servicio \n' \
                           ' abre: {} y cierra a las {}'.format(station.open_to, station.close_to)
                 return Response({
