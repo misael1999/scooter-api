@@ -113,9 +113,11 @@ class CreateOrGetAddressSerializer(serializers.ModelSerializer):
             if point:
                 point = Point(x=point['lng'], y=point['lat'], srid=4326)
                 areas = Area.objects.filter(poly__contains=point)
-                if len(areas) == 0:
-                    raise ValueError('Por el momento no estamos disponibles en tu zona')
-                data['area'] = areas[0]
+                # if len(areas) == 0:
+                #     area =
+                #     raise ValueError('Por el momento no estamos disponibles en tu zona')
+                # else:
+                #     data['area'] = areas[0]
             references = data.pop('references', None)
             address, created = CustomerAddress.objects.get_or_create(**data)
             address.references = references

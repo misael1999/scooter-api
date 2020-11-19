@@ -38,21 +38,27 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
             point = Point(x=float(lng), y=float(lat), srid=4326)
             station = Station.objects.get(pk=1)
             areas = Area.objects.filter(poly__contains=point)
+            area_id = 0
             current_hour = timezone.localtime(timezone.now()).strftime('%H:%M:%S')
             # Verificar si hay cobertura en su area
             if len(areas) == 0:
+                area_id = areas.last().id
                 return Response({
                     'status': False,
                     'type': 1,
+                    'zone': {},
+                    'area': area_id,
                     'message': 'Por el momento en tu zona no hay servicios de restaurantes o supermercados'
                 }, status=status.HTTP_200_OK)
             # Verificar si aun hay servicio disponible en el horario de la central
             if current_hour >= str(station.close_to):
-                message = 'La central no tiene servicio \n' \
+                message = 'La central de repartos no tiene servicio \n' \
                           ' abre: {} y cierra a las {}'.format(station.open_to, station.close_to)
                 return Response({
                     'status': False,
+                    'zone': {},
                     'type': 2,
+                    'area': area_id,
                     'message': message
                 }, status=status.HTTP_200_OK)
 
@@ -67,21 +73,24 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
                         if str(zone.from_hour) <= current_hour:
                             message = 'Te encuentras en una zona roja \n' \
                                       ' nuestros repartidores no operan a' \
-                                      ' partir de {}'.format(zone.from_hour)
+                                      ' partir de las {}'.format(zone.from_hour)
                             return Response({
                                 'status': False,
                                 'zone': StationZoneSimpleSerializer(zone).data,
                                 'type': 2,
+                                'area_id': area_id,
                                 'message': message
                             }, status=status.HTTP_200_OK)
                     else:
                         # Es una zona sin cobertura
                         message = 'Te encuentras en una zona roja,' \
-                                  ' ampliamos nuestra cobertura de manera constante'
+                                  ' ampliamos nuestra cobertura de manera constante.' \
+                                  ' Vuelve a consultar la app más adelante.'
                         return Response({
                             'status': False,
                             'zone': StationZoneSimpleSerializer(zone).data,
                             'type': 2,
+                            'area_id': area_id,
                             'message': message
                         }, status=status.HTTP_200_OK)
 
