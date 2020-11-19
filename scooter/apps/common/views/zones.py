@@ -42,7 +42,6 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
             current_hour = timezone.localtime(timezone.now()).strftime('%H:%M:%S')
             # Verificar si hay cobertura en su area
             if len(areas) == 0:
-                area_id = areas.last().id
                 return Response({
                     'status': False,
                     'type': 1,
@@ -50,6 +49,7 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
                     'area': area_id,
                     'message': 'Por el momento en tu zona no hay servicios de restaurantes o supermercados'
                 }, status=status.HTTP_200_OK)
+            area_id = areas.last().id
             # Verificar si aun hay servicio disponible en el horario de la central
             if current_hour >= str(station.close_to):
                 message = 'La central de repartos no tiene servicio \n' \
