@@ -1,24 +1,17 @@
 # Django rest
 from django.contrib.gis.geos import Point
+from django.utils import timezone
 from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 # Models
 from scooter.apps.common.models import Area
-from scooter.apps.customers.models.customers import CustomerAddress
-from scooter.apps.common.models.status import Status
-# Serializers
-from scooter.apps.customers.serializers.addresses import (CustomerAddressModelSerializer,
-                                                          AddressRecommendationsSerializer)
 # Viewset
 from scooter.apps.stations.models import StationZone, Station
 from scooter.apps.stations.serializers import StationZoneSerializer, StationZoneSimpleSerializer
 from scooter.utils.viewsets.scooter import ScooterViewSet
 # Permissions
 from rest_framework.permissions import IsAuthenticated, AllowAny
-# Filters
-from rest_framework.filters import SearchFilter, OrderingFilter
-from django_filters.rest_framework import DjangoFilterBackend
 
 
 class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
@@ -45,6 +38,7 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
             point = Point(x=float(lng), y=float(lat), srid=4326)
             station = Station.objects.get(pk=1)
             areas = Area.objects.filter(poly__contains=point)
+            current_hour = timezone.localtime(timezone.now()).strftime('%H:%M:%S')
             # Verificar si hay cobertura en su area
             if len(areas) == 0:
                 return Response({
@@ -52,17 +46,45 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
                     'type': 1,
                     'message': 'Por el momento en tu zona no hay servicios de restaurantes o supermercados'
                 }, status=status.HTTP_200_OK)
+            # Verificar si aun hay servicio disponible en el horario de la central
+            if station.open_to < current_hour > station.close_to:
+                message = 'La central no tiene servicio \n' \
+                          ' abre: {} y cierra a las {}'.format(station.open_to, station.close_to)
+                return Response({
+                    'status': False,
+                    'type': 2,
+                    'message': message
+                }, status=status.HTTP_200_OK)
+
             # Verificar si esta activada las zonas restringidas
             if station.restricted_zones_activated:
                 zones = station.stationzone_set.filter(type__slug_name="restricted_zone", poly__contains=point)
                 # Si hay un punto en esa zona restringida, entonces regresamos una respuesta
                 if len(zones) > 0:
-                    return Response({
-                        'status': False,
-                        'zone': StationZoneSimpleSerializer(zones.last()).data,
-                        'type': 2,
-                        'message': 'Por el momento en tu zona no hay servicios de restaurantes o supermercados'
-                    }, status=status.HTTP_200_OK)
+                    zone = zones.last()
+                    if zone.has_schedule:
+                        # Si la zona tiene horario entonces verificamos la hora actual
+                        if str(zone.from_hour) <= current_hour <= str(
+                                zone.to_hour):
+                            message = 'Te encuentras en una zona roja \n' \
+                                      ' nuestros repartidores no operan a' \
+                                      ' partir de {} hasta {}'.format(zone.from_hour, zone.to_hour)
+                            return Response({
+                                'status': False,
+                                'zone': StationZoneSimpleSerializer(zone).data,
+                                'type': 2,
+                                'message': message
+                            }, status=status.HTTP_200_OK)
+                    else:
+                        # Es una zona sin cobertura
+                        message = 'Te encuentras en una zona roja,' \
+                                  ' ampliamos nuestra cobertura de manera constante'
+                        return Response({
+                            'status': False,
+                            'zone': StationZoneSimpleSerializer(zone).data,
+                            'type': 2,
+                            'message': message
+                        }, status=status.HTTP_200_OK)
 
             return Response({
                 'status': True,

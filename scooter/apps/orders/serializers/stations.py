@@ -38,6 +38,33 @@ class AssignDeliveryManStationSerializer(serializers.Serializer):
             raise serializers.ValidationError({'detail': 'Error al asignar el pedido'})
 
 
+class ReassignDeliveryManStationSerializer(serializers.Serializer):
+    delivery_man_id = StationFilteredPrimaryKeyRelatedField(queryset=DeliveryMan.objects,
+                                                            source="delivery_man")
+
+    def update(self, order, data):
+        try:
+            delivery_man = data['delivery_man']
+            order.delivery_man = delivery_man
+            order.save()
+            send_notification_push_task.delay(user_id=delivery_man.user.id,
+                                              title='Pedido asignado por la central',
+                                              body='Revisa tu lista de pedidos',
+                                              sound="ringtone.mp3",
+                                              data={"type": "ORDER_ASSIGNED",
+                                                    "order_id": order.id,
+                                                    'click_action': 'FLUTTER_NOTIFICATION_CLICK'},
+                                              android_channel_id="alarms")
+
+            return order
+        except ValueError as e:
+            raise serializers.ValidationError({'detail': str(e)})
+        except Exception as ex:
+            print("Exception in reject order, please check it")
+            print(ex.args.__str__())
+            raise serializers.ValidationError({'detail': 'Error al asignar el pedido'})
+
+
 class RejectOrderStationSerializer(serializers.Serializer):
     reason_rejection = serializers.CharField(max_length=100)
 
