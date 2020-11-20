@@ -30,7 +30,7 @@ class CategoryMerchantViewSet(ScooterViewSet, mixins.CreateModelMixin, mixins.Li
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs).data
         response['actions'] = {
-            'shared_code': False
+            'shared_code': True
         }
         return Response(data=response, status=status.HTTP_200_OK)
 
