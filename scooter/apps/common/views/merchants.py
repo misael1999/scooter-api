@@ -28,7 +28,11 @@ class CategoryMerchantViewSet(ScooterViewSet, mixins.CreateModelMixin, mixins.Li
 
     @method_decorator(cache_page(7200))
     def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
+        response = super().list(request, *args, **kwargs).data
+        response['actions'] = {
+            'shared_code': False
+        }
+        return Response(data=response, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['GET'])
     def subcategories(self, request, *args, **kwargs):
