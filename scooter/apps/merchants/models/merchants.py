@@ -71,6 +71,7 @@ class MerchantSchedule(ScooterModel):
     schedule = models.ForeignKey('common.Schedule', on_delete=models.DO_NOTHING)
     from_hour = models.TimeField()
     to_hour = models.TimeField()
+    is_open = models.BooleanField(default=True)
 
     class Meta:
         ordering = ['schedule_id']
