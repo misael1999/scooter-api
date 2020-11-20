@@ -111,7 +111,7 @@ class MerchantScheduleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MerchantSchedule
-        fields = ("schedule_id", "from_hour", "to_hour", "schedule")
+        fields = ("schedule_id", "from_hour", "to_hour", "schedule", 'is_open')
 
 
 class MerchantAddressSerializer(serializers.ModelSerializer):
