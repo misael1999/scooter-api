@@ -11,7 +11,7 @@ from scooter.apps.delivery_men.models import DeliveryMan
 from scooter.apps.orders.models.orders import HistoryRejectedOrders
 # Functions channels
 # Task Celery
-from scooter.apps.taskapp.tasks import send_notification_push_task
+from scooter.apps.taskapp.tasks import send_notification_push_task, send_email_delivered_order
 # Functions
 from scooter.apps.orders.serializers.orders import get_nearest_delivery_man
 # Functions channels
@@ -141,15 +141,6 @@ class ScanQrOrderSerializer(serializers.Serializer):
                                            data=data_notification
                                            )
 
-            member_station = instance.member_station
-            if member_station:
-                member_station.total_orders = member_station.total_orders + 1
-                member_station.save()
-                if not customer.is_safe_user:
-                    if station.quantity_safe_order >= member_station.total_orders:
-                        customer.is_safe_user = True
-                        customer.save()
-
             instance.date_delivered_order = timezone.localtime(timezone.now())
             instance.in_process = False
             instance.save()
@@ -158,6 +149,10 @@ class ScanQrOrderSerializer(serializers.Serializer):
             delivery_man = instance.delivery_man
             delivery_man.delivery_status = delivery_status
             delivery_man.save()
+            # send_email_delivered_order.delay(subject="Tu pedido en Scooter envíos",
+            #                                  to_user=customer.user.username,
+            #                                  path_template='emails/users/invoice_order.html',
+            #                                  order_id=instance.id)
 
             # Notification.objects.create(user_id=instance.user_id, title="Califica tu pedido",
             #                             type_notification_id=1,

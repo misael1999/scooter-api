@@ -33,6 +33,28 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
     @action(detail=False, methods=['GET'])
     def check_location(self, request, *args, **kwargs):
         try:
+            station = Station.objects.get(pk=1)
+            area_id = 0
+            current_hour = timezone.localtime(timezone.now()).strftime('%H:%M:%S')
+            if current_hour >= str(station.close_to):
+                message = 'La central de repartos no tiene servicio \n' \
+                          ' abre: {} y cierra a las {}'.format(station.open_to, station.close_to)
+                return Response({
+                    'status': False,
+                    'zone': {},
+                    'type': 2,
+                    'area': area_id,
+                    'message': message
+                }, status=status.HTTP_200_OK)
+
+            return Response({
+                'status': True,
+                'type': 0,
+                'zone': {},
+                'area_id': area_id,
+                'message': 'Si hay cobertura'
+            }, status=status.HTTP_200_OK)
+
             lat = request.query_params.get('lat', 18.462938)
             lng = request.query_params.get('lng', -97.392701)
             point = Point(x=float(lng), y=float(lat), srid=4326)
@@ -97,6 +119,7 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
             return Response({
                 'status': True,
                 'type': 0,
+                'area_id': area_id,
                 'message': 'Si hay cobertura'
             }, status=status.HTTP_200_OK)
         except ValueError as e:

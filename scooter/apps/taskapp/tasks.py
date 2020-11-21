@@ -24,6 +24,13 @@ def send_email_task(subject, to_user, path_template, data):
     send_mail_verification(subject, to_user, path_template, data)
 
 
+@task(name='send_email_order', max_retries=3)
+def send_email_delivered_order(subject, to_user, path_template, order_id):
+    """ Send email in background when order is delivered """
+    order = Order.objects.get(pk=order_id)
+    send_mail_verification(subject, to_user, path_template, {order: order})
+
+
 @task(name='send_notification_push_task', max_retries=3)
 def send_notification_push_task(user_id, title, body, data, android_channel_id, sound):
     """ Send push notifications in all user """
