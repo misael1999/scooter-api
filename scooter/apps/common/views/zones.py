@@ -34,7 +34,7 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
     def check_location(self, request, *args, **kwargs):
         try:
             station = Station.objects.get(pk=1)
-            area_id = 0
+            area_id = 1
             current_hour = timezone.localtime(timezone.now()).strftime('%H:%M:%S')
             if current_hour >= str(station.close_to):
                 message = 'La central de repartos no tiene servicio \n' \
