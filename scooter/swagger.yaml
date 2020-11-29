@@ -8,7 +8,7 @@ info:
   license:
     name: BSD License
   version: v1
-basePath: /appback/
+basePath: /
 consumes:
   - application/json
 produces:
@@ -2000,6 +2000,42 @@ paths:
       responses:
         '200':
           description: 'Listado de comercios'
+      tags:
+        - Comercios
+    parameters: []
+  /api/v1/merchants/home/:
+    get:
+      operationId: list_merchants_home
+      description: listado de las secciones por comercios.
+      parameters:
+        - name: category_id
+          description: Categoría
+          required: true
+          in: query
+          type: integer
+        - name: area_id
+          description: Area donde se solicita
+          required: true
+          in: query
+          type: integer
+        - name: tags
+          description: Ids de etiquetas separadas por comas
+          required: false
+          in: query
+          type: string
+        - name: lat
+          description: Latitude
+          in: query
+          required: true
+          type: string
+        - name: lng
+          description: Longitude
+          in: query
+          required: true
+          type: string
+      responses:
+        '200':
+          description: 'Listado de secciones con comercios'
       tags:
         - Comercios
     parameters: []

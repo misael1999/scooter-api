@@ -255,6 +255,7 @@ FACEBOOK_APP_SECRET = '4c55431b063952e631df380e0e73a10a'
 
 URL_SERVER_BACKEND = os.environ.get('URL_SERVER_BACKEND', 'http://localhost:8000')
 URL_SERVER_FRONTEND = os.environ.get('URL_SERVER_FRONTEND', 'http://localhost:4200')
+LIMIT_SECTIONS = os.environ.get('LIMIT_SECTIONS', 5)
 
 # Apple Auth
 

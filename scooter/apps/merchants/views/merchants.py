@@ -1,3 +1,8 @@
+# Cache methods
+from django.conf import settings
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_cookie
 # Django rest
 from django.contrib.gis.geos import Point
 from rest_framework import status, mixins
@@ -6,6 +11,7 @@ from rest_framework.response import Response
 # Permissions
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
+from scooter.apps.common.models import CategoryMerchant
 from scooter.apps.merchants.models import Merchant
 # Permissions
 from scooter.apps.merchants.permissions import IsAccountOwnerMerchant, IsSameMerchant
@@ -69,7 +75,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         return serializer_class
 
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
+        if self.action in ['list', 'retrieve', 'home']:
             permission_classes = [AllowAny]
         elif self.action in ['create']:
             permission_classes = [IsAuthenticated]
@@ -124,3 +130,106 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         serializer.save()
         return Response(self.set_response(status='ok', data={},
                                           message='Contraseña actualizada correctamente'))
+
+    # Cache requested url for each user for 2 hours
+    @action(detail=False, methods=['GET'])
+    @method_decorator(cache_page(60 * 60 * 2))
+    @method_decorator(vary_on_cookie)
+    def home(self, request, *args, **kwargs):
+        try:
+            # Filtros
+            category_id = self.request.query_params.get('category_id', None)
+            lat = self.request.query_params.get('lat', 18.462938)
+            lng = self.request.query_params.get('lng', -97.392701)
+            area_id = self.request.query_params.get('area_id', 1)
+            category_model = CategoryMerchant.objects.get(id=category_id)
+            sections = []
+            # Cerca de ti
+            nearest = self.get_nearest_merchants(area_id=area_id, category=category_model,
+                                                 limit=settings.LIMIT_SECTIONS,
+                                                 lat=lat, lng=lng)
+            # Mejores calificados
+            section_2 = self.get_section_order_by(area_id=area_id, category=category_model,
+                                                  section_name="Mejores calificados",
+                                                  order_by="-reputation",
+                                                  limit=settings.LIMIT_SECTIONS,
+                                                  orientation="H"
+                                                  )
+
+            # Agregados recientemente
+            section_3 = self.get_section_order_by(area_id, category=category_model,
+                                                  section_name="Agregados recientemente",
+                                                  order_by="created",
+                                                  limit=settings.LIMIT_SECTIONS,
+                                                  orientation="H"
+                                                  )
+
+            # Listado de comercios
+            section_4 = self.get_section_order_by(area_id, category=category_model,
+                                                  section_name=category_model.name,
+                                                  order_by="created",
+                                                  limit=15,
+                                                  orientation="V"
+                                                  )
+
+            sections.append(nearest)
+            sections.append(section_2)
+            sections.append(section_3)
+            sections.append(section_4)
+
+            data = {
+                'more_merchants': True,
+                'secciones': sections
+            }
+
+            return Response(data=data, status=status.HTTP_201_CREATED)
+        except Exception as ex:
+            print(ex.__str__())
+            data = self.set_error_response(status=False, field='detail',
+                                           message='Ha ocurrido un error inesperado')
+            return Response(data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def get_nearest_merchants(self, area_id, category, limit, lat, lng):
+
+        point = Point(x=float(lng), y=float(lat), srid=4326)
+        merchants = Merchant.objects.filter(area_id=area_id, category_id=category.id, status_id=1)\
+            .annotate(distance=Distance('point', point))\
+            .order_by('-is_open', 'distance')[0:limit]
+        return {
+            'section_name': 'Populares cerca de ti',
+            'orientation': 'H',
+            'list': MerchantWithAllInfoSerializer(merchants, many=True).data,
+            'more': False
+        }
+
+    # Obtener seccion ordenado por un campo
+    def get_section_order_by(self, area_id, category, section_name, order_by, limit, orientation):
+        merchants = Merchant.objects.filter(area_id=area_id, category_id=category.id, status_id=1)\
+            .order_by('is_open', order_by)[0:limit]
+
+        if len(merchants) == 0:
+            return {
+                'has_data': False
+            }
+
+        return {
+            'has_data': True,
+            'section_name':  section_name,
+            'orientation': orientation,
+            'list': MerchantWithAllInfoSerializer(merchants, many=True).data,
+            'more': False
+        }
+
+    # Obtener secciones con filtros en los comercios
+    def get_section_filters(self, area_id, section_name, filters):
+
+        pass
+
+    def get_section_random(self, area_id, section_name):
+
+        pass
+
+    def get_list_merchant_by_category(self, area_id, category_id, limit):
+
+        pass
+

@@ -32,13 +32,13 @@ class MerchantDeliveryRuleSerializer(serializers.ModelSerializer):
 class MerchantWithAllInfoSerializer(serializers.ModelSerializer):
     category = serializers.StringRelatedField(read_only=True)
     subcategory = serializers.StringRelatedField(read_only=True)
-    user = UserModelSimpleSerializer()
+    # user = UserModelSimpleSerializer()
     delivery_rules = MerchantDeliveryRuleSerializer(read_only=True)
 
     class Meta:
         model = Merchant
         geo_field = 'point'
-        fields = ('id', 'user', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
+        fields = ('id', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
                   'information_is_complete', 'category', 'total_grades', 'subcategory', 'reputation', 'description',
                   'approximate_preparation_time', 'full_address', 'is_open', 'point', 'from_preparation_time',
                   'to_preparation_time', 'type_menu', 'zone', 'area', 'delivery_rules', 'merchant_level')
