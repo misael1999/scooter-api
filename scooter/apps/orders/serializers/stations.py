@@ -45,6 +45,8 @@ class ReassignDeliveryManStationSerializer(serializers.Serializer):
     def update(self, order, data):
         try:
             delivery_man = data['delivery_man']
+            if order.delivery_man == delivery_man:
+                raise ValueError('El pedido ya esta asignado a {}'.format(delivery_man.name))
             order.delivery_man = delivery_man
             order.save()
             send_notification_push_task.delay(user_id=delivery_man.user.id,

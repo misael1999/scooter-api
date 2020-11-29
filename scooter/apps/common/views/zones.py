@@ -69,7 +69,7 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
                     'type': 1,
                     'zone': {},
                     'area': area_id,
-                    'message': 'Por el momento en tu zona no hay servicios de restaurantes o supermercados'
+                    'message': 'En tu zona no hay servicios de restaurantes o supermercados'
                 }, status=status.HTTP_200_OK)
             area_id = areas.last().id
             # Verificar si aun hay servicio disponible en el horario de la central

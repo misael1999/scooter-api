@@ -44,6 +44,8 @@ class Merchant(ScooterModel):
     area = models.ForeignKey('common.Area', default=1, on_delete=models.DO_NOTHING)
     zone = models.ForeignKey('common.Zone', blank=True, null=True, on_delete=models.DO_NOTHING)
     merchant_level = models.PositiveIntegerField(default=1)
+    has_branches = models.BooleanField(default=False)
+    has_stock = models.BooleanField(default=False)
     # Managers
     objects = MerchantManager()
 

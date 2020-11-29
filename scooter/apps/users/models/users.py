@@ -21,6 +21,7 @@ class User(ScooterModel, AbstractBaseUser, PermissionsMixin):
     ADMIN = 4
     MERCHANT = 5
     MARKETER = 6
+    BRANCH = 7
     ROLE_CHOICES = (
         (CUSTOMER, _('Cliente')),
         (STATION, _('Central')),
@@ -28,6 +29,7 @@ class User(ScooterModel, AbstractBaseUser, PermissionsMixin):
         (ADMIN, _('Administrador')),
         (MERCHANT, _('Comerciante')),
         (MARKETER, _('Mercadologo')),
+        (BRANCH, _('Sucursal')),
     )
     username = models.CharField(
         unique=True,
@@ -84,6 +86,9 @@ class User(ScooterModel, AbstractBaseUser, PermissionsMixin):
 
     def isAdmin(self):
         return self.role == self.ADMIN
+
+    def is_branch(self):
+        return self.role == self.BRACH
 
 
 class Contact(ScooterModel):
