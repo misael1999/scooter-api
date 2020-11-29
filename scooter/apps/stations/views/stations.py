@@ -131,4 +131,4 @@ class StationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
                 self.set_error_response(status=False, field='Detail', message='No existe el área'))
         except Exception as ex:
             return Response(
-                self.set_error_response(status=False, field='Detail', message='Error al consultar los clientes'))
+                self.set_error_response(status=False, field='Detail', message='Error al consultar el area'))

@@ -41,7 +41,8 @@ class MerchantWithAllInfoSerializer(serializers.ModelSerializer):
         fields = ('id', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
                   'information_is_complete', 'category', 'total_grades', 'subcategory', 'reputation', 'description',
                   'approximate_preparation_time', 'full_address', 'is_open', 'point', 'from_preparation_time',
-                  'to_preparation_time', 'type_menu', 'zone', 'area', 'delivery_rules', 'merchant_level')
+                  'to_preparation_time', 'type_menu', 'zone', 'area', 'delivery_rules', 'merchant_level',
+                  'operational_zones_activated', 'restricted_zones_activated')
         read_only_fields = fields
 
 
@@ -57,7 +58,8 @@ class MerchantUserSimpleSerializer(serializers.ModelSerializer):
                   'information_is_complete', 'category', 'subcategory', 'reputation', 'description',
                   'approximate_preparation_time', 'is_open', 'from_preparation_time',
                   'to_preparation_time', 'type_menu', 'area', 'zone', 'full_address', 'delivery_rules',
-                  'merchant_level')
+                  'merchant_level', 'operational_zones_activated', 'restricted_zones_activated'
+)
         read_only_fields = fields
 
 
@@ -102,6 +104,8 @@ class GeneralInfoMerchantSerializer(serializers.Serializer):
     approximate_preparation_time = serializers.CharField(max_length=10)
     from_preparation_time = serializers.FloatField()
     to_preparation_time = serializers.FloatField()
+    operational_zones_activated = serializers.BooleanField(required=False)
+    restricted_zones_activated = serializers.BooleanField(required=False)
 
 
 # Merchant Schedule
@@ -135,7 +139,7 @@ class MerchantInfoSerializer(serializers.ModelSerializer):
                   'information_is_complete', 'reputation', 'description', 'total_grades',
                   'approximate_preparation_time', 'is_open', 'point', 'from_preparation_time',
                   'to_preparation_time', 'schedules', 'full_address', 'zone', 'area', 'delivery_rules',
-                  'merchant_level')
+                  'merchant_level', 'operational_zones_activated', 'restricted_zones_activated')
         read_only_fields = fields
 
 

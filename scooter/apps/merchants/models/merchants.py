@@ -46,6 +46,10 @@ class Merchant(ScooterModel):
     merchant_level = models.PositiveIntegerField(default=1)
     has_branches = models.BooleanField(default=False)
     has_stock = models.BooleanField(default=False)
+
+    # Delivery
+    operational_zones_activated = models.BooleanField(default=False)
+    restricted_zones_activated = models.BooleanField(default=False)
     # Managers
     objects = MerchantManager()
 

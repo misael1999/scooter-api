@@ -11,7 +11,8 @@ from rest_framework.response import Response
 # Permissions
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from scooter.apps.common.models import CategoryMerchant
+from scooter.apps.common.models import CategoryMerchant, Area
+from scooter.apps.common.serializers import AreaModelSerializer
 from scooter.apps.merchants.models import Merchant
 # Permissions
 from scooter.apps.merchants.permissions import IsAccountOwnerMerchant, IsSameMerchant
@@ -109,9 +110,21 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         except Merchant.DoesNotExist:
             return Response(
                 self.set_error_response(status=False, field='Detail', message='No existe el comercio'))
-        return Response(self.set_response(status='ok', data=data, message='Información actualizada correctamente')) \
- \
-               @ action(detail=True, methods=('PUT',))
+        return Response(self.set_response(status='ok', data=data, message='Información actualizada correctamente'))
+
+    @action(detail=True, methods=['GET'])
+    def area(self, request, *args, **kwargs):
+        try:
+            merchant = self.get_object()
+            area = merchant.area
+            data = AreaModelSerializer(area).data
+            return Response(data, status=status.HTTP_200_OK)
+        except Area.DoesNotExist:
+            return Response(
+                self.set_error_response(status=False, field='Detail', message='No existe el área'))
+        except Exception as ex:
+            return Response(
+                self.set_error_response(status=False, field='Detail', message='Error al consultar el area en comercios'))
 
     def update_availability(self, request, *args, **kwargs):
         merchant = self.get_object()
