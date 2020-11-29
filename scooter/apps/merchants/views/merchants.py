@@ -110,9 +110,9 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             return Response(
                 self.set_error_response(status=False, field='Detail', message='No existe el comercio'))
         return Response(self.set_response(status='ok', data=data, message='Información actualizada correctamente')) \
+ \
+               @ action(detail=True, methods=('PUT',))
 
-
-    @action(detail=True, methods=('PUT',))
     def update_availability(self, request, *args, **kwargs):
         merchant = self.get_object()
         serializer = AvailabilityMerchantSerializer(merchant, data=request.data, partial=False)
@@ -121,7 +121,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         return Response(self.set_response(status='ok', data={'status': status_availability},
                                           message='Cambio de disponibilidad correctamente'))
 
-    @action(detail=True, methods=('PATCH', ))
+    @action(detail=True, methods=('PATCH',))
     def change_password(self, request, *args, **kwargs):
         customer = self.get_object()
         partial = request.method == 'PATCH'
@@ -138,39 +138,50 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
     def home(self, request, *args, **kwargs):
         try:
             # Filtros
-            category_id = self.request.query_params.get('category_id', None)
+            category_id = self.request.query_params.get('category_id', 1)
             lat = self.request.query_params.get('lat', 18.462938)
             lng = self.request.query_params.get('lng', -97.392701)
             area_id = self.request.query_params.get('area_id', 1)
             category_model = CategoryMerchant.objects.get(id=category_id)
             sections = []
+            filters_shared = {'area_id': area_id, 'information_is_complete': True, 'category_id': category_model.id,
+                              'status_id': 1}
             # Cerca de ti
             nearest = self.get_nearest_merchants(area_id=area_id, category=category_model,
                                                  limit=settings.LIMIT_SECTIONS,
-                                                 lat=lat, lng=lng)
+                                                 lat=lat, lng=lng,
+                                                 filters=filters_shared)
+            # Comprobar si hay comercios que mostrar
+            if not nearest['has_data']:
+                data = {
+                    'more_merchants': False,
+                    'secciones': [],
+                    'message': 'No hay comercios que mostrar'
+                }
+                return Response(data=data, status=status.HTTP_200_OK)
             # Mejores calificados
             section_2 = self.get_section_order_by(area_id=area_id, category=category_model,
                                                   section_name="Mejores calificados",
                                                   order_by="-reputation",
                                                   limit=settings.LIMIT_SECTIONS,
-                                                  orientation="H"
-                                                  )
+                                                  orientation="H",
+                                                  filters=filters_shared)
 
             # Agregados recientemente
             section_3 = self.get_section_order_by(area_id, category=category_model,
                                                   section_name="Agregados recientemente",
                                                   order_by="created",
                                                   limit=settings.LIMIT_SECTIONS,
-                                                  orientation="H"
-                                                  )
+                                                  orientation="H",
+                                                  filters=filters_shared)
 
             # Listado de comercios
             section_4 = self.get_section_order_by(area_id, category=category_model,
                                                   section_name=category_model.name,
                                                   order_by="created",
                                                   limit=15,
-                                                  orientation="V"
-                                                  )
+                                                  orientation="V",
+                                                  filters=filters_shared)
 
             sections.append(nearest)
             sections.append(section_2)
@@ -182,20 +193,25 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
                 'secciones': sections
             }
 
-            return Response(data=data, status=status.HTTP_201_CREATED)
+            return Response(data=data, status=status.HTTP_200_OK)
         except Exception as ex:
             print(ex.__str__())
             data = self.set_error_response(status=False, field='detail',
                                            message='Ha ocurrido un error inesperado')
             return Response(data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def get_nearest_merchants(self, area_id, category, limit, lat, lng):
+    def get_nearest_merchants(self, area_id, category, limit, lat, lng, filters):
 
         point = Point(x=float(lng), y=float(lat), srid=4326)
-        merchants = Merchant.objects.filter(area_id=area_id, category_id=category.id, status_id=1)\
-            .annotate(distance=Distance('point', point))\
-            .order_by('-is_open', 'distance')[0:limit]
+        merchants = Merchant.objects.filter(**filters) \
+                        .annotate(distance=Distance('point', point)) \
+                        .order_by('-is_open', 'distance')[0:limit]
+        if len(merchants) == 0:
+            return {
+                'has_data': False
+            }
         return {
+            'has_data': True,
             'section_name': 'Populares cerca de ti',
             'orientation': 'H',
             'list': MerchantWithAllInfoSerializer(merchants, many=True).data,
@@ -203,9 +219,9 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         }
 
     # Obtener seccion ordenado por un campo
-    def get_section_order_by(self, area_id, category, section_name, order_by, limit, orientation):
-        merchants = Merchant.objects.filter(area_id=area_id, category_id=category.id, status_id=1)\
-            .order_by('is_open', order_by)[0:limit]
+    def get_section_order_by(self, area_id, category, section_name, order_by, limit, orientation, filters):
+        merchants = Merchant.objects.filter(**filters) \
+                        .order_by('is_open', order_by)[0:limit]
 
         if len(merchants) == 0:
             return {
@@ -214,7 +230,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
 
         return {
             'has_data': True,
-            'section_name':  section_name,
+            'section_name': section_name,
             'orientation': orientation,
             'list': MerchantWithAllInfoSerializer(merchants, many=True).data,
             'more': False
@@ -232,4 +248,3 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
     def get_list_merchant_by_category(self, area_id, category_id, limit):
 
         pass
-
