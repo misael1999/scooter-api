@@ -126,6 +126,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             return Response(
                 self.set_error_response(status=False, field='Detail', message='Error al consultar el area en comercios'))
 
+    @action(detail=True, methods=('PATCH', 'PUT'))
     def update_availability(self, request, *args, **kwargs):
         merchant = self.get_object()
         serializer = AvailabilityMerchantSerializer(merchant, data=request.data, partial=False)
@@ -191,7 +192,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             # Listado de comercios
             section_4 = self.get_section_order_by(area_id, category=category_model,
                                                   section_name=category_model.name,
-                                                  order_by="created",
+                                                  order_by="-created",
                                                   limit=15,
                                                   orientation="V",
                                                   filters=filters_shared)
