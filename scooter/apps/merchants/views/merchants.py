@@ -184,7 +184,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             # Agregados recientemente
             section_3 = self.get_section_order_by(area_id, category=category_model,
                                                   section_name="Agregados recientemente",
-                                                  order_by="created",
+                                                  order_by="-created",
                                                   limit=settings.LIMIT_SECTIONS,
                                                   orientation="H",
                                                   filters=filters_shared)
@@ -192,7 +192,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             # Listado de comercios
             section_4 = self.get_section_order_by(area_id, category=category_model,
                                                   section_name=category_model.name,
-                                                  order_by="-created",
+                                                  order_by="created",
                                                   limit=15,
                                                   orientation="V",
                                                   filters=filters_shared)
