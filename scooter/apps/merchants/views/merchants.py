@@ -147,7 +147,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
 
     # Cache requested url for each user for 2 hours
     @action(detail=False, methods=['GET'])
-    @method_decorator(cache_page(60 * 60 * 2))
+    @method_decorator(cache_page(5000 * 60))
     @method_decorator(vary_on_cookie)
     def home(self, request, *args, **kwargs):
         try:
@@ -175,7 +175,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
                 return Response(data=data, status=status.HTTP_200_OK)
             # Mejores calificados
             section_2 = self.get_section_order_by(area_id=area_id, category=category_model,
-                                                  section_name="Mejores calificados",
+                                                  section_name="Recomendado por los pedidos",
                                                   order_by="-reputation",
                                                   limit=settings.LIMIT_SECTIONS,
                                                   orientation="H",
@@ -191,7 +191,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
 
             # Listado de comercios
             section_4 = self.get_section_order_by(area_id, category=category_model,
-                                                  section_name=category_model.name,
+                                                  section_name='',
                                                   order_by="created",
                                                   limit=15,
                                                   orientation="V",

@@ -1,4 +1,7 @@
 # Django rest
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_cookie
 from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -62,6 +65,11 @@ class CustomerAddressesViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cre
                                  data=CustomerAddressModelSerializer(obj).data,
                                  message='Se ha registrado un nuevo direccion')
         return Response(data=data, status=status.HTTP_201_CREATED)
+
+    @method_decorator(cache_page(5000 * 60))
+    @method_decorator(vary_on_cookie)
+    def list(self, request, *args, **kwargs):
+        return super(CustomerAddressesViewSet, self).list(request, *args, **kwargs)
 
     @action(detail=False, methods=['post'])
     def create_or_get(self, request, *args, **kwargs):
