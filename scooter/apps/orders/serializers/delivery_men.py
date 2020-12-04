@@ -149,10 +149,10 @@ class ScanQrOrderSerializer(serializers.Serializer):
             delivery_man = instance.delivery_man
             delivery_man.delivery_status = delivery_status
             delivery_man.save()
-            # send_email_delivered_order.delay(subject="Tu pedido en Scooter envíos",
-            #                                  to_user=customer.user.username,
-            #                                  path_template='emails/users/invoice_order.html',
-            #                                  order_id=instance.id)
+            send_email_delivered_order.delay(subject="Tu pedido en Scooter envíos",
+                                             to_user=customer.user.username,
+                                             path_template='emails/users/invoice_order.html',
+                                             order_id=instance.id)
 
             # Notification.objects.create(user_id=instance.user_id, title="Califica tu pedido",
             #                             type_notification_id=1,
