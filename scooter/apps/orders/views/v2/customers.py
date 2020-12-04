@@ -17,7 +17,7 @@ from scooter.apps.orders.serializers import (OrderModelSerializer,
 from scooter.apps.orders.serializers.v2 import (CreateOrderSerializer,
                                                 OrderWithDetailModelSerializer,
                                                 RantingOrderCustomerSerializer,
-                                                RetryOrderSerializer)
+                                                RetryOrderSerializer, TestEmailSerializer)
 # Models
 from scooter.apps.orders.models.orders import Order
 # Mixin
@@ -119,6 +119,22 @@ class CustomerOrderV2ViewSet(ScooterViewSet, mixins.CreateModelMixin, AddCustome
 
         order = self.get_object()
         serializer = RetryOrderSerializer(
+            order,
+            data=request.data,
+            context={'customer': self.customer, 'order': order},
+            partial=False
+        )
+        serializer.is_valid(raise_exception=True)
+        order = serializer.save()
+        data = self.set_response(status=True,
+                                 data={'order_id': order},
+                                 message='Se ha enviado el pedido nuevamente')
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['PUT'])
+    def test_email_order(self, request, *args, **kwargs):
+        order = self.get_object()
+        serializer = TestEmailSerializer(
             order,
             data=request.data,
             context={'customer': self.customer, 'order': order},

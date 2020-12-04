@@ -24,7 +24,7 @@ def send_email_task(subject, to_user, path_template, data):
     send_mail_verification(subject, to_user, path_template, data)
 
 
-@task(name='send_email_order', max_retries=3)
+@task(name='send_email_delivered_order', max_retries=3)
 def send_email_delivered_order(subject, to_user, path_template, order_id):
     """ Send email in background when order is delivered """
     order = Order.objects.get(pk=order_id)

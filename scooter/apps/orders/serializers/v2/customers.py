@@ -24,7 +24,7 @@ from asgiref.sync import async_to_sync
 # Serializers primary field
 from scooter.apps.common.serializers.common import CustomerFilteredPrimaryKeyRelatedField
 # Task Celery
-from scooter.apps.taskapp.tasks import send_notification_push_task
+from scooter.apps.taskapp.tasks import send_notification_push_task, send_email_delivered_order
 # Methods helpers
 from scooter.apps.orders.serializers.orders import (calculate_service_price,
                                                     get_nearest_delivery_man, is_free_order)
@@ -373,6 +373,15 @@ class CheckPromoCodeSerializer(serializers.Serializer):
             print("Exception in rating order, please check it")
             print(ex.args.__str__())
             raise serializers.ValidationError({'detail': 'Error al calificar la orden'})
+
+
+class TestEmailSerializer(serializers.Serializer):
+
+    def update(self, order, data):
+        send_email_delivered_order.delay(subject="Tu pedido en Scooter envíos",
+                                         to_user=order.user.username,
+                                         path_template='emails/users/invoice_order.html',
+                                         order_id=order.id)
 
 
 class RantingOrderCustomerSerializer(serializers.Serializer):

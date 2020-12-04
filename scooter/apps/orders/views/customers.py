@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 # Utilities
-from scooter.apps.orders.serializers.v2 import CheckPromoCodeSerializer
+from scooter.apps.orders.serializers.v2 import CheckPromoCodeSerializer, TestEmailSerializer
 from scooter.apps.orders.utils.filters import OrderFilter
 from scooter.utils.viewsets.scooter import ScooterViewSet
 # Permissions

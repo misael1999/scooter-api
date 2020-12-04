@@ -1442,6 +1442,24 @@ paths:
       tags:
         - Pedidos clientes
 
+  /api/v2/customers/{customer_id}/orders/{order_id}/test_email_order/:
+    parameters:
+      - name: customer_id
+        in: path
+        required: true
+        type: number
+      - name: order_id
+        in: path
+        required: true
+        type: number
+    put:
+      operationId: send_test_email
+      description: Enviar email de la orden entregada
+      responses:
+        '200':
+          description: 'Estado actual del pedido'
+      tags:
+        - Pedidos clientes
   /api/v1/customers/{customer_id}/orders/{order_id}/rating/:
     parameters:
       - name: customer_id
