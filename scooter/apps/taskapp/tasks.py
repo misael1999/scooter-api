@@ -30,7 +30,7 @@ def send_email_task(subject, to_user, path_template, data):
 def send_email_delivered_order(subject, to_user, path_template, order_id):
     """ Send email in background when order is delivered """
     order = Order.objects.get(pk=order_id)
-    send_mail_verification(subject, to_user, path_template, {order: json.dumps(order)})
+    send_mail_verification(subject, to_user, path_template, {order: json.dump(order)})
 
 
 @task(name='send_notification_push_task', max_retries=3)
