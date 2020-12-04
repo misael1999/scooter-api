@@ -382,6 +382,7 @@ class TestEmailSerializer(serializers.Serializer):
                                          to_user=order.user.username,
                                          path_template='emails/users/invoice_order.html',
                                          order_id=order.id)
+        return data
 
 
 class RantingOrderCustomerSerializer(serializers.Serializer):
