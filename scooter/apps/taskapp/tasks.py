@@ -1,4 +1,5 @@
 # Django
+import json
 from datetime import timedelta
 from django.utils import timezone
 # Functions
@@ -29,8 +30,7 @@ def send_email_task(subject, to_user, path_template, data):
 def send_email_delivered_order(subject, to_user, path_template, order_id):
     """ Send email in background when order is delivered """
     order = Order.objects.get(pk=order_id)
-    data = OrderWithDetailModelSerializer(order).data
-    send_mail_verification(subject, to_user, path_template, {order: data})
+    send_mail_verification(subject, to_user, path_template, {order: json.dumps(order)})
 
 
 @task(name='send_notification_push_task', max_retries=3)
