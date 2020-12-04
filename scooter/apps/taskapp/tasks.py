@@ -4,6 +4,7 @@ from django.utils import timezone
 # Functions
 from scooter.apps.common.models import OrderStatus
 from scooter.apps.delivery_men.models import DeliveryMan
+from scooter.apps.orders.serializers.v2 import OrderWithDetailModelSerializer
 from scooter.utils.functions import send_mail_verification, send_order_delivery
 # Celery
 from celery.task import task, periodic_task
@@ -28,7 +29,8 @@ def send_email_task(subject, to_user, path_template, data):
 def send_email_delivered_order(subject, to_user, path_template, order_id):
     """ Send email in background when order is delivered """
     order = Order.objects.get(pk=order_id)
-    send_mail_verification(subject, to_user, path_template, {order: order})
+    data = OrderWithDetailModelSerializer(order).data
+    send_mail_verification(subject, to_user, path_template, {order: data})
 
 
 @task(name='send_notification_push_task', max_retries=3)
