@@ -384,6 +384,51 @@ paths:
       tags:
         - Marketing
     parameters: []
+  /api/v1/customers/{customer_id}/cards/:
+    get:
+      operationId: get_customer_cards
+      description: Obtener metodos de pagos de un cliente
+      parameters:
+        - name: limit
+          in: query
+          description: Numero de resultados por pagina
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: El índice inicial desde el que devolver los resultados.
+          required: false
+          type: integer
+        - name: type_address
+          description: Tipo de dirección
+          required: false
+          in: query
+          type: integer
+        - name: search
+          description: Buscar por (nombre)
+          in: query
+          required: false
+          type: string
+      responses:
+        '201':
+          description: 'Listado de metodos de pago'
+      tags:
+        - Clientes pagos
+    post:
+      operationId: create_customer_cards
+      description:
+      parameters:
+        - name: body
+          in: body
+          description: Crear metodo de pago para un cliente
+          schema:
+            $ref: '#/definitions/CustomerCard'
+      responses:
+        '200':
+          description: 'Regresa información del cliente y su access_token'
+      tags:
+        - Clientes pagos
+    parameters: []
   /api/v1/customers/login/:
     post:
       operationId: customer_login
@@ -3901,6 +3946,22 @@ definitions:
         description: Imagen del producto
   UnlockProduct:
     type: object
+  CustomerCard:
+    type: object
+    properties:
+      card_token:
+        type: string
+        description: card token stripe
+      last_four:
+        type: integer
+        desciption: last four digits from credit card
+      brand:
+        type: string
+        description: brand to credit card
+    required:
+      - card_token
+      - last_four
+      - brand
   UpdateMerchant:
     type: object
     properties:
