@@ -150,14 +150,15 @@ class ScanQrOrderSerializer(serializers.Serializer):
             delivery_man = instance.delivery_man
             delivery_man.delivery_status = delivery_status
             delivery_man.save()
-            data_email = {'order': OrderWithDetailModelSerializer(instance).data,
-                          'date_delivered_order': instance.date_delivered_order.strftime(
-                              "%m/%d/%Y, %H:%M:%S")
-                          }
-            send_email_task.delay(subject="Tu pedido en Los Pedidos",
-                                  to_user=instance.user.username,
-                                  path_template='emails/users/invoice_order.html',
-                                  data=data_email)
+            if instance.is_order_to_merchant:
+                data_email = {'order': OrderWithDetailModelSerializer(instance).data,
+                              'date_delivered_order': instance.date_delivered_order.strftime(
+                                  "%m/%d/%Y, %H:%M:%S")
+                              }
+                send_email_task.delay(subject="Tu pedido en Los Pedidos",
+                                      to_user=instance.user.username,
+                                      path_template='emails/users/invoice_order.html',
+                                      data=data_email)
 
             # Notification.objects.create(user_id=instance.user_id, title="Califica tu pedido",
             #                             type_notification_id=1,
