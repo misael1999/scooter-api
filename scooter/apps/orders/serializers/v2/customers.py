@@ -380,12 +380,12 @@ class TestEmailSerializer(serializers.Serializer):
 
     def update(self, order, data):
         try:
-            send_email_delivered_order.delay(subject="Tu pedido en Scooter envíos",
-                                             to_user=order.user.username,
-                                             path_template='emails/users/invoice_order.html',
-                                             order_id=order.id)
+            # send_email_delivered_order.delay(subject="Tu pedido en Scooter envíos",
+            #                                  to_user=order.user.username,
+            #                                  path_template='emails/users/invoice_order.html',
+            #                                  order_id=order.id)
             send_mail_verification(subject="Tu pedido en Scooter envíos", to_user=order.user.username,
-                                   path_template="mails/users/invoice_order.html", data={'order': order})
+                                   path_template="emails/users/invoice_order.html", data={'order': order})
 
             return data
         except Exception as ex:
