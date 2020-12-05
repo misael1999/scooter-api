@@ -385,6 +385,11 @@ paths:
         - Marketing
     parameters: []
   /api/v1/customers/{customer_id}/cards/:
+    parameters:
+    - name: customer_id
+      in: path
+      required: true
+      type: string
     get:
       operationId: get_customer_cards
       description: Obtener metodos de pagos de un cliente
@@ -428,7 +433,6 @@ paths:
           description: 'Regresa información del cliente y su access_token'
       tags:
         - Clientes pagos
-    parameters: []
   /api/v1/customers/login/:
     post:
       operationId: customer_login
