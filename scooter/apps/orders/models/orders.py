@@ -76,7 +76,9 @@ class OrderDetail(ScooterModel):
         db_table = 'orders_order_detail'
 
     def get_total_detail(self):
-        return self.quantity * self.product_price
+        if self.quantity and self.product_price:
+            return self.quantity * self.product_price
+        return 0
 
 
 class OrderDetailMenu(ScooterModel):
