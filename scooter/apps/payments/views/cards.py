@@ -40,7 +40,7 @@ class CardsViewSet(ScooterViewSet, mixins.ListModelMixin,
 
     def get_queryset(self):
         if self.action in ['list', 'update', 'partial_update', 'retrieve']:
-            return self.customer.cards.filter(status=1)
+            return Card.objects.filter(customer_id=self.customer.id)
         return self.queryset
 
     def get_serializer_class(self):
