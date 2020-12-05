@@ -75,6 +75,9 @@ class OrderDetail(ScooterModel):
     class Meta:
         db_table = 'orders_order_detail'
 
+    def get_total_detail(self):
+        return self.quantity * self.product_price
+
 
 class OrderDetailMenu(ScooterModel):
     detail = models.ForeignKey(OrderDetail, on_delete=models.DO_NOTHING,

@@ -11,7 +11,8 @@ from scooter.apps.delivery_men.models import DeliveryMan
 from scooter.apps.orders.models.orders import HistoryRejectedOrders
 # Functions channels
 # Task Celery
-from scooter.apps.taskapp.tasks import send_notification_push_task, send_email_delivered_order
+from scooter.apps.orders.serializers.v2 import OrderWithDetailModelSerializer
+from scooter.apps.taskapp.tasks import send_notification_push_task, send_email_task
 # Functions
 from scooter.apps.orders.serializers.orders import get_nearest_delivery_man
 # Functions channels
@@ -149,10 +150,14 @@ class ScanQrOrderSerializer(serializers.Serializer):
             delivery_man = instance.delivery_man
             delivery_man.delivery_status = delivery_status
             delivery_man.save()
-            send_email_delivered_order.delay(subject="Tu pedido en Scooter envíos",
-                                             to_user=customer.user.username,
-                                             path_template='emails/users/invoice_order.html',
-                                             order_id=instance.id)
+            data_email = {'order': OrderWithDetailModelSerializer(instance).data,
+                          'date_delivered_order': instance.date_delivered_order.strftime(
+                              "%m/%d/%Y, %H:%M:%S")
+                          }
+            send_email_task.delay(subject="Tu pedido en Los Pedidos",
+                                  to_user=instance.user.username,
+                                  path_template='emails/users/invoice_order.html',
+                                  data=data_email)
 
             # Notification.objects.create(user_id=instance.user_id, title="Califica tu pedido",
             #                             type_notification_id=1,

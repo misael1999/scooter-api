@@ -13,7 +13,7 @@ from scooter.apps.orders.models.orders import Order
 # Django Geo
 from scooter.apps.orders.serializers import RatingOrderSerializer
 from scooter.apps.stations.serializers import StationSimpleOrderSerializer
-from scooter.apps.orders.models import OrderDetailMenu, OrderDetailMenuOption
+from scooter.apps.orders.models import OrderDetailMenu, OrderDetailMenuOption, OrderDetail
 
 
 class DetailMenuOptionSerializer(serializers.ModelSerializer):
@@ -34,13 +34,21 @@ class DetailMenuSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'menu_name')
 
 
-class DetailOrderSerializer(serializers.Serializer):
+class DetailOrderSerializer(serializers.ModelSerializer):
     product_name = serializers.CharField(max_length=201, allow_null=True, required=False)
+    product_price = serializers.FloatField(required=False)
     picture = Base64ImageField(required=False, use_url=True, allow_null=True, allow_empty_file=True, max_length=None)
     product_id = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all(), source="product", allow_null=True,
                                                     required=False)
     quantity = serializers.IntegerField(min_value=1, allow_null=True, required=False)
     menu_options = DetailMenuSerializer(many=True, required=False, allow_null=True)
+    total_detail = serializers.FloatField(required=False, source="get_total_detail")
+
+    class Meta:
+        model = OrderDetail
+        fields = ('id', 'product_name', 'product_price',
+                  'picture', 'product_id', 'quantity', 'menu_options', 'total_detail'
+                  )
 
     def create(self, validated_data):
         pass

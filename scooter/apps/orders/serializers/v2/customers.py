@@ -10,7 +10,7 @@ from rest_framework import serializers
 from scooter.apps.customers.serializers import PointSerializer
 from scooter.apps.merchants.models import Merchant
 from scooter.apps.orders.models.ratings import RatingOrder
-from scooter.apps.orders.serializers.v2.orders import DetailOrderSerializer
+from scooter.apps.orders.serializers.v2.orders import DetailOrderSerializer, OrderWithDetailModelSerializer
 # Models
 from scooter.apps.orders.models.orders import (OrderDetail, HistoryRejectedOrders, OrderDetailMenu,
                                                OrderDetailMenuOption)
@@ -24,7 +24,7 @@ from asgiref.sync import async_to_sync
 # Serializers primary field
 from scooter.apps.common.serializers.common import CustomerFilteredPrimaryKeyRelatedField
 # Task Celery
-from scooter.apps.taskapp.tasks import send_notification_push_task, send_email_delivered_order
+from scooter.apps.taskapp.tasks import send_notification_push_task, send_email_task
 # Methods helpers
 from scooter.apps.orders.serializers.orders import (calculate_service_price,
                                                     get_nearest_delivery_man, is_free_order)
@@ -380,17 +380,22 @@ class TestEmailSerializer(serializers.Serializer):
 
     def update(self, order, data):
         try:
-            # send_email_delivered_order.delay(subject="Tu pedido en Scooter envíos",
-            #                                  to_user=order.user.username,
-            #                                  path_template='emails/users/invoice_order.html',
-            #                                  order_id=order.id)
-            send_mail_verification(subject="Tu pedido en Scooter envíos", to_user=order.user.username,
-                                   path_template="emails/users/invoice_order.html", data={'order': order})
-
+            data_email = {'order': OrderWithDetailModelSerializer(order).data,
+                          'date_delivered_order': order.date_delivered_order.strftime(
+                              "%m/%d/%Y, %H:%M:%S")
+                          }
+            send_email_task.delay(subject="Tu pedido en Los Pedidos",
+                                  to_user=order.user.username,
+                                  path_template='emails/users/invoice_order.html',
+                                  data=data_email)
+            # send_email = send_mail_verification(subject="Tu pedido en Scooter envíos",
+            #                                     to_user='misael.gonzalez.e.229@gmail.com',
+            #                                     path_template="emails/users/invoice_order.html",
+            #                                     )
             return data
         except Exception as ex:
-            print(ex.__str__())
-            raise serializers.ValidationError('Error')
+            print(ex)
+            raise serializers.ValidationError({'detail': 'Error al calificar la orden'})
 
 
 class RantingOrderCustomerSerializer(serializers.Serializer):
