@@ -32,7 +32,8 @@ from scooter.apps.orders.serializers.orders import (calculate_service_price,
 import random
 from string import ascii_uppercase, digits
 
-from scooter.utils.functions import send_notification_push_order, send_notification_push_order_with_sound
+from scooter.utils.functions import send_notification_push_order, send_notification_push_order_with_sound, \
+    send_mail_verification
 
 
 class CurrentLocationAddressSerializer(serializers.ModelSerializer):
@@ -378,11 +379,18 @@ class CheckPromoCodeSerializer(serializers.Serializer):
 class TestEmailSerializer(serializers.Serializer):
 
     def update(self, order, data):
-        send_email_delivered_order.delay(subject="Tu pedido en Scooter envíos",
-                                         to_user=order.user.username,
-                                         path_template='emails/users/invoice_order.html',
-                                         order_id=order.id)
-        return data
+        try:
+            send_email_delivered_order.delay(subject="Tu pedido en Scooter envíos",
+                                             to_user=order.user.username,
+                                             path_template='emails/users/invoice_order.html',
+                                             order_id=order.id)
+            send_mail_verification(subject="Tu pedido en Scooter envíos", to_user=order.user.username,
+                                   path_template="mails/users/invoice_order.html", data={'order': order})
+
+            return data
+        except Exception as ex:
+            print(ex.__str__())
+            raise serializers.ValidationError('Error')
 
 
 class RantingOrderCustomerSerializer(serializers.Serializer):
