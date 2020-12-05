@@ -151,8 +151,9 @@ class ScanQrOrderSerializer(serializers.Serializer):
             delivery_man.delivery_status = delivery_status
             delivery_man.save()
             if instance.is_order_to_merchant:
+                date_delivered = instance.date_delivered_order
                 data_email = {'order': OrderWithDetailModelSerializer(instance).data,
-                              'date_delivered_order': instance.date_delivered_order.strftime(
+                              'date_delivered_order': date_delivered.strftime(
                                   "%m/%d/%Y, %H:%M:%S")
                               }
                 send_email_task.delay(subject="Tu pedido en Los Pedidos",

@@ -49,6 +49,7 @@ class DetailOrderSerializer(serializers.ModelSerializer):
         fields = ('id', 'product_name', 'product_price',
                   'picture', 'product_id', 'quantity', 'menu_options', 'total_detail'
                   )
+        read_only_fields = fields
 
     def create(self, validated_data):
         pass
