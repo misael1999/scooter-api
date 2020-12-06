@@ -36,6 +36,7 @@ from scooter.utils.functions import (send_notification_push_order, send_notifica
                                      send_mail_verification)
 # Conekta
 import conekta
+
 conekta.api_key = "key_2jx7uHTnz8ydRyKkXrNCcQ"
 conekta.api_version = "2.0.0"
 
@@ -160,10 +161,12 @@ class CreateOrderSerializer(serializers.ModelSerializer):
             data['order_date'] = timezone.localtime(timezone.now())
             data['maximum_response_time'] = maximum_response_time
             order = Order.objects.create(**data)
+            details_to_conekta = []
 
             # Save detail order
             if details and is_order_to_merchant:
-                details_to_save = self.create_details_merchant(details=details, order=order)
+                resp = self.create_details_merchant(details=details, order=order)
+                details_to_conekta = resp['details_to_conekta']
             elif details:
                 details_to_save = [OrderDetail(**detail, order=order) for detail in details]
                 OrderDetail.objects.bulk_create(details_to_save)
@@ -187,36 +190,12 @@ class CreateOrderSerializer(serializers.ModelSerializer):
                 payment_method = data.get('payment_method', 1)
                 if payment_method == 2:
                     # Realizamos el cobro con tarjeta
-                    try:
-                        card = data.get('card', None)
-                        # Crear orden de conekta
-                        order = conekta.Order.create({
-                            "currency": "MXN",
-                            "pre_authorize": True,
-                            "customer_info": {
-                                "customer_id": card.conekta_id
-                            },
-                            "line_items": [{
-                                "name": "Box of Cohiba S1s",
-                                "unit_price": 35000,
-                                "quantity": 1
-                            }],
-                            "charges": [{
-                                "amount": order.total_order,
-                                "payment_method": {
-                                    "type": "card",
-                                    "source_id": card.source_id
-                                }
-                            }]
-                        })
-
-                    except conekta.ConektaError as e:
-                        print('Error un conekta, por favor revisar')
-                        print(e.details)
-                        print(e.code)
-                        print(e.debug_message)
-                        print(e.message)
-                        raise ValueError('Ah ocurrido un error al realizar el cobro')
+                    card = data.get('card', None)
+                    # Crear orden de conekta
+                    order_conekta = self.create_order_conekta(card=card, order=order, items=details_to_conekta)
+                    order.is_payment_online = True
+                    order.order_conekta_id = order_conekta.id
+                    order.save()
 
                 # async_to_sync(notify_merchants)(merchant.id, order.id, 'NEW_ORDER')
                 # async_to_sync(send_order_to_station_channel)(station.id, order.id)
@@ -312,8 +291,35 @@ class CreateOrderSerializer(serializers.ModelSerializer):
             "extra_price": extra_price
         }
 
+    def create_order_conekta(self, card, order, items):
+        try:
+            order_conekta = conekta.Order.create({
+                "currency": "MXN",
+                "pre_authorize": True,
+                "customer_info": {
+                    "customer_id": card.conekta_id
+                },
+                "line_items": items,
+                "charges": [{
+                    "amount": order.total_order * 100,
+                    "payment_method": {
+                        "type": "card",
+                        "source_id": card.source_id
+                    }
+                }]
+            })
+            return order_conekta
+        except conekta.ConektaError as e:
+            print('Error un conekta, por favor revisar')
+            print(e.details)
+            print(e.code)
+            print(e.debug_message)
+            print(e.message)
+            raise ValueError('Ah ocurrido un error al realizar el cobro')
+
     def create_details_merchant(self, details, order):
         details_to_save = []
+        details_to_conekta = []
         price_order = 0.0
 
         for detail in details:
@@ -328,14 +334,17 @@ class CreateOrderSerializer(serializers.ModelSerializer):
                                                         product_price=product.price,
                                                         order=order)
             details_options_to_save = []
+            # Obtener los menus(secciones) del producto
             for menu_option in menu_options:
                 options = menu_option.pop('options', [])
                 menu_price = 0.0
                 detail_menu = OrderDetailMenu.objects.create(**menu_option,
                                                              detail=detail_product,
                                                              menu_name=menu_option['menu'].name)
+                # Obtener las opciones seleccionadas del menu
                 for option in options:
                     option_obj = option['option']
+                    # Acumular el precio extra que son las opciones que tienen un costo
                     extra_price = extra_price + option_obj.price
                     menu_price = menu_price + option_obj.price
                     details_options_to_save.append(OrderDetailMenuOption(**option,
@@ -346,13 +355,18 @@ class CreateOrderSerializer(serializers.ModelSerializer):
                 detail_menu.price = menu_price
                 detail_menu.save()
             # El precio extra son las opciones que tienen un costo
+            details_to_conekta.append({
+                "name": product.name,
+                "unit_price": (detail['product'].price + extra_price) * 100,
+                "quantity": detail['quantity']
+            })
             price_order = price_order + ((detail['product'].price + extra_price) * detail['quantity'])
             OrderDetailMenuOption.objects.bulk_create(details_options_to_save)
 
         order.order_price = price_order
         order.total_order = price_order + order.service_price
         order.save()
-        return details_to_save
+        return {'details_to_save': details_to_save, 'details_to_conekta': details_to_conekta}
 
 
 class RetryOrderSerializer(serializers.Serializer):
