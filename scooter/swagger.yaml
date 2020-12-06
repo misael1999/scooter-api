@@ -8,7 +8,7 @@ info:
   license:
     name: BSD License
   version: v1
-basePath: /appback/
+basePath: /
 consumes:
   - application/json
 produces:
@@ -3620,6 +3620,14 @@ definitions:
         type: string
         description: Precio aproximado de la compra
         example: Menos de 100
+      payment_method:
+        type: number
+        description: Id del tipo de metodo de pago(efectivo o tarjetas)
+        example: 1
+      card_id:
+        type: number
+        description: Tarjeta con la que se va a realizar el pago
+        example: 1
       phone_number:
         type: string
         description: Numero de teléfono

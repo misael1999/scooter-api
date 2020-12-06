@@ -14,6 +14,7 @@ from scooter.apps.orders.serializers.v2.orders import DetailOrderSerializer, Ord
 # Models
 from scooter.apps.orders.models.orders import (OrderDetail, HistoryRejectedOrders, OrderDetailMenu,
                                                OrderDetailMenuOption)
+from scooter.apps.payments.models import Card
 from scooter.apps.stations.models import Station, StationService, MemberStation
 from scooter.apps.common.models import Service, OrderStatus, Notification
 from scooter.apps.customers.models import CustomerAddress, CustomerPromotion
@@ -31,9 +32,12 @@ from scooter.apps.orders.serializers.orders import (calculate_service_price,
 # Utilities
 import random
 from string import ascii_uppercase, digits
-
-from scooter.utils.functions import send_notification_push_order, send_notification_push_order_with_sound, \
-    send_mail_verification
+from scooter.utils.functions import (send_notification_push_order, send_notification_push_order_with_sound,
+                                     send_mail_verification)
+# Conekta
+import conekta
+conekta.api_key = "key_2jx7uHTnz8ydRyKkXrNCcQ"
+conekta.api_version = "2.0.0"
 
 
 class CurrentLocationAddressSerializer(serializers.ModelSerializer):
@@ -52,6 +56,7 @@ class CreateOrderSerializer(serializers.ModelSerializer):
     station_id = serializers.PrimaryKeyRelatedField(queryset=Station.objects.all(),
                                                     source="station", required=False, allow_null=True)
     service_id = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all(), source="service")
+
     # Modified to add address recommendations
     from_address_id = serializers.PrimaryKeyRelatedField(allow_null=True, allow_empty=True, required=False,
                                                          queryset=CustomerAddress.objects.all(),
@@ -60,16 +65,23 @@ class CreateOrderSerializer(serializers.ModelSerializer):
                                                            required=False, allow_null=True)
 
     validate_qr = serializers.BooleanField(default=False, allow_null=True)
+
     # Merchants
     merchant_id = serializers.PrimaryKeyRelatedField(allow_null=True, allow_empty=True, required=False,
                                                      queryset=Merchant.objects.all(), source="merchant")
     is_order_to_merchant = serializers.BooleanField(required=True, allow_null=True)
 
+    # Payment methods
+    payment_method = serializers.IntegerField(default=1, required=False, allow_null=True)
+    card_id = CustomerFilteredPrimaryKeyRelatedField(required=False, queryset=Card.objects,
+                                                     source="card", allow_null=True,
+                                                     allow_empty=True)
+
     class Meta:
         model = Order
         fields = ('user', 'details', 'station_id', 'service_id', 'from_address_id', 'to_address_id',
                   'indications', 'approximate_price_order', 'phone_number', 'validate_qr', 'merchant_id',
-                  'is_order_to_merchant', 'promotion')
+                  'is_order_to_merchant', 'promotion', 'payment_method', 'card_id')
 
     def validate(self, data):
         try:
@@ -171,6 +183,41 @@ class CreateOrderSerializer(serializers.ModelSerializer):
             # else:
 
             if is_order_to_merchant:
+                # Verificar si el pago es con tarjeta:
+                payment_method = data.get('payment_method', 1)
+                if payment_method == 2:
+                    # Realizamos el cobro con tarjeta
+                    try:
+                        card = data.get('card', None)
+                        # Crear orden de conekta
+                        order = conekta.Order.create({
+                            "currency": "MXN",
+                            "pre_authorize": True,
+                            "customer_info": {
+                                "customer_id": card.conekta_id
+                            },
+                            "line_items": [{
+                                "name": "Box of Cohiba S1s",
+                                "unit_price": 35000,
+                                "quantity": 1
+                            }],
+                            "charges": [{
+                                "amount": order.total_order,
+                                "payment_method": {
+                                    "type": "card",
+                                    "source_id": card.source_id
+                                }
+                            }]
+                        })
+
+                    except conekta.ConektaError as e:
+                        print('Error un conekta, por favor revisar')
+                        print(e.details)
+                        print(e.code)
+                        print(e.debug_message)
+                        print(e.message)
+                        raise ValueError('Ah ocurrido un error al realizar el cobro')
+
                 # async_to_sync(notify_merchants)(merchant.id, order.id, 'NEW_ORDER')
                 # async_to_sync(send_order_to_station_channel)(station.id, order.id)
                 send_notification_push_order_with_sound(user_id=merchant.user_id,

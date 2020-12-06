@@ -7,3 +7,4 @@ from .statistics import *
 from .delivery_men import *
 from .branches import *
 from .zones import *
+from .payments import *

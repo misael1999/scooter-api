@@ -20,7 +20,6 @@ class CardSimpleSerializer(ScooterModelSerializer):
 
 
 class CardModelSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Card
         fields = '__all__'
@@ -32,6 +31,9 @@ class CardModelSerializer(serializers.ModelSerializer):
     def create(self, data):
         try:
             customer = self.context['customer']
+            card_exist = Card.objects.filter(customer=customer, last_four=data['last_four'])
+            if card_exist.exist():
+                raise ValueError('Ya existe una tarjeta con la misma terminación')
             # Comprobar si existe el usuario
             customer_exist = CustomerConekta.objects.filter(customer=customer)
 
@@ -50,6 +52,7 @@ class CardModelSerializer(serializers.ModelSerializer):
                 card = Card.objects.create(
                     customer_conekta=customer_conek,
                     customer=customer,
+                    conekta_id=customer_update.id,
                     **data,
                     source_id=source.id
                 )
@@ -76,12 +79,14 @@ class CardModelSerializer(serializers.ModelSerializer):
                     customer_conekta=customer_conekta,
                     customer=customer,
                     **data,
+                    conekta_id=customer_create.id,
                     source_id=customer_create.payment_sources[0].id
                 )
             return data
         except conekta.ConektaError as e:
+            print('CONEKTA ERROR')
             print(e.message)
-            raise serializers.ValidationError({'detail': str(e.message)})
+            raise serializers.ValidationError({'detail': 'Tarjeta invalida'})
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
         except Exception as ex:

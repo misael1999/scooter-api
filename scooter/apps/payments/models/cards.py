@@ -19,8 +19,9 @@ class CustomerConekta(ScooterModel):
 class Card(ScooterModel):
     customer_conekta = models.ForeignKey(CustomerConekta, on_delete=models.DO_NOTHING,
                                          blank=True, null=True)
-    customer = models.OneToOneField('customers.Customer', on_delete=models.CASCADE,
-                                    related_name='cards', blank=True, null=True)
+    conekta_id = models.CharField(max_length=100, null=True, blank=True)
+    customer = models.ForeignKey('customers.Customer', on_delete=models.CASCADE,
+                                 related_name='cards', blank=True, null=True)
     source_id = models.CharField(max_length=100, null=True, blank=True)
     card_token = models.CharField(max_length=100)
     last_four = models.CharField(max_length=4)
