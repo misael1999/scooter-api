@@ -32,7 +32,7 @@ class CardModelSerializer(serializers.ModelSerializer):
         try:
             customer = self.context['customer']
             card_exist = Card.objects.filter(customer=customer, last_four=data['last_four'])
-            if card_exist.exist():
+            if card_exist.exists():
                 raise ValueError('Ya existe una tarjeta con la misma terminación')
             # Comprobar si existe el usuario
             customer_exist = CustomerConekta.objects.filter(customer=customer)
