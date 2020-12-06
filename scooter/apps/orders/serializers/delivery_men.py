@@ -21,6 +21,11 @@ from scooter.apps.orders.utils.orders import notify_delivery_men
 from asgiref.sync import async_to_sync
 
 from scooter.utils.functions import send_notification_push_order, send_notification_push_order_with_sound
+# Conekta
+import conekta
+
+conekta.api_key = "key_2jx7uHTnz8ydRyKkXrNCcQ"
+conekta.api_version = "2.0.0"
 
 
 class AcceptOrderByDeliveryManSerializer(serializers.Serializer):
@@ -124,7 +129,7 @@ class ScanQrOrderSerializer(serializers.Serializer):
             raise serializers.ValidationError({'detail': 'Código QR no valido para ese pedido'})
         return qr_code
 
-    def update(self, instance, data):
+    def update(self, order, data):
         try:
             data_notification = {
                 "title": 'Pedido entregado, por favor califica tu pedido 🛵 🛴',
@@ -132,39 +137,58 @@ class ScanQrOrderSerializer(serializers.Serializer):
                 "type": "ORDER_DELIVERED"
             }
             # Update member station
-            station = instance.station
-            customer = instance.customer
+            # station = order.station
+            customer = order.customer
             self.generate_free_delivery(customer=customer)
 
-            instance = update_order_status(service=data['service'],
-                                           order_status=OrderStatus.objects.get(slug_name="delivered"),
-                                           instance=instance,
-                                           data=data_notification
-                                           )
+            order = update_order_status(service=data['service'],
+                                        order_status=OrderStatus.objects.get(slug_name="delivered"),
+                                        instance=order,
+                                        data=data_notification
+                                        )
 
-            instance.date_delivered_order = timezone.localtime(timezone.now())
-            instance.in_process = False
-            instance.save()
+            order.date_delivered_order = timezone.localtime(timezone.now())
+            order.in_process = False
+            order.save()
 
             delivery_status = DeliveryManStatus.objects.get(slug_name="available")
-            delivery_man = instance.delivery_man
+            delivery_man = order.delivery_man
             delivery_man.delivery_status = delivery_status
             delivery_man.save()
-            if instance.is_order_to_merchant:
-                date_delivered = instance.date_delivered_order
-                data_email = {'order': OrderWithDetailModelSerializer(instance).data,
+            if order.is_order_to_merchant:
+                # Capturar el pago preautorizado
+                if order.is_payment_online:
+                    try:
+                        order_conekta = conekta.Order.find(order.order_conekta_id)
+                        order_captured = order_conekta.capture()
+                    except conekta.ConektaError as e:
+                        # Mandar notificación de manera temporal
+                        # Agregar una tabla con pagos no realizados psra reintentar
+                        send_notification_push_task.delay(user_id=order.station.user.id,
+                                                          title='Cobro no realizodo',
+                                                          body="No se ha realizo el cobro del pedido con el numero 123",
+                                                          sound="default",
+                                                          android_channel_id="messages",
+                                                          data={"type": data['type'],
+                                                                "order_id": order.id,
+                                                                "message": "Pedido de nuevo",
+                                                                'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                                                })
+
+                date_delivered = order.date_delivered_order
+                data_email = {'order': OrderWithDetailModelSerializer(order).data,
                               'date_delivered_order': date_delivered.strftime(
                                   "%m/%d/%Y, %H:%M:%S")
                               }
                 send_email_task.delay(subject="Tu pedido en Los Pedidos",
-                                      to_user=instance.user.username,
+                                      to_user=order.user.username,
                                       path_template='emails/users/invoice_order.html',
                                       data=data_email)
 
             # Notification.objects.create(user_id=instance.user_id, title="Califica tu pedido",
             #                             type_notification_id=1,
             #                             body="Tu pedido ha sido entregado, deja una calificación")
-            return instance
+            return order
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
         except Exception as ex:
