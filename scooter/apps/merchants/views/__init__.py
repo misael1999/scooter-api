@@ -6,3 +6,4 @@ from .subcategories import *
 from .statistics import *
 from .delivery_men import *
 from .zones import *
+from .payments import *
