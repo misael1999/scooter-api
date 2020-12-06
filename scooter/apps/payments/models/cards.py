@@ -22,6 +22,7 @@ class Card(ScooterModel):
     conekta_id = models.CharField(max_length=100, null=True, blank=True)
     customer = models.ForeignKey('customers.Customer', on_delete=models.CASCADE,
                                  related_name='cards', blank=True, null=True)
+    card_name = models.CharField(max_length=160, null=True, blank=True)
     source_id = models.CharField(max_length=100, null=True, blank=True)
     card_token = models.CharField(max_length=100)
     last_four = models.CharField(max_length=4)

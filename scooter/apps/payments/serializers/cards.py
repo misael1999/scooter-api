@@ -26,6 +26,8 @@ class CardModelSerializer(serializers.ModelSerializer):
         read_only_fields = (
             'customer_conekta',
             'customer',
+            'conekta_id',
+            'source_id'
         )
 
     def create(self, data):

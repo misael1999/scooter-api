@@ -3963,7 +3963,10 @@ definitions:
     properties:
       card_token:
         type: string
-        description: card token stripe
+        description: card token conekta
+      card_name:
+        type: string
+        description: Nombre de la persona en la tarjeta
       last_four:
         type: integer
         desciption: last four digits from credit card
