@@ -51,6 +51,7 @@ class Merchant(ScooterModel):
     operational_zones_activated = models.BooleanField(default=False)
     restricted_zones_activated = models.BooleanField(default=False)
     # Managers
+    accept_payment_online = models.BooleanField(default=False)
     objects = MerchantManager()
 
     def __str__(self):
