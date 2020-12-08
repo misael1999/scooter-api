@@ -310,7 +310,6 @@ class CreateOrderSerializer(serializers.ModelSerializer):
                 },
                 "line_items": items,
                 "charges": [{
-                    "amount": order.total_order * 100,
                     "payment_method": {
                         "type": "card",
                         "source_id": card.source_id
