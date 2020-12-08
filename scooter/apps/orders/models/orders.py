@@ -57,10 +57,7 @@ class Order(ScooterModel):
     is_safe_order = models.BooleanField(default=False)
     # payments
     is_payment_online = models.BooleanField(default=False)
-    payment_method = models.ForeignKey('merchants.MerchantPaymentMethod',
-                                       on_delete=models.DO_NOTHING,
-                                       null=True,
-                                       blank=True)
+    payment_method = models.PositiveIntegerField(default=1)
     card_id = models.ForeignKey('payments.Card', on_delete=models.DO_NOTHING,
                                 null=True, blank=True)
     order_conekta_id = models.CharField(max_length=80, null=True, blank=True)
