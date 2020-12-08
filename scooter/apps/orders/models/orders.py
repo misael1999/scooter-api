@@ -58,8 +58,8 @@ class Order(ScooterModel):
     # payments
     is_payment_online = models.BooleanField(default=False)
     payment_method = models.PositiveIntegerField(default=1)
-    card_id = models.ForeignKey('payments.Card', on_delete=models.DO_NOTHING,
-                                null=True, blank=True)
+    card = models.ForeignKey('payments.Card', on_delete=models.DO_NOTHING,
+                             null=True, blank=True)
     order_conekta_id = models.CharField(max_length=80, null=True, blank=True)
 
     objects = OrderManager()
