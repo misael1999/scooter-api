@@ -300,6 +300,7 @@ class CreateOrderSerializer(serializers.ModelSerializer):
                 "quantity": 1
             }
         )
+        print(items)
         try:
             order_conekta = conekta.Order.create({
                 "currency": "MXN",
@@ -363,9 +364,12 @@ class CreateOrderSerializer(serializers.ModelSerializer):
                 detail_menu.price = menu_price
                 detail_menu.save()
             # El precio extra son las opciones que tienen un costo
+            print('PRECIO DE PRODUCTO ========')
+            print((product.price + extra_price) * 100)
+            print(detail['quantity'])
             details_to_conekta.append({
                 "name": product.name,
-                "unit_price": (detail['product'].price + extra_price) * 100,
+                "unit_price": (product.price + extra_price) * 100,
                 "quantity": detail['quantity']
             })
             price_order = price_order + ((detail['product'].price + extra_price) * detail['quantity'])
