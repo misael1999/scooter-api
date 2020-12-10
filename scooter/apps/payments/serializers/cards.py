@@ -1,5 +1,6 @@
 """ Common status serializers """
 # Django rest framework
+from django.conf import settings
 from rest_framework import serializers
 # Models
 from rest_framework.validators import UniqueValidator
@@ -9,8 +10,8 @@ from scooter.apps.payments.models.cards import Card, CustomerConekta
 from scooter.utils.serializers.scooter import ScooterModelSerializer
 import conekta
 
-conekta.api_key = "key_2jx7uHTnz8ydRyKkXrNCcQ"
-conekta.api_version = "2.0.0"
+conekta.api_key = settings.CONEKTA_API_KEY
+conekta.api_version = settings.CONEKTA_API_VERSION
 
 
 class CardSimpleSerializer(ScooterModelSerializer):
