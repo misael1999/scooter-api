@@ -185,10 +185,10 @@ def get_nearest_delivery_man(location_selected, station, list_exclude, distance,
 
 # Rembolsar dinero al usuario
 def return_money_user(order):
-    if not order.order_coneckta_id:
+    if not order.order_conekta_id:
         return
     try:
-        order = conekta.Order.find(order.order_coneckta_id)
+        order = conekta.Order.find(order.order_conekta_id)
         order.refund({
             "reason": "requested_by_client",
             "amount": round(order.total_order) * 100
