@@ -193,6 +193,8 @@ class CreateOrderSerializer(serializers.ModelSerializer):
                 if payment_method == 2:
                     # Realizamos el cobro con tarjeta
                     card = data.get('card', None)
+                    if not card:
+                        raise ValueError('No has ingresado una tarjeta valida')
                     # Crear orden de conekta
                     order_conekta = self.create_order_conekta(card=card, order=order, items=details_to_conekta)
                     order.is_payment_online = True
