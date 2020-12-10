@@ -44,11 +44,11 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
     search_fields = ('merchant_name',)
     ordering_fields = ('is_open', 'reputation', 'created')
     ordering = ('-is_open', 'created')
-    filter_fields = ('category', 'subcategory', 'area', 'zone')
+    filter_fields = ('category', 'subcategory', 'area', 'zone', 'status', 'information_is_complete')
 
     def get_queryset(self):
         if self.action == 'list':
-            merchants = Merchant.objects.filter(status__slug_name='active', information_is_complete=True)
+            merchants = Merchant.objects.filter(status=1, information_is_complete=True)
             return merchants
         return self.queryset
 
@@ -108,7 +108,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
                                             message='Ha ocurrido un error al borrar el vehiculo')
             return Response(data=error, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    @action(detail=True, methods=['PATCH'])
+    @action(detail=True, methods=['PATCH', 'PUT'])
     def unlock(self, request, *args, **kwargs):
         merchant = self.get_object()
         sts = Status.objects.get(slug_name='active')

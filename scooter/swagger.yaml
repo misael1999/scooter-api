@@ -2064,6 +2064,16 @@ paths:
           in: query
           required: false
           type: string
+        - name: status
+          description: Estatus del comercio(1, 2, 3)
+          in: query
+          required: false
+          type: string
+        - name: information_is_complete
+          description: Si la información del comercio esta completa
+          in: query
+          required: false
+          type: boolean
       responses:
         '200':
           description: 'Listado de comercios'
@@ -2152,6 +2162,32 @@ paths:
       responses:
         '201':
           description: 'Listado de categorías por comercio'
+      tags:
+        - Comercios
+    delete:
+      operationId: delete_merchant
+      description: Desactivar comercio
+      responses:
+        '201':
+          description: 'Información del vehiculo'
+      tags:
+        - Comercios
+  /api/v1/merchants/{merchant_id}/unlock/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+    put:
+      operationId: update_merchanr_unlock
+      description: Activar comercio
+      parameters:
+        - name: body
+          in: body
+          description: Activar comercio
+      responses:
+        '201':
+          description: 'Información del comercio'
       tags:
         - Comercios
 # CATEGORIES

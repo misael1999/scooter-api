@@ -38,7 +38,7 @@ class MerchantWithAllInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Merchant
         geo_field = 'point'
-        fields = ('id', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
+        fields = ('id', 'email', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
                   'information_is_complete', 'category', 'total_grades', 'subcategory', 'reputation', 'description',
                   'approximate_preparation_time', 'full_address', 'is_open', 'point', 'from_preparation_time',
                   'to_preparation_time', 'type_menu', 'zone', 'area', 'delivery_rules', 'merchant_level',
@@ -54,7 +54,7 @@ class MerchantUserSimpleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Merchant
-        fields = ('id', 'user', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
+        fields = ('id', 'email', 'user', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
                   'information_is_complete', 'category', 'subcategory', 'reputation', 'description',
                   'approximate_preparation_time', 'is_open', 'from_preparation_time',
                   'to_preparation_time', 'type_menu', 'area', 'zone', 'full_address', 'delivery_rules',
@@ -135,7 +135,7 @@ class MerchantInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Merchant
         geo_field = 'point'
-        fields = ('id', 'user', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
+        fields = ('id', 'email', 'user', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
                   'information_is_complete', 'reputation', 'description', 'total_grades',
                   'approximate_preparation_time', 'is_open', 'point', 'from_preparation_time',
                   'to_preparation_time', 'schedules', 'full_address', 'zone', 'area', 'delivery_rules',
@@ -302,7 +302,8 @@ class MerchantSignUpSerializer(serializers.Serializer):
 
     def create(self, data):
         try:
-            user = User(username=data.pop('username'),
+            username = data.pop('username')
+            user = User(username=username,
                         is_verified=True,
                         role=User.MERCHANT,
                         is_client=False,
@@ -312,6 +313,7 @@ class MerchantSignUpSerializer(serializers.Serializer):
             user.set_password(password)
             user.save()
             merchant = Merchant.objects.create(**data,
+                                               email=username,
                                                user=user)
 
             # code = generate_verification_token(user=user,
@@ -320,7 +322,7 @@ class MerchantSignUpSerializer(serializers.Serializer):
 
             subject = 'Bienvenido {name}'.format(name=merchant.merchant_name)
             data = {
-                'email': user.username,
+                'email': username,
                 'name': merchant.merchant_name,
                 'password': password,
                 'url': settings.URL_SERVER_FRONTEND
