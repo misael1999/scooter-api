@@ -190,11 +190,12 @@ def return_money_user(order):
     try:
         order = conekta.Order.find(order.order_coneckta_id)
         order.refund({
-            "reason": "Solicitado por el cliente",
+            "reason": "requested_by_client",
             "amount": round(order.total_order) * 100
         })
     except conekta.ConektaError as e:
         # Mandar correo al soporte y al usuario
         print(e.code)
+        print('Conekta error')
         raise ValueError('Error al devolver el cobro')
 

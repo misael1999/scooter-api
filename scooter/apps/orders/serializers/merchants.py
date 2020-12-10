@@ -153,8 +153,10 @@ class CancelOrderMerchantSerializer(serializers.Serializer):
                                                })
             return order
         except ValueError as e:
+            print(e.__str__())
             raise serializers.ValidationError({'detail': str(e)})
         except Exception as ex:
+            print(ex.__str__())
             raise serializers.ValidationError({'detail': 'Error desconocido'})
 
 
