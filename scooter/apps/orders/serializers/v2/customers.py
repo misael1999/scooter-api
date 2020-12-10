@@ -37,8 +37,8 @@ from scooter.utils.functions import (send_notification_push_order, send_notifica
 # Conekta
 import conekta
 
-conekta.api_key = settings.conekta_api_key
-conekta.api_version = settings.conekta_api_version
+conekta.api_key = settings.CONEKTA_API_KEY
+conekta.api_version = settings.CONEKTA_API_VERSION
 
 
 class CurrentLocationAddressSerializer(serializers.ModelSerializer):

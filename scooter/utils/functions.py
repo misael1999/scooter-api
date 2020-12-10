@@ -15,8 +15,8 @@ from fcm_django.models import FCMDevice
 from scooter.apps.delivery_men.models import DeliveryMan
 from scooter.apps.orders.utils.orders import notify_delivery_men
 import conekta
-conekta.api_key = settings.conekta_api_key
-conekta.api_version = settings.conekta_api_version
+conekta.api_key = settings.CONEKTA_API_KEY
+conekta.api_version = settings.CONEKTA_API_KEY
 
 
 def send_mail_verification(subject, to_user, path_template, data):

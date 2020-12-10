@@ -250,8 +250,8 @@ GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
 # END STORAGE
 
 # Conekta
-conekta_api_key = "key_2jx7uHTnz8ydRyKkXrNCcQ"
-conekta_api_version = "2.0"
+CONEKTA_API_KEY = "key_2jx7uHTnz8ydRyKkXrNCcQ"
+CONEKTA_API_VERSION = "2.0"
 
 # Swagger
 SWAGGER_YAML_FILE = str(APPS_DIR.path('swagger.yaml'))  # os.path.join(BASE_DIR, 'swagger.yaml')
