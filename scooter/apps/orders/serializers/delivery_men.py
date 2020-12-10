@@ -1,6 +1,7 @@
 # Rest framework
 from datetime import timedelta
 
+from django.conf import settings
 from rest_framework import serializers
 from django.utils import timezone
 # Serializers
@@ -24,8 +25,8 @@ from scooter.utils.functions import send_notification_push_order, send_notificat
 # Conekta
 import conekta
 
-conekta.api_key = "key_2jx7uHTnz8ydRyKkXrNCcQ"
-conekta.api_version = "2.0.0"
+conekta.api_key = settings.conekta_api_key
+conekta.api_version = settings.conekta_api_version
 
 
 class AcceptOrderByDeliveryManSerializer(serializers.Serializer):

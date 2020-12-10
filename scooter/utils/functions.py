@@ -14,6 +14,9 @@ from fcm_django.models import FCMDevice
 
 from scooter.apps.delivery_men.models import DeliveryMan
 from scooter.apps.orders.utils.orders import notify_delivery_men
+import conekta
+conekta.api_key = settings.conekta_api_key
+conekta.api_version = settings.conekta_api_version
 
 
 def send_mail_verification(subject, to_user, path_template, data):
@@ -178,3 +181,20 @@ def get_nearest_delivery_man(location_selected, station, list_exclude, distance,
     #                                           ).exclude(id__in=list_exclude).last()
 
     return delivery_man
+
+
+# Rembolsar dinero al usuario
+def return_money_user(order):
+    if not order.order_coneckta_id:
+        return
+    try:
+        order = conekta.Order.find(order.order_coneckta_id)
+        order.refund({
+            "reason": "Solicitado por el cliente",
+            "amount": round(order.total_order) * 100
+        })
+    except conekta.ConektaError as e:
+        # Mandar correo al soporte y al usuario
+        print(e.code)
+        raise ValueError('Error al devolver el cobro')
+

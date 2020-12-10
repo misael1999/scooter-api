@@ -3,7 +3,7 @@ from django.utils import timezone
 from rest_framework import serializers
 from scooter.apps.common.models import OrderStatus
 from scooter.apps.orders.serializers import send_order_delivery
-from scooter.utils.functions import send_notification_push_order
+from scooter.utils.functions import send_notification_push_order, return_money_user
 from scooter.apps.taskapp.tasks import send_notice_order_delivery, send_notification_push_task
 from scooter.apps.orders.utils.orders import notify_merchants, notify_delivery_men, send_order_to_station_channel
 from asgiref.sync import async_to_sync
@@ -95,8 +95,11 @@ class RejectOrderMerchantSerializer(serializers.Serializer):
 
     def update(self, order, data):
         try:
+            type_notification = 'REJECT_ORDER_MERCHANT'
+            if order.is_payment_online:
+                type_notification = 'REJECT_ORDER_MERCHANT_PAYMENT'
+                return_money_user(order)
             merchant = self.context['merchant']
-            print(order.order_status.slug_name)
             if order.order_status.slug_name != 'await_confirmation_merchant':
                 raise ValueError('El pedido ya fue aceptado o rechazado')
             order_status = OrderStatus.objects.get(slug_name="rejected")
@@ -109,7 +112,7 @@ class RejectOrderMerchantSerializer(serializers.Serializer):
                                          body='{}'.format(data['reason_rejection']),
                                          sound="default",
                                          android_channel_id="messages",
-                                         data={"type": "REJECT_ORDER_MERCHANT",
+                                         data={"type": type_notification,
                                                "order_id": order.id,
                                                "message": "Pedido rechazado",
                                                'click_action': 'FLUTTER_NOTIFICATION_CLICK'
@@ -126,6 +129,10 @@ class CancelOrderMerchantSerializer(serializers.Serializer):
 
     def update(self, order, data):
         try:
+            type_notification = 'REJECT_ORDER_MERCHANT'
+            if order.is_payment_online:
+                type_notification = 'REJECT_ORDER_MERCHANT_PAYMENT'
+                return_money_user(order)
             merchant = self.context['merchant']
             if order.order_status.slug_name not in ['await_confirmation_merchant', 'preparing_order']:
                 raise ValueError('No es posible cancelar pedido, verifique que no haya sido aceptado o cancelado')
@@ -139,7 +146,7 @@ class CancelOrderMerchantSerializer(serializers.Serializer):
                                          body='{}'.format(data['reason_rejection']),
                                          sound="default",
                                          android_channel_id="messages",
-                                         data={"type": "REJECT_ORDER_MERCHANT",
+                                         data={"type": type_notification,
                                                "order_id": order.id,
                                                "message": "Pedido cancelado",
                                                'click_action': 'FLUTTER_NOTIFICATION_CLICK'

@@ -4,7 +4,7 @@ from django.utils import timezone
 # Functions
 from scooter.apps.common.models import OrderStatus
 from scooter.apps.delivery_men.models import DeliveryMan
-from scooter.utils.functions import send_mail_verification, send_order_delivery
+from scooter.utils.functions import send_mail_verification, send_order_delivery, return_money_user
 # Celery
 from celery.task import task, periodic_task
 from celery.schedules import crontab
@@ -102,12 +102,17 @@ def ignore_orders():
     if orders:
         order_status = OrderStatus.objects.get(slug_name='ignored')
         for order in orders:
+            type_notification = 'REJECT_ORDER_MERCHANT'
+            if order.is_payment_online:
+                # Devolver el dinero
+                type_notification = 'REJECT_ORDER_MERCHANT_PAYMENT'
+                return_money_user(order)
             # Function
             send_notification_push_order(order.user_id, title='Pedido ignorado por el comerciante',
                                          body='No hubo respuesta por parte del comercio',
                                          sound="default",
                                          android_channel_id="messages",
-                                         data={"type": "REJECT_ORDER_MERCHANT",
+                                         data={"type": type_notification,
                                                "order_id": order.id,
                                                "message": "No hubo respuesta del comerciante",
                                                'click_action': 'FLUTTER_NOTIFICATION_CLICK'})
