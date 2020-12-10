@@ -15,6 +15,7 @@ class TypeMenuMerchant(ScooterModel):
 
 class Merchant(ScooterModel):
     user = models.OneToOneField('users.User', on_delete=models.DO_NOTHING)
+    email = models.CharField(null=True, blank=True, max_length=200)
     contact_person = models.CharField(max_length=80)
     picture = models.ImageField(upload_to='merchants/pictures/', blank=True, null=True,
                                 validators=[FileExtensionValidator(['jpg', 'png', 'jpeg'])])

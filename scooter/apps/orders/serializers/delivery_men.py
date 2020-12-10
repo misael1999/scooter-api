@@ -306,8 +306,8 @@ def update_order_status(service, order_status, instance, data):
                                                     })
         elif order_status.slug_name == 'already_here':
             send_notification_push_order_with_sound(user_id=instance.user_id,
-                                                    title='El scooter acaba de llegar ',
-                                                    body='El scooter te esta esperando'.format(instance.qr_code),
+                                                    title='Tu pedirepartidor acaba de llegar ',
+                                                    body='El pedirepartidor te esta esperando'.format(instance.qr_code),
                                                     sound="claxon.mp3",
                                                     android_channel_id="claxon",
                                                     data={"type": "UPDATE_ORDER_STATUS",
@@ -341,32 +341,32 @@ def get_data_notification(status_slug_name):
     sw_purchase = {
         'way_commerce': {
             "title": 'En el lugar de entrega',
-            "body": 'Tu scooter ha llegado',
+            "body": 'Tu Pedirepartidor ha llegado',
             "type": "UPDATE_ORDER_STATUS"
         },
         'in_the_commerce': {
-            "title": 'Tu scooter ya esta en la tienda',
+            "title": 'Tu Pedirepartidor ya esta en la tienda',
             "body": 'Te avisaremos cuando ya tengamos tus productos',
             "type": "UPDATE_ORDER_STATUS"
         },
         'delivery_process': {
             "title": 'Ya tenemos tus productos',
-            "body": 'Tu scooter ya va en camino a entregarlos',
+            "body": 'Tu Pedirepartidor ya va en camino a entregarlos',
             "type": "UPDATE_ORDER_STATUS"
         },
         'already_here': {
-            "title": 'Tu scooter te esta esperando afuera',
-            "body": 'Tu scooter esta esperando afuera con tu pedido',
+            "title": 'Tu Pedirepartidor te esta esperando afuera',
+            "body": 'Tu Pedirepartidor esta esperando afuera con tu pedido',
             "type": "UPDATE_ORDER_STATUS"
         },
         'location_pick_up': {
             "title": 'En el lugar de recolección',
-            "body": 'Tu scooter ya esta recogiendo los productos',
+            "body": 'Tu Pedirepartidor ya esta recogiendo los productos',
             "type": "UPDATE_ORDER_STATUS"
         },
         'delivery_process_pickup': {
             "title": 'En proceso de entrega',
-            "body": 'Tu scooter ya recogio los productos',
+            "body": 'Tu Pedirepartidor ya recogio los productos',
             "type": "UPDATE_ORDER_STATUS"
         }
 
@@ -418,7 +418,7 @@ def accept_order_devivery(order, delivery_man):
     if order.is_order_to_merchant:
         type_notification = "ACCEPT_ORDER_DELIVERY"
         send_notification_push_task.delay(user_id=order.merchant.user_id,
-                                          title='El scooter ya va por el pedido',
+                                          title='Tu Pedirepartidor ya va por el pedido',
                                           body='Numero de pedido {}'.format(order.qr_code),
                                           sound="default",
                                           android_channel_id="messages",

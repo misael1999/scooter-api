@@ -11,7 +11,7 @@ from rest_framework.response import Response
 # Permissions
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from scooter.apps.common.models import CategoryMerchant, Area
+from scooter.apps.common.models import CategoryMerchant, Area, Status
 from scooter.apps.common.serializers import AreaModelSerializer
 from scooter.apps.merchants.models import Merchant
 # Permissions
@@ -34,7 +34,7 @@ from django.contrib.gis.db.models.functions import Distance
 
 class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
                       mixins.CreateModelMixin, mixins.ListModelMixin,
-                      mixins.UpdateModelMixin):
+                      mixins.UpdateModelMixin, mixins.DestroyModelMixin):
     """ Handle signup and update of merchant """
     queryset = Merchant.objects.all()
     serializer_class = MerchantWithAllInfoSerializer
@@ -97,6 +97,26 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
                                  data={},
                                  message='Se ha registrado un nuevo comercio')
         return Response(data, status=status.HTTP_201_CREATED)
+
+    def perform_destroy(self, instance):
+        try:
+            sts = Status.objects.get(slug_name='inactive')
+            instance.status = sts
+            instance.save()
+        except Status.DoesNotExist:
+            error = self.set_error_response(status=False, field='status',
+                                            message='Ha ocurrido un error al borrar el vehiculo')
+            return Response(data=error, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=True, methods=['PATCH'])
+    def unlock(self, request, *args, **kwargs):
+        merchant = self.get_object()
+        sts = Status.objects.get(slug_name='active')
+        # Send instance of vehicle for validate of name not exist
+        merchant.status = sts
+        merchant.save()
+        data = self.set_response(status=True, data={}, message="Comercio desbloqueado correctamente")
+        return Response(data=data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=('PATCH', 'PUT'))
     def update_info(self, request, *args, **kwargs):

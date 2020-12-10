@@ -160,6 +160,7 @@ class CreateOrderSerializer(serializers.ModelSerializer):
             data['is_safe_order'] = is_safe_order
             data['order_date'] = timezone.localtime(timezone.now())
             data['maximum_response_time'] = maximum_response_time
+            data['date_update_order'] = timezone.localtime(timezone.now())
             order = Order.objects.create(**data)
             details_to_conekta = []
 
@@ -300,7 +301,6 @@ class CreateOrderSerializer(serializers.ModelSerializer):
                 "quantity": 1
             }
         )
-        print(items)
         try:
             order_conekta = conekta.Order.create({
                 "currency": "MXN",

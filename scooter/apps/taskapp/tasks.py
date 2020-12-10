@@ -89,7 +89,7 @@ def reject_orders():
                                                "message": "No hubo respuesta del pedido",
                                                'click_action': 'FLUTTER_NOTIFICATION_CLICK'})
         orders.update(order_status=order_status,
-                      reason_rejection="Pedido ignorado por el comerciante")
+                      reason_rejection="Pedido ignorado por el central")
 
 
 @periodic_task(name='ignore_orders', run_every=timedelta(minutes=1))

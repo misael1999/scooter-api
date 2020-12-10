@@ -90,7 +90,7 @@ class OrderWithDetailModelSerializer(serializers.ModelSerializer):
                   "order_date", "date_delivered_order", "qr_code", "order_status",
                   "customer", "delivery_man", "station", 'details', 'maximum_response_time', 'validate_qr',
                   'rated_order', 'in_process', 'service_id', 'is_safe_order', 'station_object', 'merchant_location',
-                  'order_price', 'total_order', 'is_delivery_by_store', 'is_order_to_merchant',
+                  'order_price', 'total_order', 'is_delivery_by_store', 'is_order_to_merchant', 'is_payment_online'
                   )
         read_only_fields = fields
 
