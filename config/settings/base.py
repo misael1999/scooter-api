@@ -249,8 +249,10 @@ GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
 )
 # END STORAGE
 
-# Conekta
-CONEKTA_API_KEY = "key_2jx7uHTnz8ydRyKkXrNCcQ"
+# Conekta prod
+CONEKTA_API_KEY = "key_JZxwiecZxNrqHo3YNyxTQQ"
+# dev
+# CONEKTA_API_KEY = "key_2jx7uHTnz8ydRyKkXrNCcQ"
 CONEKTA_API_VERSION = "2.0"
 
 # Swagger
