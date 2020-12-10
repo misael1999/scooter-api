@@ -112,6 +112,7 @@ def ignore_orders():
                                                "message": "No hubo respuesta del comerciante",
                                                'click_action': 'FLUTTER_NOTIFICATION_CLICK'})
         orders.update(order_status=order_status,
+                      in_process=False,
                       reason_rejection="Pedido ignorado por el comerciante")
 
 

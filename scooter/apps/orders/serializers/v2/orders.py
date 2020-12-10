@@ -63,7 +63,7 @@ class OrderWithoutInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ("id", "to_address", "order_date", "date_delivered_order",
-                  "qr_code", "order_status", 'order_price'
+                  "qr_code", "order_status", 'order_price', 'date_update_order'
                   )
         read_only_fields = fields
 
@@ -86,7 +86,7 @@ class OrderWithDetailModelSerializer(serializers.ModelSerializer):
         model = Order
         fields = ("id", 'merchant', "service",
                   "from_address", "to_address", "service_price", "distance",
-                  "indications", "approximate_price_order", 'reason_rejection',
+                  "indications", "approximate_price_order", 'reason_rejection', 'date_update_order',
                   "order_date", "date_delivered_order", "qr_code", "order_status",
                   "customer", "delivery_man", "station", 'details', 'maximum_response_time', 'validate_qr',
                   'rated_order', 'in_process', 'service_id', 'is_safe_order', 'station_object', 'merchant_location',

@@ -138,6 +138,7 @@ class CreateOrderSerializer(serializers.ModelSerializer):
                 data['distance'] = data_service['distance']
 
             if is_order_to_merchant:
+                data['in_process'] = True
                 if merchant.is_open:
                     # if not self.valid_stock(details):
                     #     raise ValueError('Un producto no cuenta con suficiente stock')
