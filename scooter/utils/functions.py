@@ -208,6 +208,9 @@ def return_money_user(order):
         order_conekta.void({
             "reason": "requested_by_client"
         })
+        order_conekta.refund({
+            "reason": "requested_by_client"
+        })
     except conekta.ConektaError as e:
         # Mandar correo al soporte y al usuario
         print(e.code)
