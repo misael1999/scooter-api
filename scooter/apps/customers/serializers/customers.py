@@ -36,6 +36,7 @@ class CustomerInvitationSimpleSerializer(serializers.ModelSerializer):
 class CustomerSimpleModelSerializer(serializers.ModelSerializer):
     picture = Base64ImageField(max_length=None, required=False, use_url=True)
     user = UserModelSimpleSerializer()
+    email = serializers.EmailField(required=False, allow_null=True)
 
     class Meta:
         model = Customer
@@ -49,18 +50,23 @@ class CustomerSimpleModelSerializer(serializers.ModelSerializer):
             'code_share',
             'phone_number',
             'reputation',
-            'is_safe_user'
+            'is_safe_user',
+            'email'
         )
 
-    def update(self, instance, data):
+    def update(self, customer, data):
         """ Before updating we have to delete the previous image """
         try:
+            if data['email']:
+                user = customer.user
+                user.username = data['email']
+                user.save()
             if data['picture']:
-                instance.picture.delete(save=True)
+                customer.picture.delete(save=True)
         except Exception as ex:
             print("Exception deleting image client, please check it")
             print(ex.args.__str__())
-        return super().update(instance, data)
+        return super().update(customer, data)
 
 
 class CustomerSimpleOrderSerializer(serializers.ModelSerializer):
