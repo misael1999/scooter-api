@@ -297,13 +297,13 @@ class CreateOrderSerializer(serializers.ModelSerializer):
 
     def create_order_conekta(self, card, order, items):
         # Agregamos el precio del envío como item
-        # items.append(
-        #     {
-        #         "name": 'Servicio de moto',
-        #         "unit_price": round(order.service_price * 100),
-        #         "quantity": 1
-        #     }
-        # )
+        items.append(
+            {
+                "name": 'Servicio de moto',
+                "unit_price": round(order.service_price * 100),
+                "quantity": 1
+            }
+        )
         try:
             order_conekta = conekta.Order.create({
                 "currency": "MXN",
