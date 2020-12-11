@@ -57,9 +57,10 @@ class CustomerSimpleModelSerializer(serializers.ModelSerializer):
     def update(self, customer, data):
         """ Before updating we have to delete the previous image """
         try:
-            if data['email']:
+            email = data.pop('email', None)
+            if email:
                 user = customer.user
-                user.username = data['email']
+                user.username = email
                 user.save()
             if data['picture']:
                 customer.picture.delete(save=True)
