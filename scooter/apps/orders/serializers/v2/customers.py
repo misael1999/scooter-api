@@ -105,7 +105,7 @@ class CreateOrderSerializer(serializers.ModelSerializer):
         """ Create a new order and send message socket """
         try:
             details = data.pop('details', None)
-            customer = data['customer']
+            card = data.pop('card', None)
             station = data.get('station', None)
             merchant = data.get('merchant', None)
             customer_promotion = data.get('promotion', None)
@@ -192,13 +192,13 @@ class CreateOrderSerializer(serializers.ModelSerializer):
                 payment_method = data.get('payment_method', 1)
                 if payment_method == 2:
                     # Realizamos el cobro con tarjeta
-                    card = data.get('card', None)
                     if not card:
                         raise ValueError('No has ingresado una tarjeta valida')
                     # Crear orden de conekta
                     order_conekta = self.create_order_conekta(card=card, order=order, items=details_to_conekta)
                     order.is_payment_online = True
                     order.order_conekta_id = order_conekta.id
+                    order.card = card
                     order.save()
 
                 # async_to_sync(notify_merchants)(merchant.id, order.id, 'NEW_ORDER')
