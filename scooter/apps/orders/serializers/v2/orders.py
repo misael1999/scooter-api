@@ -15,6 +15,7 @@ from scooter.apps.orders.serializers import RatingOrderSerializer
 from scooter.apps.payments.serializers import CardModelSerializer
 from scooter.apps.stations.serializers import StationSimpleOrderSerializer
 from scooter.apps.orders.models import OrderDetailMenu, OrderDetailMenuOption, OrderDetail
+from scooter.utils.serializers.scooter import ScooterModelSerializer
 
 
 class DetailMenuOptionSerializer(serializers.ModelSerializer):
@@ -69,7 +70,7 @@ class OrderWithoutInfoSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
-class OrderWithDetailModelSerializer(serializers.ModelSerializer):
+class OrderWithDetailModelSerializer(ScooterModelSerializer):
     merchant = MerchantUserSimpleSerializer()
     station = serializers.StringRelatedField(read_only=True)
     station_object = StationSimpleOrderSerializer(read_only=True, source="station")

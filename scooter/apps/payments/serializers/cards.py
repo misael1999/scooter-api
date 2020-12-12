@@ -28,7 +28,8 @@ class CardModelSerializer(serializers.ModelSerializer):
             'customer_conekta',
             'customer',
             'conekta_id',
-            'source_id'
+            'source_id',
+            'status'
         )
 
     def create(self, data):
