@@ -12,6 +12,7 @@ from scooter.apps.merchants.serializers import MerchantUserSimpleSerializer
 from scooter.apps.orders.models.orders import Order
 # Django Geo
 from scooter.apps.orders.serializers import RatingOrderSerializer
+from scooter.apps.payments.serializers import CardModelSerializer
 from scooter.apps.stations.serializers import StationSimpleOrderSerializer
 from scooter.apps.orders.models import OrderDetailMenu, OrderDetailMenuOption, OrderDetail
 
@@ -81,6 +82,7 @@ class OrderWithDetailModelSerializer(serializers.ModelSerializer):
     delivery_man = DeliveryManOrderSerializer(required=False)
     order_status = OrderStatusModelSerializer(read_only=True)
     rated_order = RatingOrderSerializer(required=False, read_only=True)
+    card = CardModelSerializer(read_only=True)
 
     class Meta:
         model = Order
@@ -90,7 +92,8 @@ class OrderWithDetailModelSerializer(serializers.ModelSerializer):
                   "order_date", "date_delivered_order", "qr_code", "order_status",
                   "customer", "delivery_man", "station", 'details', 'maximum_response_time', 'validate_qr',
                   'rated_order', 'in_process', 'service_id', 'is_safe_order', 'station_object', 'merchant_location',
-                  'order_price', 'total_order', 'is_delivery_by_store', 'is_order_to_merchant', 'is_payment_online'
+                  'order_price', 'total_order', 'is_delivery_by_store', 'is_order_to_merchant', 'is_payment_online',
+                  'card'
                   )
         read_only_fields = fields
 
