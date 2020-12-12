@@ -31,7 +31,7 @@ class RatingOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = RatingOrder
         fields = ("order", "station", "delivery_man",
-                  "rating_customer", "comments", "rating")
+                  "rating_customer", "comments", "rating", 'rating_merchant')
         read_only_fields = fields
 
 
