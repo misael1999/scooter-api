@@ -108,18 +108,19 @@ def ignore_orders():
                 type_notification = 'REJECT_ORDER_MERCHANT_PAYMENT'
                 return_money_user(order)
             else:
+                pass
                 # Function
-                send_notification_push_order(order.user_id, title='Pedido ignorado por el comerciante',
-                                             body='No hubo respuesta por parte del comercio',
-                                             sound="default",
-                                             android_channel_id="messages",
-                                             data={"type": type_notification,
-                                                   "order_id": order.id,
-                                                   "message": "No hubo respuesta del comerciante",
-                                                   'click_action': 'FLUTTER_NOTIFICATION_CLICK'})
+                # send_notification_push_order(order.user_id, title='Pedido ignorado por el comerciante',
+                #                              body='No hubo respuesta por parte del comercio',
+                #                              sound="default",
+                #                              android_channel_id="messages",
+                #                              data={"type": type_notification,
+                #                                    "order_id": order.id,
+                #                                    "message": "No hubo respuesta del comerciante",
+                #                                    'click_action': 'FLUTTER_NOTIFICATION_CLICK'})
         orders.update(order_status=order_status,
                       in_process=False,
-                      reason_rejection="Pedido ignorado por el comerciante")
+                      reason_rejection="Pedido ignorado por el comercio")
 
 
 @periodic_task(name='location_notice_not_enabled', run_every=timedelta(hours=2))

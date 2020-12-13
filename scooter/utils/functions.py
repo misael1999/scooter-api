@@ -189,29 +189,11 @@ def return_money_user(order):
     if not order.order_conekta_id:
         return
     try:
-        # data = {
-        #     "reason": "requested_by_client"
-        # }
-        #
-        # headers = {
-        #     'Accept': 'application/vnd.conekta-v%s+json' % (settings.CONEKTA_API_VERSION),
-        #     'Content-type': 'application/json',
-        #     'X-Conekta-Client-User-Agent':  settings.CONEKTA_API_KEY
-        # }
-        # url = 'https://api.conekta.io/orders/{}/void'.format(order.order_conekta_id)
-        # req = requests.post(url=url, data=data, headers=headers, )
-        # if req.status_code >= 400:
-        #     print(req.json())
-        #     raise ValueError('Error al iniciar sesión')
-        # json_obj = req.json()
         order_conekta = conekta.Order.find(order.order_conekta_id)
         order_conekta.void({
             "reason": "requested_by_client"
 
         })
-        # order_conekta.refund({
-        #     "reason": "requested_by_client"
-        # })
     except conekta.ConektaError as e:
         # Mandar correo al soporte y al usuario
         print(e.code)
