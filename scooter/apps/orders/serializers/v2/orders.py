@@ -45,13 +45,13 @@ class DetailOrderSerializer(serializers.ModelSerializer):
                                                     required=False)
     menu_options = DetailMenuSerializer(many=True, required=False, allow_null=True)
     total_detail = serializers.FloatField(required=False, source="get_total_detail")
+    quantity = serializers.IntegerField(default=1)
 
     class Meta:
         model = OrderDetail
-        fields = ('id', 'product_name', 'product_price',
-                  'picture', 'product_id', 'quantity', 'menu_options', 'total_detail'
+        fields = ('id', 'product_name', 'product_price', 'quantity',
+                  'picture', 'product_id', 'menu_options', 'total_detail'
                   )
-        read_only_fields = fields
 
     def create(self, validated_data):
         pass
