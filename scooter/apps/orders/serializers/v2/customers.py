@@ -359,6 +359,7 @@ class CreateOrderSerializer(serializers.ModelSerializer):
                     extra_price = extra_price + option_obj.price
                     menu_price = menu_price + option_obj.price
                     details_options_to_save.append(OrderDetailMenuOption(**option,
+                                                                         quantity=option['quantity'],
                                                                          option_name=option_obj.name,
                                                                          price_option=option_obj.price,
                                                                          detail_menu=detail_menu))

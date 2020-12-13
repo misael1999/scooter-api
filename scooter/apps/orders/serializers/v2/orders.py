@@ -23,7 +23,7 @@ class DetailMenuOptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderDetailMenuOption
         fields = ('id', 'option', 'option_name', 'price_option', 'quantity')
-        read_only_fields = ('id', 'option_name', 'price_option', 'quantity')
+        read_only_fields = ('id', 'option_name', 'price_option')
 
 
 class DetailMenuSerializer(serializers.ModelSerializer):
@@ -42,7 +42,6 @@ class DetailOrderSerializer(serializers.ModelSerializer):
     picture = Base64ImageField(required=False, use_url=True, allow_null=True, allow_empty_file=True, max_length=None)
     product_id = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all(), source="product", allow_null=True,
                                                     required=False)
-    quantity = serializers.IntegerField(min_value=1, allow_null=True, required=False)
     menu_options = DetailMenuSerializer(many=True, required=False, allow_null=True)
     total_detail = serializers.FloatField(required=False, source="get_total_detail")
 
