@@ -22,7 +22,7 @@ class ProductMenuOptionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductMenuOption
-        fields = ('option_id', 'id', 'name', 'price', 'quantity', 'is_available', 'status')
+        fields = ('option_id', 'id', 'name', 'price', 'is_available', 'status')
         read_only_fields = ('id', 'status')
 
 

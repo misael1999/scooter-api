@@ -107,6 +107,7 @@ class OrderDetailMenuOption(ScooterModel):
                                related_name="order_menu_option")
     option_name = models.CharField(max_length=100)
     price_option = models.FloatField(blank=True, null=True, default=0)
+    quantity = models.PositiveIntegerField(default=1)
 
     class Meta:
         db_table = 'orders_order_detail_menu_option'
