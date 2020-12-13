@@ -19,6 +19,7 @@ from scooter.utils.serializers.scooter import ScooterModelSerializer
 
 
 class DetailMenuOptionSerializer(serializers.ModelSerializer):
+    quantity = serializers.IntegerField(required=False, allow_null=True)
 
     class Meta:
         model = OrderDetailMenuOption
