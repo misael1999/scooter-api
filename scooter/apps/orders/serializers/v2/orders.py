@@ -22,8 +22,8 @@ class DetailMenuOptionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderDetailMenuOption
-        fields = ('id', 'option', 'option_name', 'price_option')
-        read_only_fields = ('id', 'option_name', 'price_option')
+        fields = ('id', 'option', 'option_name', 'price_option', 'quantity')
+        read_only_fields = ('id', 'option_name', 'price_option', 'quantity')
 
 
 class DetailMenuSerializer(serializers.ModelSerializer):
