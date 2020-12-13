@@ -107,15 +107,16 @@ def ignore_orders():
                 # Devolver el dinero
                 type_notification = 'REJECT_ORDER_MERCHANT_PAYMENT'
                 return_money_user(order)
-            # Function
-            send_notification_push_order(order.user_id, title='Pedido ignorado por el comerciante',
-                                         body='No hubo respuesta por parte del comercio',
-                                         sound="default",
-                                         android_channel_id="messages",
-                                         data={"type": type_notification,
-                                               "order_id": order.id,
-                                               "message": "No hubo respuesta del comerciante",
-                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'})
+            else:
+                # Function
+                send_notification_push_order(order.user_id, title='Pedido ignorado por el comerciante',
+                                             body='No hubo respuesta por parte del comercio',
+                                             sound="default",
+                                             android_channel_id="messages",
+                                             data={"type": type_notification,
+                                                   "order_id": order.id,
+                                                   "message": "No hubo respuesta del comerciante",
+                                                   'click_action': 'FLUTTER_NOTIFICATION_CLICK'})
         orders.update(order_status=order_status,
                       in_process=False,
                       reason_rejection="Pedido ignorado por el comerciante")
