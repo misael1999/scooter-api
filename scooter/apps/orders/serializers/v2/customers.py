@@ -355,10 +355,12 @@ class CreateOrderSerializer(serializers.ModelSerializer):
                 # Obtener las opciones seleccionadas del menu
                 for option in options:
                     option_obj = option['option']
+                    quantity = option.pop('quantity', 1)
                     # Acumular el precio extra que son las opciones que tienen un costo
-                    extra_price = extra_price + option_obj.price
+                    extra_price = extra_price + (option_obj.price * quantity)
                     menu_price = menu_price + option_obj.price
                     details_options_to_save.append(OrderDetailMenuOption(**option,
+                                                                         quantity=quantity,
                                                                          option_name=option_obj.name,
                                                                          price_option=option_obj.price,
                                                                          detail_menu=detail_menu))
