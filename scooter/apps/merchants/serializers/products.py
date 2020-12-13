@@ -22,7 +22,7 @@ class ProductMenuOptionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductMenuOption
-        fields = ('option_id', 'id', 'name', 'price', 'is_available', 'status')
+        fields = ('option_id', 'id', 'name', 'price', 'quantity', 'is_available', 'status')
         read_only_fields = ('id', 'status')
 
 
@@ -35,7 +35,7 @@ class ProductMenuCategorySerializer(serializers.ModelSerializer):
         model = ProductMenuCategory
         fields = ('id', 'menu_id', 'name', 'is_range', 'is_obligatory', 'have_quantity', 'min_quantity', 'max_quantity',
                   'limit_options_choose', 'min_options_choose',
-                  'max_options_choose', 'options', 'status')
+                  'max_options_choose', 'options', 'is_option_repeatable', 'status')
         read_only_fields = ('status', 'id')
 
 
@@ -82,19 +82,6 @@ class ProductsModelSerializer(ScooterModelSerializer):
 
     def validate(self, data):
         merchant = self.context['merchant']
-        # Send instance of product for validate of name not exist
-        # product_instance = self.context.get('product_instance', None)
-        # exist_product = Product.objects.filter(merchant=merchant, name=data['name']).exists()
-        # if exist_product and not product_instance:
-        #     raise serializers.ValidationError(
-        #         {'detail': 'Ya se encuentra registrado un producto con ese nombre, verifique que no este desactivado'},
-        #         code='product_exist')
-        # # When is update
-        # elif exist_product and product_instance and product_instance.name != data['name']:
-        #     raise serializers.ValidationError(
-        #         {'detail': 'Ya se encuentra registrado un producto con ese nombre, verifique que no este desactivado'},
-        #         code='product_exist')
-
         data['merchant'] = merchant
         return data
 

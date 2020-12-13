@@ -51,6 +51,7 @@ class ProductMenuCategory(ScooterModel):
     have_quantity = models.BooleanField(default=False)
     min_quantity = models.PositiveIntegerField(default=0)
     max_quantity = models.PositiveIntegerField(default=0)
+    is_option_repeatable = models.BooleanField(default=False)
 
     class Meta:
         get_latest_by = 'created'
@@ -63,6 +64,7 @@ class ProductMenuCategory(ScooterModel):
 class ProductMenuOption(ScooterModel):
     menu = models.ForeignKey(ProductMenuCategory, on_delete=models.DO_NOTHING, related_name="options")
     name = models.CharField(max_length=90)
+    quantity = models.PositiveIntegerField(default=1)
     price = models.FloatField(null=True, blank=True)
     is_available = models.BooleanField(default=True)
 
