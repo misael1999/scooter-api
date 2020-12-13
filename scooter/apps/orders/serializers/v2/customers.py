@@ -262,6 +262,8 @@ class CreateOrderSerializer(serializers.ModelSerializer):
         except Exception as ex:
             print("Exception in create order v2, please check it")
             print(ex.args.__str__())
+            print(ex.__cause__)
+            print(ex)
             raise serializers.ValidationError({'detail': 'Error al crear la orden'})
 
     def valid_stock(self, details):
