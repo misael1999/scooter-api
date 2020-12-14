@@ -1,10 +1,13 @@
 # Django rest
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, mixins
 from rest_framework.decorators import action
+from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.response import Response
 # Permissions
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
+from scooter.apps.customers.permissions import IsStation
 from scooter.apps.users.permissions import IsAccountOwner
 # Utilities
 from scooter.utils.viewsets import ScooterViewSet
@@ -24,6 +27,12 @@ class CustomerViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
     queryset = Customer.objects.filter(status=1)
     serializer_class = CustomerUserModelSerializer
     lookup_field = 'id'
+    # Filters
+    filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
+    search_fields = ('name', 'phone_number')
+    # ordering_fields = ('created',)
+    # Affect the default order
+    ordering = ('-created', 'name')
 
     def get_serializer_class(self):
         serializer_class = self.serializer_class
@@ -36,6 +45,8 @@ class CustomerViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             permission_classes = [AllowAny]
         elif self.action in ['partial_update', 'update']:
             permission_classes = [IsAuthenticated, IsAccountOwner]
+        elif self.action in ['list']:
+            permission_classes = [IsAuthenticated, IsStation]
         else:
             permission_classes = [IsAuthenticated]
 

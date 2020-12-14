@@ -13,7 +13,15 @@ class IsAccountOwnerCustomer(BasePermission):
         except Customer.DoesNotExist:
             return False
         # Customer
-        return customer == view.customer
+        return customer == view.customerc
+
+
+class IsStation(BasePermission):
+
+    def has_permission(self, request, view):
+        """Verify user have a customer."""
+        user = request.user
+        return user.is_station()
 
 
 
