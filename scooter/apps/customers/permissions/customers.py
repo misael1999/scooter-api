@@ -13,7 +13,7 @@ class IsAccountOwnerCustomer(BasePermission):
         except Customer.DoesNotExist:
             return False
         # Customer
-        return customer == view.customerc
+        return customer == view.customer
 
 
 class IsStation(BasePermission):
