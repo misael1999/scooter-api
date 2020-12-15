@@ -167,7 +167,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
 
     # Cache requested url for each user for 2 hours
     @action(detail=False, methods=['GET'])
-    @method_decorator(cache_page(5000 * 60))
+    @method_decorator(cache_page(1000 * 120))
     @method_decorator(vary_on_cookie)
     def home(self, request, *args, **kwargs):
         try:
@@ -255,7 +255,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
     # Obtener seccion ordenado por un campo
     def get_section_order_by(self, area_id, category, section_name, order_by, limit, orientation, filters):
         merchants = Merchant.objects.filter(**filters) \
-                        .order_by('is_open', order_by)[0:limit]
+                        .order_by('-is_open', order_by)[0:limit]
 
         if len(merchants) == 0:
             return {
