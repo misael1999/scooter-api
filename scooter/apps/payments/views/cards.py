@@ -12,7 +12,7 @@ from scooter.apps.common.models import Status
 # Models
 from scooter.apps.payments.models.cards import Card
 # Serializers
-from scooter.apps.payments.serializers import CardModelSerializer, CardSimpleSerializer
+from scooter.apps.payments.serializers import CardModelSerializer, CardSimpleSerializer, UpdateCardSerializer
 # Utilities
 from scooter.utils.viewsets import ScooterViewSet
 
@@ -21,7 +21,7 @@ class CardsViewSet(ScooterViewSet, mixins.ListModelMixin,
                    mixins.RetrieveModelMixin, mixins.CreateModelMixin,
                    mixins.UpdateModelMixin, mixins.DestroyModelMixin, AddCustomerMixin):
     """ Handle add brands """
-    queryset = Card.objects.all()
+    queryset = Card.objects.filter(status=1)
     permission_classes = (IsAuthenticated, IsAccountOwnerCustomer)
     serializer_class = CardModelSerializer
     filter_backends = (DjangoFilterBackend,)
@@ -40,20 +40,22 @@ class CardsViewSet(ScooterViewSet, mixins.ListModelMixin,
 
     def get_queryset(self):
         if self.action in ['list', 'update', 'partial_update', 'retrieve']:
-            return Card.objects.filter(customer_id=self.customer.id)
+            return Card.objects.filter(customer_id=self.customer.id, status=1)
         return self.queryset
 
     def get_serializer_class(self):
         if self.action == 'list':
             return CardSimpleSerializer
+        if self.action in ['update', 'partial_update']:
+            return UpdateCardSerializer
         return self.serializer_class
 
     def perform_destroy(self, instance):
         try:
-            sts = Status.objects.get(slug_name='inactive')
+            sts = Status.objects.get(slug_name='deleted')
             instance.status = sts
             instance.save()
         except Status.DoesNotExist:
             error = self.set_error_response(status=False, field='status',
-                                            message='Ha ocurrido un error al borrar la categoria')
+                                            message='Ha ocurrido un error al borrar la tarjeta')
             return Response(data=error, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

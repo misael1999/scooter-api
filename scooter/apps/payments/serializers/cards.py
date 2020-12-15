@@ -35,7 +35,9 @@ class CardModelSerializer(serializers.ModelSerializer):
     def create(self, data):
         try:
             customer = self.context['customer']
-            card_exist = Card.objects.filter(customer=customer, last_four=data['last_four'])
+            card_exist = Card.objects.filter(customer=customer,
+                                             last_four=data['last_four'],
+                                             status=1)
             if card_exist.exists():
                 raise ValueError('Ya existe una tarjeta con la misma terminación')
             # Comprobar si existe el usuario
@@ -72,6 +74,7 @@ class CardModelSerializer(serializers.ModelSerializer):
                         'token_id': data['card_token']
                     }]
                 })
+
                 # Añadimos el usuario a nuestra base de datos
                 customer_conekta = CustomerConekta.objects.create(
                     user=customer.user,
@@ -91,6 +94,23 @@ class CardModelSerializer(serializers.ModelSerializer):
             print('CONEKTA ERROR')
             print(e.message)
             raise serializers.ValidationError({'detail': 'Tarjeta invalida'})
+        except ValueError as e:
+            raise serializers.ValidationError({'detail': str(e)})
+        except Exception as ex:
+            print("Exception in rating order, please check it")
+            print(ex.args.__str__())
+            raise serializers.ValidationError({'detail': 'Error al guardar la tarjeta'})
+
+
+class UpdateCardSerializer(serializers.Serializer):
+
+    cvv = serializers.IntegerField()
+
+    def update(self, card, data):
+        try:
+            customer = conekta.Customer.find(card.conekta_id)
+            customer.payment_sources[0].update({'cvv': data['cvv']})
+            return data
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
         except Exception as ex:

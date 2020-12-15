@@ -433,6 +433,46 @@ paths:
           description: 'Regresa información del cliente y su access_token'
       tags:
         - Clientes pagos
+  /api/v1/customers/{customer_id}/cards/{card_id}/:
+    parameters:
+      - name: customer_id
+        in: path
+        required: true
+        type: string
+      - name: card_id
+        in: path
+        required: true
+        type: string
+    patch:
+      operationId: update_card
+      description: Actualizar datos de una tarjeta
+      parameters:
+        - name: body
+          in: body
+          description: Actualizar datos del cliente
+          schema:
+            $ref: '#/definitions/UpdateCustomerCard'
+      responses:
+        '201':
+          description: 'Información del cliente'
+      tags:
+        - Clientes pagos
+    get:
+      operationId: get_client_card
+      description: Obtener datos una tarjeta
+      responses:
+        '201':
+          description: 'Información del cliente'
+      tags:
+        - Clientes pagos
+    delete:
+      operationId: delete_client_card
+      description: Eliminar tarjeta
+      responses:
+        '201':
+          description: 'Información del cliente'
+      tags:
+        - Clientes pagos
   /api/v1/customers/login/:
     post:
       operationId: customer_login
@@ -4038,6 +4078,22 @@ definitions:
       brand:
         type: string
         description: brand to credit card
+    required:
+      - card_token
+      - last_four
+      - brand
+  UpdateCustomerCard:
+    type: object
+    properties:
+      cvv:
+        type: string
+        description: Codigo de la tarjeta
+      month_experiation:
+        type: string
+        description: Mes de expiración
+      year_experiation:
+        type: string
+        description: Año de expiración
     required:
       - card_token
       - last_four
