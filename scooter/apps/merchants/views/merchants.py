@@ -257,7 +257,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
     # Obtener seccion ordenado por un campo
     def get_section_order_by(self, area_id, category, section_name, order_by, limit, orientation, filters):
         merchants = Merchant.objects.filter(**filters) \
-                        .order_by('-is_open', order_by, 'total_grades')[0:limit]
+                        .order_by('-is_open', order_by, '-total_grades')[0:limit]
 
         if len(merchants) == 0:
             return {
