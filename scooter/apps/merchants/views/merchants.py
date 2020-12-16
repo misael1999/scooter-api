@@ -190,6 +190,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
                 data = {
                     'more_merchants': False,
                     'secciones': [],
+                    'orders': 0,
                     'message': 'No hay comercios que mostrar'
                 }
                 return Response(data=data, status=status.HTTP_200_OK)
@@ -224,7 +225,8 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
 
             data = {
                 'more_merchants': True,
-                'secciones': sections
+                'secciones': sections,
+                'orders': 2,
             }
 
             return Response(data=data, status=status.HTTP_200_OK)
@@ -246,7 +248,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             }
         return {
             'has_data': True,
-            'section_name': 'Populares cerca de ti',
+            'section_name': 'Cerca de ti',
             'orientation': 'H',
             'list': MerchantWithAllInfoSerializer(merchants, many=True).data,
             'more': False
