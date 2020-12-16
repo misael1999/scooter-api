@@ -316,8 +316,7 @@ class CreateOrderSerializer(serializers.ModelSerializer):
                 "line_items": items,
                 "charges": [{
                     "payment_method": {
-                        "type": "card",
-                        "payment_source_id": card.source_id,
+                        "type": "default"
                     }
                 }]
             })
