@@ -229,16 +229,16 @@ class CreateOrderSerializer(serializers.ModelSerializer):
                 location_selected = get_ref_location(order)
                 if station.assign_delivery_manually:
 
-                    send_notification_push_task.delay(user_id=station.user_id,
-                                                      title='Pedido nuevo',
-                                                      body='Solicitud nueva',
-                                                      sound="alarms.mp3",
-                                                      android_channel_id="alarms",
-                                                      data={"type": "NEW_ORDER",
-                                                            "order_id": order.id,
-                                                            "message": "Pedido de nuevo",
-                                                            'click_action': 'FLUTTER_NOTIFICATION_CLICK'
-                                                            })
+                    send_notification_push_order_with_sound(user_id=station.user_id,
+                                                            title='Pedido nuevo',
+                                                            body='Solicitud nueva',
+                                                            sound="alarms.mp3",
+                                                            android_channel_id="alarms",
+                                                            data={"type": "NEW_ORDER",
+                                                                  "order_id": order.id,
+                                                                  "message": "Pedido de nuevo",
+                                                                  'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                                                  })
                     # Send message by django channel
                     # async_to_sync(send_order_to_station_channel)(station.id, order.id)
                 else:
@@ -298,7 +298,7 @@ class CreateOrderSerializer(serializers.ModelSerializer):
         }
 
     def create_order_conekta(self, card, order, items):
-         # Agregamos el precio del envío como item
+        # Agregamos el precio del envío como item
         items.append(
             {
                 "name": 'Servicio de moto',
@@ -320,7 +320,7 @@ class CreateOrderSerializer(serializers.ModelSerializer):
                         "payment_source_id": card.source_id,
                     }
                 }]
-                
+
             })
             return order_conekta
         except conekta.ConektaError as e:

@@ -4,7 +4,8 @@ from django.utils import timezone
 # Functions
 from scooter.apps.common.models import OrderStatus
 from scooter.apps.delivery_men.models import DeliveryMan
-from scooter.utils.functions import send_mail_verification, send_order_delivery, return_money_user
+from scooter.utils.functions import send_mail_verification, send_order_delivery, return_money_user, \
+    send_notification_push_order_with_sound
 # Celery
 from celery.task import task, periodic_task
 from celery.schedules import crontab
@@ -52,14 +53,27 @@ def send_notice_order_delivery(order_id):
 def send_notification_delivery():
     """ Send notification delivery man when nobody response """
     now = timezone.localtime(timezone.now())
-    offset = now - timedelta(seconds=50)
+    offset = now - timedelta(seconds=120)
     orders = Order.objects.filter(order_ready_date__lte=offset,
                                   order_status__slug_name__in=["await_delivery_man"])
     if orders:
         for order in orders:
-            send_order_delivery(location_selected=order.merchant_location,
-                                station=order.station,
-                                order=order)
+            station = order.station
+            if station.assign_delivery_manually:
+                send_notification_push_order(user_id=station.user_id,
+                                             title='¡¡¡¡¡ Pedido SIN responder !!!!!!!',
+                                             body='Tienes un pedido sin responder',
+                                             sound="alarms.mp3",
+                                             android_channel_id="alarms",
+                                             data={"type": "NEW_ORDER",
+                                                   "order_id": order.id,
+                                                   "message": "Pedido de nuevo",
+                                                   'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                                   })
+            else:
+                send_order_delivery(location_selected=order.merchant_location,
+                                    station=order.station,
+                                    order=order)
 
 
 # Period Task with crontab
@@ -120,7 +134,6 @@ def ignore_orders():
         orders.update(order_status=order_status,
                       in_process=False,
                       reason_rejection="Pedido ignorado por el comercio")
-
 
 # @periodic_task(name='location_notice_not_enabled', run_every=timedelta(hours=2))
 # def location_notice_not_enabled():
