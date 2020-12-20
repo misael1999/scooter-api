@@ -25,7 +25,7 @@ class DeliveryManAddressSerializer(serializers.ModelSerializer):
         model = DeliveryManAddress
         fields = (
             'street', 'suburb', 'postal_code',
-            'exterior_number', 'inside_number', 'references', 'last_time_update_location'
+            'exterior_number', 'inside_number', 'references'
         )
 
 
