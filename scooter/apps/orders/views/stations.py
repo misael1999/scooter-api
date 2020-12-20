@@ -36,8 +36,8 @@ class StationOrderViewSet(ScooterViewSet, AddStationMixin,
     permission_classes = (IsAuthenticated, IsAccountOwnerStation)
     lookup_field = 'pk'
     filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
-    search_fields = ('customer__name', 'from_address__street', 'from_address__suburb', 'qr_code')
-    ordering_fields = ('created', 'customer__name')
+    search_fields = ('customer__name', 'qr_code')
+    ordering_fields = ('created', 'service_price', 'distance')
     # Affect the default order
     # ordering = ('-created', 'passengers__count')
     filter_class = OrderFilter
