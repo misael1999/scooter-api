@@ -25,7 +25,7 @@ class DeliveryManAddressSerializer(serializers.ModelSerializer):
         model = DeliveryManAddress
         fields = (
             'street', 'suburb', 'postal_code',
-            'exterior_number', 'inside_number', 'references'
+            'exterior_number', 'inside_number', 'references', 'last_time_update_location'
         )
 
 
@@ -43,7 +43,7 @@ class DeliveryManModelSerializer(ScooterModelSerializer):
             'name', 'last_name', 'phone_number', 'picture', 'reputation',
             'location', 'delivery_status', 'address',
             'vehicle_plate', 'vehicle_model',
-            'vehicle_year', 'vehicle_color', 'vehicle_type'
+            'vehicle_year', 'vehicle_color', 'vehicle_type', 'last_time_update_location'
         )
         read_only_fields = fields
 
@@ -70,7 +70,7 @@ class DeliveryManWithAddressSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'user', 'merchant', 'station', 'vehicle',
             'name', 'last_name', 'phone_number', 'status',
-            'picture', 'reputation',
+            'picture', 'reputation', 'last_time_update_location',
             'location', 'delivery_status', 'address')
         read_only_fields = fields
 
