@@ -44,12 +44,13 @@ class DetailOrderSerializer(serializers.Serializer):
 
 
 class OrderCurrentStatusSerializer(serializers.ModelSerializer):
-    order_status = serializers.StringRelatedField()
+    order_status = serializers.StringRelatedField(read_only=True)
+    order_status_obj = OrderStatusModelSerializer(read_only=True)
     delivery_man = DeliveryManOrderSerializer(read_only=True)
 
     class Meta:
         model = Order
-        fields = ('order_status', 'delivery_man', 'date_update_order')
+        fields = ('order_status_obj', 'order_status', 'delivery_man', 'date_update_order')
         read_only_fields = fields
 
 
