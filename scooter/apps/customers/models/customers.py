@@ -18,6 +18,7 @@ class Customer(ScooterModel):
     code_used_complete = models.BooleanField(default=False)
     # stats
     reputation = models.FloatField(default=0)
+    total_orders = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return '{name}'.format(name=self.name)
