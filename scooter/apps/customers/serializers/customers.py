@@ -51,7 +51,8 @@ class CustomerSimpleModelSerializer(serializers.ModelSerializer):
             'phone_number',
             'reputation',
             'is_safe_user',
-            'email'
+            'email',
+            'total_orders'
         )
 
     def update(self, customer, data):
@@ -80,7 +81,8 @@ class CustomerSimpleOrderSerializer(serializers.ModelSerializer):
             'code_share',
             'phone_number',
             'reputation',
-            'is_safe_user'
+            'is_safe_user',
+            'total_orders'
         )
         read_only_fields = fields
 
@@ -125,7 +127,7 @@ class CustomerSignUpSerializer(serializers.Serializer):
         code = generate_verification_token(user=user,
                                            exp=user.verification_deadline,
                                            token_type='email_confirmation')
-        subject = 'Bienvenido a Scooter Envíos {name}'.format(name=customer.name)
+        subject = 'Bienvenido a los pedidos {name}'.format(name=customer.name)
         # Create a notification
         # Notification.objects.create(user=user, title="Bienvenido",
         #                             type_notification_id=1,
