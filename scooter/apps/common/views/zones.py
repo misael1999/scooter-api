@@ -61,18 +61,8 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
                     'message': 'En tu zona no hay servicios de restaurantes o supermercados'
                 }, status=status.HTTP_200_OK)
             area_id = areas.last().id
-            if current_hour >= str(station.close_to):
-                message = 'La central de repartos no tiene servicio \n' \
-                          ' abre: {} y cierra a las {}'.format(station.open_to, station.close_to)
-                return Response({
-                    'status': False,
-                    'zone': {},
-                    'type': 2,
-                    'area': area_id,
-                    'message': message
-                }, status=status.HTTP_200_OK)
             # Verificar si aun hay servicio disponible en el horario de la central
-            if current_hour >= str(station.close_to):
+            if str(station.open_to) <= current_hour >= str(station.close_to):
                 message = 'La central de repartos no tiene servicio \n' \
                           ' abre: {} y cierra a las {}'.format(station.open_to, station.close_to)
                 return Response({
@@ -92,7 +82,7 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
                     if zone.has_schedule:
                         # Si la zona tiene horario entonces verificamos la hora actual
                         if str(zone.from_hour) <= current_hour:
-                            message = 'Te encuentras en una zona roja \n' \
+                            message = 'Te encuentras en una zona restringida por horarios \n' \
                                       ' nuestros repartidores no operan a' \
                                       ' partir de las {}'.format(zone.from_hour)
                             return Response({
