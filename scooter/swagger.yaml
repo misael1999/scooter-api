@@ -1729,6 +1729,30 @@ paths:
           description: 'Info del pedido'
       tags:
         - Pedidos centrales
+  /api/v1/stations/{station_id}/orders/{order_id}/ready_order_merchant/:
+    parameters:
+      - name: station_id
+        in: path
+        required: true
+        type: string
+      - name: order_id
+        in: path
+        required: true
+        type: string
+    put:
+      operationId: station_merchant_order_ready
+      description: Pedido listo
+      parameters:
+        - name: body
+          in: body
+          description: Pedido listo
+          schema:
+            $ref: '#/definitions/AcceptOrder'
+      responses:
+        '201':
+          description: 'Pedido listo'
+      tags:
+        - Pedidos comercios
   /api/v1/stations/{station_id}/orders/{order_id}/assign_order/:
     parameters:
       - name: station_id

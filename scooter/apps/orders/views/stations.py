@@ -18,7 +18,7 @@ from scooter.apps.orders.serializers import (OrderModelSerializer,
                                              RejectOrderStationSerializer, AssignDeliveryManStationSerializer,
                                              AcceptOrderMerchantSerializer, RejectOrderMerchantSerializer,
                                              CancelOrderMerchantSerializer, CancelOrderStationSerializer,
-                                             ReassignDeliveryManStationSerializer)
+                                             ReassignDeliveryManStationSerializer, OrderReadyMerchantSerializer)
 # Models
 from scooter.apps.orders.models.orders import Order
 # Mixin
@@ -126,6 +126,22 @@ class StationOrderViewSet(ScooterViewSet, AddStationMixin,
         data = self.set_response(status=True,
                                  data={},
                                  message='Pedido aceptado correctamente')
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    @action(methods=['PUT'], detail=True)
+    def ready_order_merchant(self, request, *args, **kwargs):
+        order = self.get_object()
+        serializer = OrderReadyMerchantSerializer(
+            order,
+            data=request.data,
+            context={'merchant': order.merchant, 'order': order},
+            partial=False
+        )
+        serializer.is_valid(raise_exception=True)
+        order = serializer.save()
+        data = self.set_response(status=True,
+                                 data={},
+                                 message='Pedido listo correctamente')
         return Response(data=data, status=status.HTTP_200_OK)
 
     @action(methods=['PUT'], detail=True)
