@@ -1752,7 +1752,7 @@ paths:
         '201':
           description: 'Pedido listo'
       tags:
-        - Pedidos comercios
+        - Pedidos centrales
   /api/v1/stations/{station_id}/orders/{order_id}/assign_order/:
     parameters:
       - name: station_id
