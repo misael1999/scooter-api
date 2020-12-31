@@ -13,6 +13,8 @@ router.register(r'api/v1/commons/addresses', view_set.RecommendationsAddressesVi
                 basename='common-addresses')
 router.register(r'api/v1/commons/zones', view_set.ZonesViewSet,
                 basename='common-zones')
+router.register(r'api/v1/commons/faq', view_set.FaqViewSet,
+                basename='common-faq')
 
 urlpatterns = [
     # Users

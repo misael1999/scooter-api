@@ -32,17 +32,17 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
 
     @action(detail=False, methods=['GET'])
     def check_location(self, request, *args, **kwargs):
-        try: 
+        try:
             station = Station.objects.get(pk=1)
             area_id = 1
             current_hour = timezone.localtime(timezone.now()).strftime('%H:%M:%S')
-            # return Response({
-            #     'status': False,
-            #     'type': 0,
-            #     'zone': {},
-            #     'area_id': area_id,
-            #     'message': 'No estaremos disponibles el día 24 y 25 de diciembre\nLos Pedidos les desea una feliz navidad, nos vemos pronto.'
-            # }, status=status.HTTP_200_OK)
+            return Response({
+                'status': False,
+                'type': 0,
+                'zone': {},
+                'area_id': area_id,
+                'message': 'No estaremos disponibles el día 31 de diciembre y 01 de enero\nLos Pedidos les desea un feliz año nuevo, nos vemos pronto.'
+            }, status=status.HTTP_200_OK)
 
             lat = request.query_params.get('lat', 18.462938)
             lng = request.query_params.get('lng', -97.392701)
@@ -62,7 +62,7 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
                 }, status=status.HTTP_200_OK)
             area_id = areas.last().id
             # Verificar si aun hay servicio disponible en el horario de la central
-            if current_hour >= str(station.open_to) and current_hour <= str(station.close_to) :
+            if current_hour >= str(station.open_to) and current_hour <= str(station.close_to):
                 pass
             else:
                 message = 'La central de repartos no tiene servicio \n' \

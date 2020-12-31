@@ -3,3 +3,4 @@ from .addresses import *
 from .notifications import *
 from .merchants import *
 from .zones import *
+from .faq import *

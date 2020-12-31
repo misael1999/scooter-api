@@ -16,7 +16,8 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 
 
-class RecommendationsAddressesViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.UpdateModelMixin,
+class RecommendationsAddressesViewSet(ScooterViewSet, mixins.ListModelMixin,
+                                      mixins.CreateModelMixin, mixins.UpdateModelMixin,
                                       mixins.DestroyModelMixin):
     """ View set for the general can register a new address for recommendations """
 

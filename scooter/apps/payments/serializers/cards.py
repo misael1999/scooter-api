@@ -3,8 +3,6 @@
 from django.conf import settings
 from rest_framework import serializers
 # Models
-from rest_framework.validators import UniqueValidator
-# Models
 from scooter.apps.payments.models.cards import Card, CustomerConekta
 # Utilities
 from scooter.utils.serializers.scooter import ScooterModelSerializer

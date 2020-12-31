@@ -197,6 +197,69 @@ paths:
           description: 'Información de la dirección'
       tags:
         - Común
+  /api/v1/commons/faq/:
+    post:
+      operationId: faq_questions
+      description: Preguntas frecuentes
+      parameters:
+        - name: body
+          in: body
+          description: Preguntas frecuentes
+          schema:
+            $ref: '#/definitions/CreateQuestion'
+      responses:
+        '201':
+          description: 'Información de la pregunta'
+      tags:
+        - Común
+    get:
+      operationId: get_faqs
+      description: Obtener las preguntas frecuentes
+      parameters:
+        - name: search
+          description: Buscar por (titulo)
+          in: query
+          required: false
+          type: string
+      responses:
+        '201':
+          description: 'Listado de preguntas'
+      tags:
+        - Común
+  /api/v1/commons/faq/{question_id}/:
+    parameters:
+      - name: question_id
+        in: path
+        required: true
+        type: string
+    patch:
+      operationId: update_question
+      description: Actualizar pregunta frecuente
+      parameters:
+        - name: body
+          in: body
+          description: Actualizar una pregunta
+          schema:
+            $ref: '#/definitions/CreateQuestion'
+      responses:
+        '201':
+          description: 'Información de la pregunta'
+      tags:
+        - Común
+    delete:
+      operationId: delete_question
+      description: Borra una pregunta
+      parameters:
+        - name: search
+          description: Buscar por (titulo)
+          in: query
+          required: false
+          type: string
+      responses:
+        '201':
+          description: 'Listado de preguntas'
+      tags:
+        - Común
   # DEVICES
   /api/v1/devices/:
     post:
@@ -4168,6 +4231,13 @@ definitions:
                 type: number
                 description: Longitude
                 example: -97.39279966871719
+  CreateQuestion:
+    type: object
+    properties:
+      title:
+        type: string
+      answer:
+        type: string
 
 
 
