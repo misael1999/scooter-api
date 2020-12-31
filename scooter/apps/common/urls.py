@@ -15,6 +15,8 @@ router.register(r'api/v1/commons/zones', view_set.ZonesViewSet,
                 basename='common-zones')
 router.register(r'api/v1/commons/faq', view_set.FaqViewSet,
                 basename='common-faq')
+router.register(r'api/v1/commons/group/faq', view_set.FaqGroupViewSet,
+                basename='common-group-faq')
 
 urlpatterns = [
     # Users

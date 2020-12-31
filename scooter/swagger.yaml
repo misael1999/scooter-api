@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
-  title: SCOOTER API REST
-  description: It is API to scooter app
+  title: LOS PEDIDOS API REST
+  description: It is API to pedidos app
   termsOfService: https://www.google.com/policies/terms/
   contact:
     email: misael.gonzalez.e.229@gmail.com
@@ -195,6 +195,29 @@ paths:
       responses:
         '201':
           description: 'Información de la dirección'
+      tags:
+        - Común
+  /api/v1/commons/group/faq/:
+    post:
+      operationId: faq_gruoup_questions
+      description: Preguntas frecuentes
+      parameters:
+        - name: body
+          in: body
+          description: Preguntas frecuentes
+          schema:
+            $ref: '#/definitions/CreateGroupQuestion'
+      responses:
+        '201':
+          description: 'Información de la pregunta'
+      tags:
+        - Común
+    get:
+      operationId: get_group_faqs
+      description: Obtener las preguntas frecuentes
+      responses:
+        '201':
+          description: 'Listado de preguntas'
       tags:
         - Común
   /api/v1/commons/faq/:
@@ -4237,6 +4260,13 @@ definitions:
       title:
         type: string
       answer:
+        type: string
+      group:
+        type: int
+  CreateGroupQuestion:
+    type: object
+    properties:
+      name:
         type: string
 
 
