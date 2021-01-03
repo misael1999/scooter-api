@@ -3,7 +3,7 @@
 from rest_framework import serializers
 # Models
 from rest_framework.validators import UniqueValidator
-
+from scooter.apps.common.serializers.common import MerchantFilteredPrimaryKeyRelatedField
 from scooter.apps.common.serializers import Base64ImageField, StatusModelSerializer
 from scooter.apps.merchants.models import CategoryProducts, Product, ProductMenuOption, ProductMenuCategory, \
     SubcategoryProducts, SubcategorySectionProducts
@@ -54,7 +54,7 @@ class CategoryProductsModelSerializer(ScooterModelSerializer):
 
     class Meta:
         model = CategoryProducts
-        fields = ("id", 'name', 'picture', 'status', 'user', 'subcategories')
+        fields = ("id", 'name', 'picture', 'status', 'user', 'subcategories', 'ordering')
         read_only_fields = ("id", "status")
 
     def __init__(self, *args, **kwargs):
@@ -102,7 +102,7 @@ class CategoryWithProductsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CategoryProducts
-        fields = ('id', 'name', 'picture')
+        fields = ('id', 'name', 'picture', 'ordering')
         read_only_fields = fields
 
 
@@ -112,7 +112,7 @@ class CategoryWithSubcategoriesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CategoryProducts
-        fields = ('id', 'name', 'picture', 'subcategories')
+        fields = ('id', 'name', 'picture', 'subcategories', 'ordering')
         read_only_fields = fields
 
 
@@ -121,5 +121,24 @@ class CategoryProductsSimpleModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CategoryProducts
-        fields = ('id', 'name', 'picture')
+        fields = ('id', 'name', 'picture', 'ordering')
         read_only_fields = fields
+
+
+class CategorySimpleModelSerializer(serializers.Serializer):
+    category_id = MerchantFilteredPrimaryKeyRelatedField(queryset=CategoryProducts.objects.all(), source="category")
+
+
+class OrderingSerializer(serializers.Serializer):
+    categories = CategorySimpleModelSerializer(many=True)
+
+    def create(self, data):
+        categories = data.get('categories', [])
+        categories_to_update = []
+        for i, category in enumerate(categories):
+            category_obj = category['category']
+            category_obj.ordering = (i + 1)
+            categories_to_update.append(category_obj)
+
+        CategoryProducts.objects.bulk_update(categories_to_update, ['ordering'])
+        return data

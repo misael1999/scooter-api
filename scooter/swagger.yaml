@@ -312,6 +312,35 @@ paths:
           description: 'Listado de preguntas'
       tags:
         - Support customers
+  # SUPPORT ====================
+  /api/v1/stations/{station_id}/support/:
+    parameters:
+      - name: station_id
+        in: path
+        required: true
+        type: string
+    post:
+      operationId: crete_station_support
+      description: Abrir ticket de soporte
+      parameters:
+        - name: body
+          in: body
+          description: Abrir ticket de soporte
+          schema:
+            $ref: '#/definitions/CreateSupport'
+      responses:
+        '201':
+          description: 'Información de la pregunta'
+      tags:
+        - Support customers
+    get:
+      operationId: get_supports_stations
+      description: Obtener los soportes por cliente
+      responses:
+        '201':
+          description: 'Listado de preguntas'
+      tags:
+        - Support customers
   /api/v1/support/{support_id}/messages/:
     parameters:
       - name: customer_id
@@ -2455,6 +2484,27 @@ paths:
       tags:
         - Comercios
 # CATEGORIES
+  /api/v1/merchants/{merchant_id}/categories/ordering_categories/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+    # CREATE CATEGORY BY MERCHANT
+    post:
+      operationId: ordering_categories
+      description: Ordenar categorías
+      parameters:
+        - name: body
+          in: body
+          description: Ordenar categorías
+          schema:
+            $ref: '#/definitions/OrderingCategories'
+      responses:
+        '201':
+          description: 'Información del repartidor creado'
+      tags:
+        - Comercios
   /api/v1/merchants/{merchant_id}/categories/:
     parameters:
       - name: merchant_id
@@ -4104,6 +4154,17 @@ definitions:
       - station_name
       - contact_person
   # CATEGORY'S MERCHANT
+  OrderingCategories:
+    type: object
+    properties:
+      categories:
+        type: array
+        items:
+          type: object
+          properties:
+            category_id:
+              type: string
+              example: 1
   RegisterCategory:
     type: object
     properties:
@@ -4363,8 +4424,6 @@ definitions:
     type: object
     properties:
       text:
-        type: string
-      support:
         type: string
       support_type_id:
         type: string

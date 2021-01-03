@@ -10,7 +10,7 @@ from scooter.apps.merchants.serializers import SubcategoryProductsModelSerialize
 from scooter.apps.merchants.serializers.categories import (CategoryProductsModelSerializer,
                                                            CategoryWithProductsSerializer, ProductSimpleModelSerializer,
                                                            CategoryWithSubcategoriesSerializer,
-                                                           CategoryProductsSimpleModelSerializer)
+                                                           CategoryProductsSimpleModelSerializer, OrderingSerializer)
 # Viewset
 from scooter.apps.merchants.models import CategoryProducts, Product
 from scooter.utils.viewsets.scooter import ScooterViewSet
@@ -35,7 +35,7 @@ class CategoriesProductsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cr
     search_fields = ('name',)
     ordering_fields = ('created', 'name')
     # Affect the default order
-    ordering = ('-created',)
+    ordering = ('ordering', '-created',)
     filter_fields = ('status',)
     """ Method dispatch in AddMerchantMixin """
     merchant = None
@@ -48,7 +48,7 @@ class CategoriesProductsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cr
         return self.queryset
 
     def get_permissions(self):
-        if self.action in ['create', 'update', 'destroy']:
+        if self.action in ['create', 'update', 'destroy', 'ordering_categories']:
             permission_classes = [IsAuthenticated, IsAccountOwnerMerchant]
         # elif self.action in ['products',
         # 'products/search', 'products_cat', 'level_two', 'level_three', 'subcategories/products']:
@@ -106,6 +106,16 @@ class CategoriesProductsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cr
         category.save()
         data = self.set_response(status=True, data={}, message="Categoría activada correctamente")
         return Response(data=data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['POST'])
+    def ordering_categories(self, request, *args, **kwargs):
+        serializer = OrderingSerializer(data=request.data, context=self.get_serializer_context())
+        serializer.is_valid(raise_exception=True)
+        obj = serializer.save()
+        # data = self.set_response(status=True,
+        #                          data=CategoryProductsModelSerializer(obj).data,
+        #                          message='Se ha registrado un nuevo categoría')
+        return Response(data={'message': 'Categorías ordenada correctamente'}, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['GET'])
     def products(self, request, *args, **kwargs):
