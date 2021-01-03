@@ -36,6 +36,8 @@ urlpatterns = [
     # Marketing
     path('', include('scooter.apps.marketing.urls')),
     # Payments
-    path('', include('scooter.apps.payments.urls'))
+    path('', include('scooter.apps.payments.urls')),
+    # Support
+    path('', include('scooter.apps.support.urls'))
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

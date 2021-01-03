@@ -211,7 +211,7 @@ paths:
         '201':
           description: 'Información de la pregunta'
       tags:
-        - Común
+        - Faq
     get:
       operationId: get_group_faqs
       description: Obtener las preguntas frecuentes
@@ -219,7 +219,7 @@ paths:
         '201':
           description: 'Listado de preguntas'
       tags:
-        - Común
+        - Faq
   /api/v1/commons/faq/:
     post:
       operationId: faq_questions
@@ -234,7 +234,7 @@ paths:
         '201':
           description: 'Información de la pregunta'
       tags:
-        - Común
+        - Faq
     get:
       operationId: get_faqs
       description: Obtener las preguntas frecuentes
@@ -248,7 +248,7 @@ paths:
         '201':
           description: 'Listado de preguntas'
       tags:
-        - Común
+        - Faq
   /api/v1/commons/faq/{question_id}/:
     parameters:
       - name: question_id
@@ -268,7 +268,7 @@ paths:
         '201':
           description: 'Información de la pregunta'
       tags:
-        - Común
+        - Faq
     delete:
       operationId: delete_question
       description: Borra una pregunta
@@ -282,7 +282,92 @@ paths:
         '201':
           description: 'Listado de preguntas'
       tags:
-        - Común
+        - Faq
+  # SUPPORT ====================
+  /api/v1/customers/{customer_id}/support/:
+    parameters:
+      - name: customer_id
+        in: path
+        required: true
+        type: string
+    post:
+      operationId: crete_support
+      description: Abrir ticket de soporte
+      parameters:
+        - name: body
+          in: body
+          description: Abrir ticket de soporte
+          schema:
+            $ref: '#/definitions/CreateSupport'
+      responses:
+        '201':
+          description: 'Información de la pregunta'
+      tags:
+        - Support customers
+    get:
+      operationId: get_supports_customers
+      description: Obtener los soportes por cliente
+      responses:
+        '201':
+          description: 'Listado de preguntas'
+      tags:
+        - Support customers
+  /api/v1/support/{support_id}/messages/:
+    parameters:
+      - name: customer_id
+        in: path
+        required: true
+        type: string
+      - name: support_id
+        in: path
+        required: true
+        type: string
+    post:
+      operationId: create_support_message
+      description: Mandar mensaje a un soporte
+      parameters:
+        - name: body
+          in: body
+          description: Mandar mensaje a un soporte
+          schema:
+            $ref: '#/definitions/CreateSupportMessage'
+      responses:
+        '201':
+          description: 'Información de la pregunta'
+      tags:
+        - Support customers
+    get:
+      operationId: get_supports_messages_customers
+      description: Obtener los mensajes de un soporte
+      responses:
+        '201':
+          description: 'Listado de mensajes'
+      tags:
+        - Support customers
+  /api/v1/support/{support_id}/messages/{message_id}/mark_as_viewed/:
+    parameters:
+      - name: message_id
+        in: path
+        required: true
+        type: string
+      - name: support_id
+        in: path
+        required: true
+        type: string
+    post:
+      operationId: mark_as_viewed_support_message
+      description: Marcar como visto un mensaje
+#      parameters:
+#        - name: body
+#          in: body
+#          description: Marcar como visto un mensaje
+#          schema:
+#            $ref: '#/definitions/CreateSupportMessage'
+      responses:
+        '201':
+          description: 'Información de la pregunta'
+      tags:
+        - Support customers
   # DEVICES
   /api/v1/devices/:
     post:
@@ -3708,6 +3793,8 @@ definitions:
         type: string
         example: true
   # ==== ORDERS
+  RejectOrder:
+    type: object
   RejectOrderDeliveryMan:
     type: object
     properties:
@@ -4173,6 +4260,10 @@ definitions:
         description: Imagen del producto
   UnlockProduct:
     type: object
+  AcceptOrder:
+    type: object
+  AcceptOrderDeliveryMan:
+    type: object
   CustomerCard:
     type: object
     properties:
@@ -4267,6 +4358,32 @@ definitions:
     type: object
     properties:
       name:
+        type: string
+  CreateSupport:
+    type: object
+    properties:
+      text:
+        type: string
+      support:
+        type: string
+      support_type_id:
+        type: string
+      is_to_order:
+        type: string
+      is_to_help:
+        type: string
+      is_to_delivery_man:
+        type: string
+      delivery_man:
+        type: string
+      station:
+        type: string
+      order:
+        type: string
+  CreateSupportMessage:
+    type: object
+    properties:
+      text:
         type: string
 
 

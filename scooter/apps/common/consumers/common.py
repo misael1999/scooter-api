@@ -6,6 +6,7 @@ from django.contrib.auth.models import AnonymousUser
 # Models
 from scooter.apps.orders.models import Order
 
+
 # Send when there are new order
 class GeneralOrderConsumer(AsyncJsonWebsocketConsumer):
 

@@ -1,6 +1,7 @@
 from channels.routing import ProtocolTypeRouter, URLRouter
 from config.settings.middlewares import TokenAuthMiddlewareStack
 import scooter.apps.common.routing as order_routing
+import scooter.apps.support.routing as support_routing
 
 
 # from chat.consumers import ChatConsumer
