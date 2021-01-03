@@ -126,7 +126,7 @@ class CategoryProductsSimpleModelSerializer(serializers.ModelSerializer):
 
 
 class CategorySimpleModelSerializer(serializers.Serializer):
-    category_id = MerchantFilteredPrimaryKeyRelatedField(queryset=CategoryProducts.objects.all(), source="category")
+    id = MerchantFilteredPrimaryKeyRelatedField(queryset=CategoryProducts.objects.all(), source="category")
 
 
 class OrderingSerializer(serializers.Serializer):

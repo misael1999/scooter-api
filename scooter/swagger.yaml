@@ -4162,7 +4162,7 @@ definitions:
         items:
           type: object
           properties:
-            category_id:
+            id:
               type: string
               example: 1
   RegisterCategory:
