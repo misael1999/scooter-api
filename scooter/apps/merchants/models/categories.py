@@ -20,7 +20,7 @@ class CategoryProducts(ScooterModel):
 
     class Meta:
         get_latest_by = 'created'
-        ordering = ['-ordering', '-created']
+        ordering = ['ordering', '-created']
 
 
 class SubcategoryProducts(ScooterModel):
