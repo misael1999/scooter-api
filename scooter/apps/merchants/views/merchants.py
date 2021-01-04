@@ -197,6 +197,8 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             # Mejores calificados
             section_2 = self.get_section_order_by(area_id=area_id, category=category_model,
                                                   section_name="Recomendado por los pedidos",
+                                                  section_description="Te presentamos los comercios con mejor raiting "
+                                                                      "en nuestra plataforma.",
                                                   order_by="-reputation",
                                                   limit=settings.LIMIT_SECTIONS,
                                                   orientation="H",
@@ -205,6 +207,8 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             # Agregados recientemente
             section_3 = self.get_section_order_by(area_id, category=category_model,
                                                   section_name="Agregados recientemente",
+                                                  section_description="Comercios afiliados recientemente a Los "
+                                                                      "Pedidos, conócelos…",
                                                   order_by="-created",
                                                   limit=settings.LIMIT_SECTIONS,
                                                   orientation="H",
@@ -213,6 +217,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             # Listado de comercios
             section_4 = self.get_section_order_by(area_id, category=category_model,
                                                   section_name=category_model.name,
+                                                  section_description="",
                                                   order_by="created",
                                                   limit=20,
                                                   orientation="V",
@@ -249,13 +254,14 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         return {
             'has_data': True,
             'section_name': 'Cerca de ti',
+            'section_description': "Estos son los productos más cercanos según tu ubicación actual.",
             'orientation': 'H',
             'list': MerchantWithAllInfoSerializer(merchants, many=True).data,
             'more': False
         }
 
     # Obtener seccion ordenado por un campo
-    def get_section_order_by(self, area_id, category, section_name, order_by, limit, orientation, filters):
+    def get_section_order_by(self, area_id, category, section_name, section_description, order_by, limit, orientation, filters):
         merchants = Merchant.objects.filter(**filters) \
                         .order_by('-is_open', order_by, '-total_grades')[0:limit]
 
@@ -267,6 +273,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         return {
             'has_data': True,
             'section_name': section_name,
+            'section_description': section_description,
             'orientation': orientation,
             'list': MerchantWithAllInfoSerializer(merchants, many=True).data,
             'more': False
