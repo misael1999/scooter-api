@@ -18,6 +18,10 @@ class CategoryProducts(ScooterModel):
     def __str__(self):
         return self.name
 
+    class Meta:
+        get_latest_by = 'created'
+        ordering = ['-ordering', '-created']
+
 
 class SubcategoryProducts(ScooterModel):
     name = models.CharField(max_length=70)
