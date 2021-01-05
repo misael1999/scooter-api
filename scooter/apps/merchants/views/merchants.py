@@ -44,7 +44,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
     search_fields = ('merchant_name',)
     ordering_fields = ('is_open', 'reputation', 'created')
     ordering = ('-is_open', 'created')
-    filter_fields = ('category', 'subcategory', 'area', 'zone', 'status', 'information_is_complete')
+    filter_fields = ('category', 'subcategory', 'area', 'zone', 'status', 'information_is_complete', 'reputation')
 
     def get_queryset(self):
         if self.action == 'list':
