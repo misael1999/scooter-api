@@ -85,20 +85,26 @@ class CreateSupportModelSerializer(serializers.ModelSerializer):
 
 class CreateMessageSupportSerializer(serializers.Serializer):
     text = serializers.CharField(max_length=600)
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     def create(self, data):
         try:
             support = self.context['support']
             is_to_delivery_man = support.is_to_delivery_man
             customer = support.customer
+            user = data.pop('user')
             delivery_man = support.delivery_man
             station = support.station
+            is_station = user.is_station()
+            receiver_by = station.user if not is_to_delivery_man else delivery_man.user
+            if is_station:
+                receiver_by = customer.user
 
             # Save message
             message = SupportMessage.objects.create(**data,
                                                     support=support,
-                                                    sender_by=customer.user,
-                                                    receiver_by=station.user if not is_to_delivery_man else delivery_man.user
+                                                    sender_by=user,
+                                                    receiver_by=receiver_by
                                                     )
             message_data = SupportMessageSimpleSerializer(message).data
             # Send push notification to station or delivery man
