@@ -16,7 +16,7 @@ class SupportCustomerConsumer(AsyncJsonWebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.room_group_name = ''
-        self.room_name = 'support'
+        self.room_name = 'support-chat'
 
     async def connect(self):
 
@@ -46,7 +46,7 @@ class SupportCustomerConsumer(AsyncJsonWebsocketConsumer):
                 self.channel_name
             )
 
-    async def notify(self, event):
+    async def send_message_support(self, event):
         await self.send_json(event["content"])
 
     async def receive_json(self, content, **kwargs):
