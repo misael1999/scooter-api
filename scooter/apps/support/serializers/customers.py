@@ -111,6 +111,8 @@ class CreateMessageSupportSerializer(serializers.Serializer):
 
             # Send data to station or delivery man via socket
             group_name = 'attend-support-{}'.format(station.id)
+            if is_station:
+                group_name = 'support-chat-{}'.format(support.id)
             async_to_sync(send_message)(group_name=group_name, message=message_data)
             return data
         except ValueError as e:
