@@ -55,6 +55,7 @@ class SupportMessageSimpleSerializer(serializers.ModelSerializer):
 
 
 class SupportModelSimpleSerializer(serializers.ModelSerializer):
+    customer = serializers.StringRelatedField(read_only=True)
     support_status = serializers.StringRelatedField(read_only=True)
     support_status_id = serializers.IntegerField(read_only=True)
     support_type = serializers.StringRelatedField(read_only=True)

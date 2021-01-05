@@ -27,6 +27,7 @@ class CreateSupportModelSerializer(serializers.ModelSerializer):
             'is_to_delivery_man',
             'delivery_man',
             'station',
+            'customer',
             'order'
         )
 
@@ -55,7 +56,6 @@ class CreateSupportModelSerializer(serializers.ModelSerializer):
             sku = generate_sku()
             support = Support.objects.create(
                 sku=sku,
-                customer=customer,
                 user=user,
                 station=station,
                 support_status_id=1,
@@ -73,7 +73,7 @@ class CreateSupportModelSerializer(serializers.ModelSerializer):
             async_to_sync(send_message(group_name=group_name, message=message_data))
             # SupportModelSimpleSerializer(support).data
             return {
-                'support': "siuuuu"
+                'support': SupportModelSimpleSerializer(support).data
             }
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})

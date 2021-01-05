@@ -178,8 +178,8 @@ class OrderReadyMerchantSerializer(serializers.Serializer):
                 station = order.station
                 order.save()
                 send_notification_push_order(user_id=order.user_id,
-                                             title='Tu pedido de {} esta listo'.format(merchant.merchant_name),
-                                             body='Estamos buscando al repartidor más cercano',
+                                             title='Tu pedido de {} esta casi listo'.format(merchant.merchant_name),
+                                             body='Tu pedido esta casi listo',
                                              sound="default",
                                              android_channel_id="messages",
                                              data={"type": "ORDER_READY",

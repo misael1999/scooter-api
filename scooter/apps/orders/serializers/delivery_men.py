@@ -402,7 +402,7 @@ def accept_order_devivery(order, delivery_man):
         order_status = OrderStatus.objects.get(slug_name='pick_up')
         data_message = {
             'title': "Repartidor en camino",
-            'body': "Tu scooter ya va en camino a recolectar tu pedido"
+            'body': "{} está en camino de recolectar tu pedido".format(delivery_man.name)
         }
     else:
         # Check if it is a safe order
@@ -419,7 +419,7 @@ def accept_order_devivery(order, delivery_man):
     if order.is_order_to_merchant:
         type_notification = "ACCEPT_ORDER_DELIVERY"
         send_notification_push_task.delay(user_id=order.merchant.user_id,
-                                          title='Tu Pedirepartidor ya va por el pedido',
+                                          title="{} está en camino de recolectar el pedido".format(delivery_man.name),
                                           body='Numero de pedido {}'.format(order.qr_code),
                                           sound="default",
                                           android_channel_id="messages",
@@ -430,8 +430,8 @@ def accept_order_devivery(order, delivery_man):
                                                 })
 
     send_notification_push_task.delay(user_id=order.user_id,
-                                      title=data_message['title'],
-                                      body=data_message['body'],
+                                      title="{} está en camino de recolectar el pedido".format(delivery_man.name),
+                                      body="Tu pedido esta casí listo",
                                       sound="default",
                                       android_channel_id="messages",
                                       data={"type": type_notification,
@@ -441,4 +441,4 @@ def accept_order_devivery(order, delivery_man):
                                             })
     # async_to_sync(notify_station_accept)(order.station_id, order.id)
     # Notify all delivery men that order was accepted
-    async_to_sync(notify_delivery_men)(order.id, 'ORDER_ACCEPTED')
+    # async_to_sync(notify_delivery_men)(order.id, 'ORDER_ACCEPTED')

@@ -22,7 +22,7 @@ from fcm_django.models import FCMDevice
 class UserModelSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('username', 'is_verified', 'auth_facebook')
+        fields = ('username', 'is_verified', 'auth_facebook', 'id')
 
 
 class AccountVerificationSerializer(serializers.Serializer):

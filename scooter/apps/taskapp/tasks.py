@@ -77,8 +77,8 @@ def send_notification_delivery():
 
 
 # Period Task with crontab
-# @periodic_task(name='reject_orders', run_every=crontab(hour=7, minute=30, day_of_week=1))
-# def create_view_schedules():
+# @periodic_task(name='reject_orders', run_every=crontab(minute=0,hour='8,9,12,13,14,15,18,19,21,22'))
+# def open_or_close_merchants():
 #     pass
 
 
