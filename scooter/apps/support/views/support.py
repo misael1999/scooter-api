@@ -1,4 +1,4 @@
-from django_filters import OrderingFilter
+from rest_framework.filters import OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins
 from rest_framework.permissions import IsAuthenticated
