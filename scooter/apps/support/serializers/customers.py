@@ -114,7 +114,7 @@ class CreateMessageSupportSerializer(serializers.Serializer):
             if is_station:
                 group_name = 'support-chat-{}'.format(support.id)
             async_to_sync(send_message)(group_name=group_name, message=message_data)
-            return SupportMessageSimpleSerializer(message_data).data
+            return message_data
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
         except Exception as ex:
