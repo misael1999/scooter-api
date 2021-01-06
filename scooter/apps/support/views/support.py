@@ -13,6 +13,7 @@ class SupportMessageViewSet(ScooterViewSet, AddSupportMixin, mixins.ListModelMix
     serializer_class = SupportMessageSimpleSerializer
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     ordering = ('created',)
+    ordering_fields = ('created',)
     # filter_fields = ('status',)
     permission_classes = (IsAuthenticated,)
     support = None
