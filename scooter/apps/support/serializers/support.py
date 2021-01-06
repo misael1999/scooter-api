@@ -49,7 +49,8 @@ class SupportMessageSimpleSerializer(serializers.ModelSerializer):
             'receiver_by',
             'viewed',
             'viewed_date',
-            'support'
+            'support',
+            'created'
         )
         read_only_fields = fields
 
