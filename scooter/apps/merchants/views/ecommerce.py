@@ -32,8 +32,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.gis.db.models.functions import Distance
 
 
-class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
-                      mixins.ListModelMixin):
+class EcommerceMerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
+                               mixins.ListModelMixin):
     """ Handle signup and update of merchant """
     queryset = Merchant.objects.all()
     serializer_class = MerchantWithAllInfoSerializer
