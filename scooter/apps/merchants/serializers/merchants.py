@@ -54,9 +54,10 @@ class MerchantUserSimpleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Merchant
+        geo_field = 'point'
         fields = ('id', 'email', 'user', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
                   'information_is_complete', 'category', 'subcategory', 'reputation', 'description',
-                  'approximate_preparation_time', 'is_open', 'from_preparation_time',
+                  'approximate_preparation_time', 'is_open', 'from_preparation_time', 'point',
                   'to_preparation_time', 'type_menu', 'area', 'zone', 'full_address', 'delivery_rules',
                   'merchant_level', 'operational_zones_activated', 'restricted_zones_activated', 'accept_payment_online'
 )

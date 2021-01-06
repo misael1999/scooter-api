@@ -395,6 +395,8 @@ class RetryOrderSerializer(serializers.Serializer):
             order.station = data['station']
             order.maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=settings.TIME_RESPONSE)
             if order.is_order_to_merchant:
+                if not order.merchant.is_open:
+                    raise ValueError('El comercio ha cerrado')
                 order.order_status = OrderStatus.objects.get(slug_name="await_confirmation_merchant")
             else:
                 order.order_status = OrderStatus.objects.get(slug_name="await_delivery_man")
@@ -425,9 +427,22 @@ class RetryOrderSerializer(serializers.Serializer):
                                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                               })
             else:
+                station = data['station']
+                if station.assign_delivery_manually:
+                    send_notification_push_order_with_sound(user_id=station.user_id,
+                                                            title='Pedido nuevo',
+                                                            body='Solicitud nueva',
+                                                            sound="alarms.mp3",
+                                                            android_channel_id="alarms",
+                                                            data={"type": "NEW_ORDER",
+                                                                  "order_id": order.id,
+                                                                  "message": "Pedido de nuevo",
+                                                                  'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                                                  })
                 # Get nearest delivery man
-                send_order_delivery(location_selected=location_selected.point, station=data['station'],
-                                    order=order)
+                else:
+                    send_order_delivery(location_selected=location_selected.point, station=data['station'],
+                                        order=order)
 
             return order.id
         except ValueError as e:
