@@ -48,6 +48,8 @@ class EcommerceMerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
     @action(detail=False, methods=['GET'])
     def search(self, request, *args, **kwargs):
         try:
+
+            
             
             pass
         except Exception as ex:
