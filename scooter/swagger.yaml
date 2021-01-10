@@ -341,6 +341,30 @@ paths:
           description: 'Listado de preguntas'
       tags:
         - Support customers
+  /api/v1/stations/{station_id}/support/{support_id}/open_or_close/:
+    parameters:
+      - name: station_id
+        in: path
+        required: true
+        type: string
+      - name: support_id
+        in: path
+        required: true
+        type: string
+    patch:
+      operationId: open_or_close_support
+      description: Abrir o cerrar ticket de soporte
+      parameters:
+        - name: body
+          in: body
+          description: Abrir o cerrar ticket de soporte
+          schema:
+            $ref: '#/definitions/OpenOrCloseSupport'
+      responses:
+        '201':
+          description: 'Información'
+      tags:
+        - Support Stations
   /api/v1/support/{support_id}/messages/:
     parameters:
       - name: customer_id
@@ -4444,6 +4468,10 @@ definitions:
     properties:
       text:
         type: string
+  OpenOrCloseSupport:
+    type: object
+    properties:
+      is_open: boolean
 
 
 
