@@ -144,7 +144,8 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
                 self.set_error_response(status=False, field='Detail', message='No existe el área'))
         except Exception as ex:
             return Response(
-                self.set_error_response(status=False, field='Detail', message='Error al consultar el area en comercios'))
+                self.set_error_response(status=False, field='Detail',
+                                        message='Error al consultar el area en comercios'))
 
     @action(detail=True, methods=('PATCH', 'PUT'))
     def update_availability(self, request, *args, **kwargs):
@@ -167,7 +168,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
 
     # Cache requested url for each user for 2 hours
     @action(detail=False, methods=['GET'])
-    @method_decorator(cache_page(60 * 3))
+    @method_decorator(cache_page(60 * 2))
     @method_decorator(vary_on_cookie)
     def home(self, request, *args, **kwargs):
         try:
@@ -196,13 +197,14 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
                 return Response(data=data, status=status.HTTP_200_OK)
             # Mejores calificados
             section_2 = self.get_section_order_by(area_id=area_id, category=category_model,
-                                                  section_name="Recomendado por los pedidos",
+                                                  section_name="Top de Los Pedidos",
                                                   section_description="Te presentamos los comercios con mejor raiting "
                                                                       "en nuestra plataforma.",
                                                   order_by="-reputation",
                                                   limit=settings.LIMIT_SECTIONS,
                                                   orientation="H",
-                                                  filters=filters_shared)
+                                                  filters=filters_shared,
+                                                  picture='https://storage.googleapis.com/scooter_app/iconos_home/Recomendado.png')
 
             # Agregados recientemente
             section_3 = self.get_section_order_by(area_id, category=category_model,
@@ -212,7 +214,8 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
                                                   order_by="-created",
                                                   limit=settings.LIMIT_SECTIONS,
                                                   orientation="H",
-                                                  filters=filters_shared)
+                                                  filters=filters_shared,
+                                                  picture='https://storage.googleapis.com/scooter_app/iconos_home/Recientemente.png')
 
             # Listado de comercios
             section_4 = self.get_section_order_by(area_id, category=category_model,
@@ -221,7 +224,8 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
                                                   order_by="created",
                                                   limit=20,
                                                   orientation="V",
-                                                  filters=filters_shared)
+                                                  filters=filters_shared
+                                                  )
 
             sections.append(nearest)
             sections.append(section_2)
@@ -257,11 +261,13 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             'section_description': "Estos son los productos más cercanos según tu ubicación actual.",
             'orientation': 'H',
             'list': MerchantWithAllInfoSerializer(merchants, many=True).data,
-            'more': False
+            'more': False,
+            'picture': 'https://storage.googleapis.com/scooter_app/iconos_home/Cerca%20de%20ti.png'
         }
 
     # Obtener seccion ordenado por un campo
-    def get_section_order_by(self, area_id, category, section_name, section_description, order_by, limit, orientation, filters):
+    def get_section_order_by(self, area_id, category, section_name, section_description, order_by, limit, orientation,
+                             filters, picture):
         merchants = Merchant.objects.filter(**filters) \
                         .order_by('-is_open', order_by, '-total_grades')[0:limit]
 
@@ -276,7 +282,8 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             'section_description': section_description,
             'orientation': orientation,
             'list': MerchantWithAllInfoSerializer(merchants, many=True).data,
-            'more': False
+            'more': False,
+            'picture': picture
         }
 
     # Obtener secciones con filtros en los comercios

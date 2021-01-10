@@ -58,6 +58,7 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
                     'type': 1,
                     'zone': {},
                     'area': area_id,
+                    'station_id': station.id,
                     'message': 'En tu zona no hay servicios de restaurantes o supermercados'
                 }, status=status.HTTP_200_OK)
             area_id = areas.last().id
@@ -72,6 +73,7 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
                     'zone': {},
                     'type': 2,
                     'area': area_id,
+                    'station_id': station.id,
                     'message': message
                 }, status=status.HTTP_200_OK)
 
@@ -92,6 +94,7 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
                                 'zone': StationZoneSimpleSerializer(zone).data,
                                 'type': 2,
                                 'area_id': area_id,
+                                'station_id': station.id,
                                 'message': message
                             }, status=status.HTTP_200_OK)
                     else:
@@ -104,6 +107,7 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
                             'zone': StationZoneSimpleSerializer(zone).data,
                             'type': 2,
                             'area_id': area_id,
+                            'station_id': station.id,
                             'message': message
                         }, status=status.HTTP_200_OK)
 
@@ -111,6 +115,7 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
                 'status': True,
                 'type': 0,
                 'area_id': area_id,
+                'station_id': station.id,
                 'message': 'Si hay cobertura'
             }, status=status.HTTP_200_OK)
         except ValueError as e:
