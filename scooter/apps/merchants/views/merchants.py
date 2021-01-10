@@ -224,7 +224,8 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
                                                   order_by="created",
                                                   limit=20,
                                                   orientation="V",
-                                                  filters=filters_shared
+                                                  filters=filters_shared,
+                                                  picture=""
                                                   )
 
             sections.append(nearest)
