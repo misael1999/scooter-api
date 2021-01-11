@@ -208,7 +208,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
 
             # Agregados recientemente
             section_3 = self.get_section_order_by(area_id, category=category_model,
-                                                  section_name="Agregados recientemente",
+                                                  section_name="Lo nuevo",
                                                   section_description="Comercios afiliados recientemente a Los "
                                                                       "Pedidos, conócelos…",
                                                   order_by="-created",
@@ -259,7 +259,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         return {
             'has_data': True,
             'section_name': 'Cerca de ti',
-            'section_description': "Estos son los productos más cercanos según tu ubicación actual.",
+            'section_description': "Estos son los comercios más cercanos según tu ubicación actual.",
             'orientation': 'H',
             'list': MerchantWithAllInfoSerializer(merchants, many=True).data,
             'more': False,
