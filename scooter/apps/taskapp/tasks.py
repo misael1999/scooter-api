@@ -1,5 +1,7 @@
 # Django
 from datetime import timedelta
+
+from django.db.models import Q
 from django.utils import timezone
 # Functions
 from scooter.apps.common.models import OrderStatus
@@ -53,9 +55,15 @@ def send_notice_order_delivery(order_id):
 def send_notification_delivery():
     """ Send notification delivery man when nobody response """
     now = timezone.localtime(timezone.now())
-    offset = now - timedelta(seconds=120)
-    orders = Order.objects.filter(order_ready_date__lte=offset,
-                                  order_status__slug_name__in=["await_delivery_man"])
+    offset = now - timedelta(seconds=90)
+    # orders = Order.objects.filter(order_ready_date__lte=offset,
+    #                               order_status__slug_name__in=["await_delivery_man"])
+    orders = Order.objects.filter(Q(order_ready_date__lte=offset,
+                                    order_status__slug_name__in=["await_delivery_man"]
+                                    ) | Q(order_status__slug_name__in=["await_delivery_man"],
+                                          maximum_response_time__lte=offset,
+                                          merchant=None,
+                                          ))
     if orders:
         for order in orders:
             station = order.station
@@ -82,28 +90,28 @@ def send_notification_delivery():
 #     pass
 
 
-@periodic_task(name='reject_orders', run_every=timedelta(minutes=1))
-def reject_orders():
-    """ Verify orders and reject when nobody responds """
-    now = timezone.localtime(timezone.now())
-    offset = now + timedelta(seconds=0)
-    orders = Order.objects.filter(maximum_response_time__lte=offset,
-                                  merchant=None,
-                                  order_status__slug_name__in=["await_delivery_man", "without_delivery"])
-    if orders:
-        order_status = OrderStatus.objects.get(slug_name='rejected')
-        for order in orders:
-            # Function
-            send_notification_push_order(order.user_id, title='Pedido rechazado',
-                                         body='No hubo respuesta por parte de los repartidores',
-                                         sound="default",
-                                         android_channel_id="messages",
-                                         data={"type": "REJECT_ORDER",
-                                               "order_id": order.id,
-                                               "message": "No hubo respuesta del pedido",
-                                               'click_action': 'FLUTTER_NOTIFICATION_CLICK'})
-        orders.update(order_status=order_status,
-                      reason_rejection="Pedido ignorado por el central")
+# @periodic_task(name='reject_orders', run_every=timedelta(minutes=1))
+# def reject_orders():
+#     """ Verify orders and reject when nobody responds """
+#     now = timezone.localtime(timezone.now())
+#     offset = now + timedelta(seconds=0)
+#     orders = Order.objects.filter(maximum_response_time__lte=offset,
+#                                   merchant=None,
+#                                   order_status__slug_name__in=["await_delivery_man", "without_delivery"])
+#     if orders:
+#         order_status = OrderStatus.objects.get(slug_name='rejected')
+#         for order in orders:
+#             # Function
+#             send_notification_push_order(order.user_id, title='Pedido rechazado',
+#                                          body='No hubo respuesta por parte de los repartidores',
+#                                          sound="default",
+#                                          android_channel_id="messages",
+#                                          data={"type": "REJECT_ORDER",
+#                                                "order_id": order.id,
+#                                                "message": "No hubo respuesta del pedido",
+#                                                'click_action': 'FLUTTER_NOTIFICATION_CLICK'})
+#         orders.update(order_status=order_status,
+#                       reason_rejection="Pedido ignorado por el central")
 
 
 @periodic_task(name='ignore_orders', run_every=timedelta(minutes=1))
