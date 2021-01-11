@@ -6,6 +6,7 @@ from django.utils import timezone
 # Functions
 from scooter.apps.common.models import OrderStatus
 from scooter.apps.delivery_men.models import DeliveryMan
+from scooter.apps.merchants.models import Merchant, MerchantSchedule
 from scooter.utils.functions import send_mail_verification, send_order_delivery, return_money_user, \
     send_notification_push_order_with_sound
 # Celery
@@ -54,16 +55,17 @@ def send_notice_order_delivery(order_id):
 @periodic_task(name='send_notification_delivery', run_every=timedelta(minutes=2))
 def send_notification_delivery():
     """ Send notification delivery man when nobody response """
-    now = timezone.localtime(timezone.now())
-    offset = now - timedelta(seconds=90)
+    # now = timezone.localtime(timezone.now())
+    # offset = now - timedelta(seconds=90)
     # orders = Order.objects.filter(order_ready_date__lte=offset,
     #                               order_status__slug_name__in=["await_delivery_man"])
-    orders = Order.objects.filter(Q(order_ready_date__lte=offset,
-                                    order_status__slug_name__in=["await_delivery_man"]
-                                    ) | Q(order_status__slug_name__in=["await_delivery_man"],
-                                          maximum_response_time__lte=offset,
-                                          merchant=None,
-                                          ))
+    orders = Order.objects.filter(order_status__slug_name__in=["await_delivery_man"])
+    # orders = Order.objects.filter(Q(order_ready_date__lte=offset,
+    #                                 order_status__slug_name__in=["await_delivery_man"]
+    #                                 ) | Q(order_status__slug_name__in=["await_delivery_man"],
+    #                                       maximum_response_time__lte=offset,
+    #                                       merchant=None,
+    #                                       ))
     if orders:
         for order in orders:
             station = order.station
@@ -87,7 +89,11 @@ def send_notification_delivery():
 # Period Task with crontab
 # @periodic_task(name='reject_orders', run_every=crontab(minute=0,hour='8,9,12,13,14,15,18,19,21,22'))
 # def open_or_close_merchants():
-#     pass
+#     today = timezone.localtime().strftime("%A").lower()
+#     merchants = Merchant.objects.filter(status_id=1)
+#     for merchant in merchants:
+#         MerchantSchedule.objects.get()
+
 
 
 # @periodic_task(name='reject_orders', run_every=timedelta(minutes=1))
