@@ -36,7 +36,8 @@ class CreateSupportModelSerializer(serializers.ModelSerializer):
             customer = self.context['customer']
             data['customer'] = customer
         # Verify if the customer has not support open
-        support = Support.objects.filter(station=data['station'], customer=data['customer'], support_status_id=1)
+        support = Support.objects.filter(station=data['station'], customer=data['customer'], support_status_id=1,
+                                         is_open=True)
         if support.exists():
             raise serializers.ValidationError('Hay un soporte abierto')
         return data
