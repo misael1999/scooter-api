@@ -125,9 +125,9 @@ class CreateMessageSupportSerializer(serializers.Serializer):
             # Send data to station or delivery man via socket
             group_name = 'attend-support-{}'.format(station.id)
             user_id_to = station.user_id
-            full_name = "Los Pedidos"
+            full_name = customer.name
             if is_station:
-                full_name = customer.name
+                full_name = "Los Pedidos"
                 user_id_to = customer.user_id
                 group_name = 'support-chat-{}'.format(support.id)
 
