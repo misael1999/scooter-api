@@ -222,7 +222,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
                                                   section_name=category_model.name,
                                                   section_description="",
                                                   order_by="created",
-                                                  limit=20,
+                                                  limit=30,
                                                   orientation="V",
                                                   filters=filters_shared,
                                                   picture=""

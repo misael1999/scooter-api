@@ -11,6 +11,8 @@ from scooter.apps.support.serializers.support import (SupportModelSimpleSerializ
 from scooter.apps.support.utils import send_message
 # Django channels
 from asgiref.sync import async_to_sync
+from scooter.apps.taskapp.tasks import send_notification_push_task, send_email_task
+
 
 
 class CreateSupportModelSerializer(serializers.ModelSerializer):
@@ -71,6 +73,16 @@ class CreateSupportModelSerializer(serializers.ModelSerializer):
             # Send push notification to station or delivery man
             # Send data to station or delivery man via socket
             group_name = 'attend-support-{}'.format(station.id)
+            send_notification_push_task.delay(user_id=station.user_id,
+                                              title=customer.name,
+                                              body=text,
+                                              sound="new_message",
+                                              android_channel_id="new_messages",
+                                              data={"type": "NEW_MESSAGE_SUPPORT",
+                                                    "support_id": support.id,
+                                                    "message": "Pedido de nuevo",
+                                                    'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                                    })
             async_to_sync(send_message(group_name=group_name, message=message_data))
             # SupportModelSimpleSerializer(support).data
             return {
@@ -112,8 +124,23 @@ class CreateMessageSupportSerializer(serializers.Serializer):
 
             # Send data to station or delivery man via socket
             group_name = 'attend-support-{}'.format(station.id)
+            user_id_to = station.user_id
+            full_name = "Los Pedidos"
             if is_station:
+                full_name = customer.name
+                user_id_to = customer.user_id
                 group_name = 'support-chat-{}'.format(support.id)
+
+            send_notification_push_task.delay(user_id=user_id_to,
+                                              title=full_name,
+                                              body=data["text"],
+                                              sound="new_message",
+                                              android_channel_id="new_messages",
+                                              data={"type": "NEW_MESSAGE_SUPPORT",
+                                                    "support_id": support.id,
+                                                    "message": "Pedido de nuevo",
+                                                    'click_action': 'FLUTTER_NOTIFICATION_CLICK'
+                                                    })
             async_to_sync(send_message)(group_name=group_name, message=message_data)
             return message_data
         except ValueError as e:
