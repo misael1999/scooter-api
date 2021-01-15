@@ -108,7 +108,6 @@ def open_or_close_merchants():
                 merchant.is_open = False
                 merchants_to_update.append(merchant)
         except MerchantSchedule.DoesNotExist():
-            print("Entro")
             pass
     Merchant.objects.bulk_update(merchants_to_update, ['is_open'])
 

@@ -84,6 +84,11 @@ class OrderWithDetailModelSerializer(ScooterModelSerializer):
     order_status = OrderStatusModelSerializer(read_only=True)
     rated_order = RatingOrderSerializer(required=False, read_only=True)
     card = CardModelSerializer(read_only=True)
+    supports = serializers.SerializerMethodField('get_supports', read_only=True)
+
+    def get_supports(self, order):
+        qs = order.supports.filter(is_open=True).values_list('id', flat=True)
+        return qs
 
     class Meta:
         model = Order
@@ -97,4 +102,6 @@ class OrderWithDetailModelSerializer(ScooterModelSerializer):
                   'card', 'supports'
                   )
         read_only_fields = fields
+
+
 
