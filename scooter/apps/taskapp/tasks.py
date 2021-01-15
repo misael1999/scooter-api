@@ -90,7 +90,7 @@ def send_notification_delivery():
 @periodic_task(name='close_or_open_merchants', run_every=crontab(minute=0, hour='8,9,12,13,14,15,16,17,18,19,20,21,22'))
 def open_or_close_merchants():
     today = timezone.localtime().strftime("%A").lower()
-    current_hour = timezone.localtime(timezone.now()).strftime('%H:%M:%S')
+    current_hour = (timezone.localtime(timezone.now()) + timedelta(minutes=15)).strftime('%H:%M:%S')
     merchants_to_update = []
     merchants = Merchant.objects.filter(status_id=1)
     for merchant in merchants:

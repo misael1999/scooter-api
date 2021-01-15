@@ -30,7 +30,9 @@ class Support(ScooterModel):
     finish_date = models.DateTimeField(null=True, blank=True)
     order_sku = models.CharField(max_length=10, null=True, blank=True)
     order_details = models.TextField(null=True, blank=True)
-    order = models.ForeignKey('orders.Order', null=True, blank=True, on_delete=models.DO_NOTHING)
+    order = models.ForeignKey('orders.Order',
+                              related_name="supports",
+                              null=True, blank=True, on_delete=models.DO_NOTHING)
     delivery_man = models.ForeignKey('delivery_men.DeliveryMan', blank=True, null=True, on_delete=models.DO_NOTHING)
     customer = models.ForeignKey('customers.Customer', blank=True, null=True, on_delete=models.DO_NOTHING)
     user = models.ForeignKey('users.User', blank=True, null=True, on_delete=models.DO_NOTHING, help_text="")

@@ -42,7 +42,8 @@ class MerchantWithAllInfoSerializer(serializers.ModelSerializer):
                   'information_is_complete', 'category', 'total_grades', 'subcategory', 'reputation', 'description',
                   'approximate_preparation_time', 'full_address', 'is_open', 'point', 'from_preparation_time',
                   'to_preparation_time', 'type_menu', 'zone', 'area', 'delivery_rules', 'merchant_level',
-                  'operational_zones_activated', 'restricted_zones_activated', 'accept_payment_online')
+                  'operational_zones_activated', 'restricted_zones_activated', 'accept_payment_online',
+                  'has_rate_operating', 'increment_price_operating')
         read_only_fields = fields
 
 
@@ -59,7 +60,8 @@ class MerchantUserSimpleSerializer(serializers.ModelSerializer):
                   'information_is_complete', 'category', 'subcategory', 'reputation', 'description',
                   'approximate_preparation_time', 'is_open', 'from_preparation_time', 'point',
                   'to_preparation_time', 'type_menu', 'area', 'zone', 'full_address', 'delivery_rules',
-                  'merchant_level', 'operational_zones_activated', 'restricted_zones_activated', 'accept_payment_online'
+                  'merchant_level', 'operational_zones_activated', 'restricted_zones_activated', 'accept_payment_online',
+                  'has_rate_operating', 'increment_price_operating'
 )
         read_only_fields = fields
 
@@ -140,7 +142,8 @@ class MerchantInfoSerializer(serializers.ModelSerializer):
                   'information_is_complete', 'reputation', 'description', 'total_grades',
                   'approximate_preparation_time', 'is_open', 'point', 'from_preparation_time',
                   'to_preparation_time', 'schedules', 'full_address', 'zone', 'area', 'delivery_rules',
-                  'merchant_level', 'operational_zones_activated', 'restricted_zones_activated', 'accept_payment_online')
+                  'merchant_level', 'operational_zones_activated', 'restricted_zones_activated', 'accept_payment_online',
+                  'has_rate_operating', 'increment_price_operating')
         read_only_fields = fields
 
 
