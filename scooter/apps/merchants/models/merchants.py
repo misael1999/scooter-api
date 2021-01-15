@@ -32,6 +32,9 @@ class Merchant(ScooterModel):
     from_preparation_time = models.FloatField(default=0)
     to_preparation_time = models.FloatField(default=0)
     full_address = models.TextField(blank=True, null=True)
+    # Tarifa extra
+    has_rate_operating = models.BooleanField(default=False)
+    increment_price_operating = models.FloatField(default=0)
     # stats
     total_grades = models.IntegerField(default=0)
     reputation = models.FloatField(default=0)
@@ -77,6 +80,7 @@ class MerchantDeliveryRule(ScooterModel):
 class MerchantSchedule(ScooterModel):
     merchant = models.ForeignKey(Merchant, on_delete=models.CASCADE, related_name="schedules")
     schedule = models.ForeignKey('common.Schedule', on_delete=models.DO_NOTHING)
+    schedule_name = models.CharField(null=True, blank=True, max_length=15)
     from_hour = models.TimeField()
     to_hour = models.TimeField()
     is_open = models.BooleanField(default=True)
