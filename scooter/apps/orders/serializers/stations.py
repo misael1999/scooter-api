@@ -83,7 +83,7 @@ class RejectOrderStationSerializer(serializers.Serializer):
                                               title='Pedido rechazado',
                                               body='Se ha rechazado tu pedido',
                                               sound="default",
-                                              data={"type": "REJECT_ORDER",
+                                              data={"type": "REJECT_ORDER_NOT_WORKING",
                                                     "order_id": instance.id,
                                                     'click_action': 'FLUTTER_NOTIFICATION_CLICK'},
                                               android_channel_id="messages")
@@ -112,7 +112,7 @@ class CancelOrderStationSerializer(serializers.Serializer):
                                               title='Pedido cancelado por la central',
                                               body='Se ha cancelo tu pedido por {}'.format(data['reason_rejection']),
                                               sound="default",
-                                              data={"type": "REJECT_ORDER",
+                                              data={"type": "REJECT_ORDER_NOT_WORKING",
                                                     "order_id": instance.id,
                                                     'click_action': 'FLUTTER_NOTIFICATION_CLICK'},
                                               android_channel_id="messages")

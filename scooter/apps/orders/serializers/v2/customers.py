@@ -167,7 +167,9 @@ class CreateOrderSerializer(serializers.ModelSerializer):
 
             # Save detail order
             if details and is_order_to_merchant:
-                resp = self.create_details_merchant(details=details, order=order)
+                resp = self.create_details_merchant(details=details, order=order,
+                                                    increment_price=merchant.increment_price_operating,
+                                                    has_rate_operating=merchant.has_rate_operating)
                 details_to_conekta = resp['details_to_conekta']
             elif details:
                 details_to_save = [OrderDetail(**detail, order=order) for detail in details]
@@ -331,7 +333,7 @@ class CreateOrderSerializer(serializers.ModelSerializer):
             print(e.message)
             raise ValueError('Ah ocurrido un error al realizar el cobro')
 
-    def create_details_merchant(self, details, order):
+    def create_details_merchant(self, details, order, has_rate_operating, increment_price):
         details_to_save = []
         details_to_conekta = []
         price_order = 0.0
@@ -381,7 +383,9 @@ class CreateOrderSerializer(serializers.ModelSerializer):
             OrderDetailMenuOption.objects.bulk_create(details_options_to_save)
 
         order.order_price = price_order
-        order.total_order = price_order + order.service_price
+        order.total_order = price_order + order.service_price + increment_price
+        order.increment_price_operating = increment_price
+        order.has_rate_operating = has_rate_operating
         order.save()
 
         return {'details_to_save': details_to_save, 'details_to_conekta': details_to_conekta}

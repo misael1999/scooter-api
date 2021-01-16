@@ -23,6 +23,7 @@ class CreateSupportModelSerializer(serializers.ModelSerializer):
         model = Support
         fields = (
             'text',
+            'issue',
             'support_type',
             'is_to_order',
             'is_to_help',

@@ -32,6 +32,8 @@ class Order(ScooterModel):
     merchant_location = models.PointField(geography=True, null=True, blank=True)
     order_price = models.FloatField(null=True, blank=True)
     total_order = models.FloatField(null=True, blank=True)
+    increment_price_operating = models.FloatField(default=0)
+    has_rate_operating = models.BooleanField(default=False)
     is_delivery_by_store = models.BooleanField(default=False)
     is_order_to_merchant = models.BooleanField(default=False)
     promotion = models.ForeignKey('customers.CustomerPromotion', blank=True, null=True, on_delete=models.DO_NOTHING)
