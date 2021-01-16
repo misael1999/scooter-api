@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from scooter.apps.common.mixins import AddSupportMixin
+from scooter.apps.support.permissions.support import IsStationOrOwnerCustomer
 from scooter.apps.support.serializers import SupportMessageSimpleSerializer, CreateMessageSupportSerializer
 from scooter.utils.viewsets import ScooterViewSet
 
@@ -15,7 +16,7 @@ class SupportMessageViewSet(ScooterViewSet, AddSupportMixin, mixins.ListModelMix
     ordering = ('created',)
     ordering_fields = ('created',)
     # filter_fields = ('status',)
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, IsStationOrOwnerCustomer)
     support = None
 
     def get_queryset(self):
