@@ -1,7 +1,10 @@
 from rest_framework import serializers
 # Models
 from scooter.apps.common.models import TypeAddress
-
+from django.core.files.base import ContentFile
+import base64
+import six
+import uuid
 
 class TypeAddressModelSerializer(serializers.ModelSerializer):
 
@@ -15,10 +18,6 @@ class TypeAddressModelSerializer(serializers.ModelSerializer):
 class Base64ImageField(serializers.ImageField):
 
     def to_internal_value(self, data):
-        from django.core.files.base import ContentFile
-        import base64
-        import six
-        import uuid
 
         if isinstance(data, six.string_types):
             if 'data:' in data and ';base64,' in data:

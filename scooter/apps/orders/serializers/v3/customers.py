@@ -2,38 +2,31 @@
 from datetime import timedelta
 
 from django.conf import settings
-from django.contrib.gis.geos import Point
-from django.db.models import Avg
 from django.utils import timezone
 from rest_framework import serializers
 # Serializers
 from scooter.apps.customers.serializers import PointSerializer
 from scooter.apps.merchants.models import Merchant
-from scooter.apps.orders.models.ratings import RatingOrder
-from scooter.apps.orders.serializers.v2.orders import DetailOrderSerializer, OrderWithDetailModelSerializer
+from scooter.apps.orders.serializers.v2 import generate_qr_code, valid_promotion, get_ref_location, send_order_delivery
+from scooter.apps.orders.serializers.v2.orders import DetailOrderSerializer
 # Models
-from scooter.apps.orders.models.orders import (OrderDetail, HistoryRejectedOrders, OrderDetailMenu,
+from scooter.apps.orders.models.orders import (OrderDetail, OrderDetailMenu,
                                                OrderDetailMenuOption)
 from scooter.apps.payments.models import Card
-from scooter.apps.stations.models import Station, StationService, MemberStation
-from scooter.apps.common.models import Service, OrderStatus, Notification
-from scooter.apps.customers.models import CustomerAddress, CustomerPromotion
+from scooter.apps.stations.models import Station, StationService
+from scooter.apps.common.models import Service, OrderStatus
+from scooter.apps.customers.models import CustomerAddress
 from scooter.apps.orders.models.orders import Order
 # Functions channels
-from scooter.apps.orders.utils.orders import notify_merchants, notify_delivery_men, send_order_to_station_channel
-from asgiref.sync import async_to_sync
 # Serializers primary field
 from scooter.apps.common.serializers.common import CustomerFilteredPrimaryKeyRelatedField
 # Task Celery
-from scooter.apps.taskapp.tasks import send_notification_push_task, send_email_task
+from scooter.apps.taskapp.tasks import send_notification_push_task
 # Methods helpers
-from scooter.apps.orders.serializers.orders import (calculate_service_price,
-                                                    get_nearest_delivery_man, is_free_order)
+from scooter.apps.orders.serializers.orders import (calculate_service_price, is_free_order)
 # Utilities
 import random
-from string import ascii_uppercase, digits
-from scooter.utils.functions import (send_notification_push_order, send_notification_push_order_with_sound,
-                                     send_mail_verification)
+from scooter.utils.functions import (send_notification_push_order_with_sound,)
 # Conekta
 import conekta
 
@@ -50,8 +43,7 @@ class CurrentLocationAddressSerializer(serializers.ModelSerializer):
                   "references", "point")
 
 
-class CreateOrderSerializer(serializers.ModelSerializer):
-    """ Create new order for customer"""
+class CreateOrderV3Serializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     details = DetailOrderSerializer(many=True, required=False, allow_null=True)
     station_id = serializers.PrimaryKeyRelatedField(queryset=Station.objects.all(),
@@ -167,7 +159,9 @@ class CreateOrderSerializer(serializers.ModelSerializer):
 
             # Save detail order
             if details and is_order_to_merchant:
-                resp = self.create_details_merchant(details=details, order=order)
+                resp = self.create_details_merchant(details=details, order=order,
+                                                    increment_price=merchant.increment_price_operating,
+                                                    has_rate_operating=merchant.has_rate_operating)
                 details_to_conekta = resp['details_to_conekta']
             elif details:
                 details_to_save = [OrderDetail(**detail, order=order) for detail in details]
@@ -331,7 +325,7 @@ class CreateOrderSerializer(serializers.ModelSerializer):
             print(e.message)
             raise ValueError('Ah ocurrido un error al realizar el cobro')
 
-    def create_details_merchant(self, details, order):
+    def create_details_merchant(self, details, order, has_rate_operating, increment_price):
         details_to_save = []
         details_to_conekta = []
         price_order = 0.0
@@ -381,274 +375,9 @@ class CreateOrderSerializer(serializers.ModelSerializer):
             OrderDetailMenuOption.objects.bulk_create(details_options_to_save)
 
         order.order_price = price_order
-        order.total_order = price_order + order.service_price
+        order.total_order = price_order + order.service_price + increment_price
+        order.increment_price_operating = increment_price
+        order.has_rate_operating = has_rate_operating
         order.save()
 
         return {'details_to_save': details_to_save, 'details_to_conekta': details_to_conekta}
-
-
-class RetryOrderSerializer(serializers.Serializer):
-    station_id = serializers.PrimaryKeyRelatedField(queryset=Station.objects.all(), source="station")
-
-    def update(self, order, data):
-        try:
-            order.station = data['station']
-            order.maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=settings.TIME_RESPONSE)
-            if order.is_order_to_merchant:
-                if not order.merchant.is_open:
-                    raise ValueError('El comercio ha cerrado')
-                order.order_status = OrderStatus.objects.get(slug_name="await_confirmation_merchant")
-            else:
-                order.order_status = OrderStatus.objects.get(slug_name="await_delivery_man")
-
-            order.save()
-            location_selected = None
-
-            if order.order_status.slug_name == "pick_up":
-                location_selected = order.from_address.point
-            else:
-                location_selected = get_ref_location(order)
-
-            # Get list that excludes delivery men that are in the history of rejected orders
-            list_exclude = HistoryRejectedOrders.objects.filter(
-                order=order
-            ).values_list('delivery_man_id', flat=True)
-
-            if order.is_order_to_merchant:
-                async_to_sync(notify_merchants)(order.merchant.id, order.id, 'NEW_ORDER')
-                send_notification_push_order_with_sound(user_id=order.merchant.user_id,
-                                                        title='Pedido entrante',
-                                                        body='Ha recibido un nuevo pedido',
-                                                        sound="ringtone.mp3",
-                                                        android_channel_id="alarms",
-                                                        data={"type": "NEW_ORDER",
-                                                              "order_id": order.id,
-                                                              "message": "Pedido de nuevo",
-                                                              'click_action': 'FLUTTER_NOTIFICATION_CLICK'
-                                                              })
-            else:
-                station = data['station']
-                if station.assign_delivery_manually:
-                    send_notification_push_order_with_sound(user_id=station.user_id,
-                                                            title='Pedido nuevo',
-                                                            body='Solicitud nueva',
-                                                            sound="alarms.mp3",
-                                                            android_channel_id="alarms",
-                                                            data={"type": "NEW_ORDER",
-                                                                  "order_id": order.id,
-                                                                  "message": "Pedido de nuevo",
-                                                                  'click_action': 'FLUTTER_NOTIFICATION_CLICK'
-                                                                  })
-                # Get nearest delivery man
-                else:
-                    send_order_delivery(location_selected=location_selected.point, station=data['station'],
-                                        order=order)
-
-            return order.id
-        except ValueError as e:
-            raise serializers.ValidationError({'detail': str(e)})
-        except Exception as ex:
-            print("Exception in retry order, please check it")
-            print(ex.args.__str__())
-            raise serializers.ValidationError({'detail': 'Error al calificar la orden'})
-
-
-class CheckPromoCodeSerializer(serializers.Serializer):
-    promotion_id = serializers.PrimaryKeyRelatedField(queryset=CustomerPromotion.objects.all(), source="promotion")
-
-    def create(self, data):
-        try:
-            customer_promotion = data['promotion']
-            price_promotion = valid_promotion(customer_promotion=customer_promotion)
-
-            return price_promotion
-        except ValueError as e:
-            raise serializers.ValidationError({'detail': str(e)})
-        except Exception as ex:
-            print("Exception in rating order, please check it")
-            print(ex.args.__str__())
-            raise serializers.ValidationError({'detail': 'Error al calificar la orden'})
-
-
-class TestEmailSerializer(serializers.Serializer):
-
-    def update(self, order, data):
-        try:
-            data_email = {'order': OrderWithDetailModelSerializer(order).data,
-                          'date_delivered_order': order.date_delivered_order.strftime(
-                              "%m/%d/%Y, %H:%M:%S")
-                          }
-            send_email_task.delay(subject="Tu pedido en Los Pedidos",
-                                  to_user=order.user.username,
-                                  path_template='emails/users/invoice_order.html',
-                                  data=data_email)
-            # send_email = send_mail_verification(subject="Tu pedido en Scooter envíos",
-            #                                     to_user='misael.gonzalez.e.229@gmail.com',
-            #                                     path_template="emails/users/invoice_order.html",
-            #                                     )
-            return data
-        except Exception as ex:
-            print(ex)
-            raise serializers.ValidationError({'detail': 'Error al calificar la orden'})
-
-
-class RantingOrderCustomerSerializer(serializers.Serializer):
-    """ Rated order by customer """
-    rating = serializers.FloatField(min_value=1, max_value=5)
-    rating_merchant = serializers.FloatField(min_value=1, max_value=5, allow_null=True)
-    comments = serializers.CharField(required=False, allow_null=True, allow_blank=True)
-
-    def validate(self, data):
-
-        order = self.context['order']
-        customer = self.context['customer']
-
-        rating_exist = RatingOrder.objects.filter(order=order, rating_customer=customer).exists()
-
-        if rating_exist:
-            raise serializers.ValidationError({'detail': 'Ya se califico este pedido'})
-
-        if order.in_process is True or order.date_delivered_order is None:
-            raise serializers.ValidationError({'detail': 'No es permitido valorar este pedido'})
-
-        data['rating_customer'] = customer
-        data['user'] = customer.user
-        data['station'] = order.station
-        data['delivery_man'] = order.delivery_man
-        data['order'] = order
-        return data
-
-    def create(self, data):
-        try:
-            data.pop('merchant', None)
-            station = data['station']
-            delivery_man = data['delivery_man']
-            order = data['order']
-            merchant = None
-            if order.is_order_to_merchant:
-                merchant = order.merchant
-                data['merchant'] = merchant
-
-            # Create new rating order
-            rating_order = RatingOrder.objects.create(
-                **data
-            )
-
-            if order.is_order_to_merchant:
-                # Update reputation merchant
-                merchant_avg = round(
-                    RatingOrder.objects.filter(
-                        merchant=merchant,
-                    ).aggregate(Avg('rating_merchant'))['rating_merchant__avg'],
-                    1
-                )
-
-                merchant.reputation = merchant_avg
-                merchant.total_grades = merchant.total_grades + 1
-                merchant.save()
-
-            # Update reputation delivery man
-            delivery_man_avg = round(
-                RatingOrder.objects.filter(
-                    delivery_man=delivery_man,
-                    station=station
-                ).aggregate(Avg('rating'))['rating__avg'],
-                1
-            )
-
-            delivery_man.reputation = delivery_man_avg
-            delivery_man.save()
-
-            return data
-        except ValueError as e:
-            raise serializers.ValidationError({'detail': str(e)})
-        except Exception as ex:
-            print("Exception in rating order, please check it")
-            print(ex.args.__str__())
-            raise serializers.ValidationError({'detail': 'Error al calificar la orden'})
-
-
-def send_order_delivery(location_selected, station, order):
-    try:
-        # Get nearest delivery man
-        delivery_men = get_nearest_delivery_man(location_selected=location_selected, station=station,
-                                                list_exclude=[], distance=settings.RANGE_DISTANCE,
-                                                status=['available'])
-
-        # Send push notification to delivery_man
-        # if delivery_men.count() == 0:
-        #     delivery_men = get_nearest_delivery_man(location_selected=location_selected, station=station,
-        #                                             list_exclude=[], distance=settings.RANGE_DISTANCE,
-        #                                             status=['available', 'busy'])
-
-        if delivery_men.count() == 0:
-            delivery_men = get_nearest_delivery_man(location_selected=location_selected, station=station,
-                                                    list_exclude=[], distance=settings.RANGE_DISTANCE,
-                                                    status=['available', 'busy', 'out_service'])
-        for delivery_man in delivery_men:
-            user_id = delivery_man.user_id
-            send_notification_push_order_with_sound(user_id=user_id,
-                                                    title='Solicitud nueva',
-                                                    body='Ha recibido un nuevo pedido',
-                                                    sound="ringtone.mp3",
-                                                    android_channel_id="alarms",
-                                                    data={"type": "NEW_ORDER",
-                                                          "order_id": order.id,
-                                                          "ordering": "",
-                                                          "message": "Pedido de nuevo",
-                                                          'click_action': 'FLUTTER_NOTIFICATION_CLICK'
-                                                          })
-        async_to_sync(notify_delivery_men)(order.id, 'NEW_ORDER')
-
-    except ValueError as e:
-        print(e.__str__())
-        raise ValueError(e)
-    except Exception as ex:
-        print(ex.args.__str__())
-        raise ValueError('Error al mandar notificaciones de pedido')
-
-
-def generate_qr_code():
-    try:
-        CODE_LENGTH = 8
-        """ Handle code creation """
-        pool = ascii_uppercase + digits
-        code = ''.join(random.choices(pool, k=CODE_LENGTH))
-        while Order.objects.filter(qr_code=code).exists():
-            code = ''.join(random.choices(pool, k=CODE_LENGTH))
-
-        return code
-    except Exception as ex:
-        raise ValueError('Error al generar el codigo qr')
-
-
-# Check if the order is safe and get location
-def get_ref_location(order):
-    if order.order_status.slug_name == "pick_up":
-        location_selected = order.from_address
-    else:
-        # If safe order, then find delivery man nearest from purchase place
-        if order.is_safe_order:
-            location_selected = order.from_address
-        else:
-            location_selected = order.to_address
-    return location_selected
-
-
-def valid_promotion(customer_promotion):
-    try:
-        # Check that not are promo expired
-        now = timezone.localtime(timezone.now())
-        if customer_promotion.used:
-            raise ValueError('La promocion ya ha sido utilizada')
-
-        if customer_promotion.expiration_date < now:
-            raise ValueError('La promocion ha expirado')
-
-        return {'price': 0.0}
-    except ValueError as e:
-        raise ValueError(e)
-    except Exception as ex:
-        print("Exception in valid promotion, please check it")
-        print(ex.args.__str__())
-        raise ValueError(ex)

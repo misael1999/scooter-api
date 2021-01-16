@@ -99,7 +99,7 @@ class OrderWithDetailModelSerializer(ScooterModelSerializer):
                   "customer", "delivery_man", "station", 'details', 'maximum_response_time', 'validate_qr',
                   'rated_order', 'in_process', 'service_id', 'is_safe_order', 'station_object', 'merchant_location',
                   'order_price', 'total_order', 'is_delivery_by_store', 'is_order_to_merchant', 'is_payment_online',
-                  'card', 'supports'
+                  'card', 'increment_price_operating', 'has_rate_operating', 'supports'
                   )
         read_only_fields = fields
 
