@@ -8,3 +8,4 @@ from .delivery_men import *
 from .branches import *
 from .zones import *
 from .payments import *
+from .tags import *
