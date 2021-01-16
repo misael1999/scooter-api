@@ -52,23 +52,21 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             return merchants
         return self.queryset
 
-    def filter_queryset(self, queryset):
-        queryset = super(MerchantViewSet, self).filter_queryset(queryset=queryset)
-        order_by = self.request.query_params.get('order_by', None)
-        if order_by:
-            if order_by == 'nearest':
-                lat = self.request.query_params.get('lat', 18.462938)
-                lng = self.request.query_params.get('lng', -97.392701)
-                point = Point(x=float(lng), y=float(lat), srid=4326)
-                queryset = queryset.annotate(distance=Distance('point', point)).order_by('-is_open', 'distance')
-            else:
-                queryset = queryset.order_by('-is_open', order_by, '-total_grades')
-        return queryset
+    # def filter_queryset(self, queryset):
+    #     queryset = super(MerchantViewSet, self).filter_queryset(queryset=queryset)
+    #     order_by = self.request.query_params.get('order_by', None)
+    #     if order_by:
+    #         if order_by == 'nearest':
+    #             lat = self.request.query_params.get('lat', 18.462938)
+    #             lng = self.request.query_params.get('lng', -97.392701)
+    #             point = Point(x=float(lng), y=float(lat), srid=4326)
+    #             queryset = queryset.annotate(distance=Distance('point', point)).order_by('-is_open', 'distance')
+    #         else:
+    #             queryset = queryset.order_by('-is_open', order_by, '-total_grades')
+    #     return queryset
 
     def get_serializer_class(self):
         serializer_class = self.serializer_class
-        if self.action == 'create':
-            serializer_class = MerchantSignUpSerializer
         if self.action == 'retrieve':
             serializer_class = MerchantInfoSerializer
         if self.action in ['list']:
@@ -78,8 +76,6 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
     def get_permissions(self):
         if self.action in ['list', 'retrieve', 'home']:
             permission_classes = [AllowAny]
-        elif self.action in ['create']:
-            permission_classes = [IsAuthenticated]
         elif self.action in ['partial_update', 'update', 'update_info']:
             permission_classes = [IsAuthenticated, IsSameMerchant]
         else:
@@ -87,26 +83,15 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
 
         return [permission() for permission in permission_classes]
 
-    def create(self, request, *args, **kwargs):
-        """ Merchant sign up """
-        serializer_class = self.get_serializer_class()
-        serializer = serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        data = self.set_response(status='ok',
-                                 data={},
-                                 message='Se ha registrado un nuevo comercio')
-        return Response(data, status=status.HTTP_201_CREATED)
-
-    def perform_destroy(self, instance):
-        try:
-            sts = Status.objects.get(slug_name='inactive')
-            instance.status = sts
-            instance.save()
-        except Status.DoesNotExist:
-            error = self.set_error_response(status=False, field='status',
-                                            message='Ha ocurrido un error al borrar el vehiculo')
-            return Response(data=error, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    # def perform_destroy(self, instance):
+    #     try:
+    #         sts = Status.objects.get(slug_name='inactive')
+    #         instance.status = sts
+    #         instance.save()
+    #     except Status.DoesNotExist:
+    #         error = self.set_error_response(status=False, field='status',
+    #                                         message='Ha ocurrido un error al borrar el vehiculo')
+    #         return Response(data=error, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @action(detail=True, methods=['PATCH', 'PUT'])
     def unlock(self, request, *args, **kwargs):

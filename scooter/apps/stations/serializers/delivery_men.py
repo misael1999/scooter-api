@@ -119,6 +119,17 @@ class CreateDeliveryManSerializer(serializers.ModelSerializer):
             print(ex.args.__str__())
             raise serializers.ValidationError({'detail': 'Ha ocurrido un problema al registrar un repartidor'})
 
+    def update(self, delivery_man, data):
+        try:
+            phone_number = data.get('phone_number', None)
+            if phone_number:
+                user = delivery_man.user
+                user.username = phone_number
+                user.save()
+            return super().update(delivery_man, data)
+        except Exception as ex:
+            raise serializers.ValidationError({'detail': 'Ha ocurrido un problema al actualizar el repartidor'})
+
 
 class GetDeliveryMenNearestSerializer(serializers.Serializer):
     order_id = StationFilteredPrimaryKeyRelatedField(queryset=Order.objects, source="order")

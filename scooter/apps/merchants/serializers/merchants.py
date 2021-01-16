@@ -138,12 +138,12 @@ class MerchantInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Merchant
         geo_field = 'point'
-        fields = ('id', 'email', 'user', 'contact_person', 'picture', 'merchant_name', 'phone_number', 'is_delivery_by_store',
-                  'information_is_complete', 'reputation', 'description', 'total_grades',
+        fields = ('id', 'email', 'user', 'contact_person', 'picture', 'merchant_name', 'phone_number',
+                  'information_is_complete', 'is_delivery_by_store', 'reputation', 'description', 'total_grades',
                   'approximate_preparation_time', 'is_open', 'point', 'from_preparation_time',
                   'to_preparation_time', 'schedules', 'full_address', 'zone', 'area', 'delivery_rules',
-                  'merchant_level', 'operational_zones_activated', 'restricted_zones_activated', 'accept_payment_online',
-                  'has_rate_operating', 'increment_price_operating')
+                  'merchant_level', 'operational_zones_activated', 'restricted_zones_activated',
+                  'accept_payment_online','has_rate_operating', 'increment_price_operating')
         read_only_fields = fields
 
 
