@@ -252,7 +252,7 @@ class UpdateInfoMerchantSerializer(serializers.Serializer):
         """ Save all data if everything goes well """
         try:
             MerchantSchedule.objects.bulk_create(schedules_to_save)
-            MerchantSchedule.objects.bulk_update(schedules_to_update, fields=["from_hour", "to_hour"])
+            MerchantSchedule.objects.bulk_update(schedules_to_update, fields=["from_hour", "to_hour", "is_open"])
 
             if address_to_save:
                 address_exist = MerchantAddress.objects.filter(merchant=instance)

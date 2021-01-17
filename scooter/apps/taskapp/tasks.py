@@ -97,7 +97,7 @@ def open_or_close_merchants():
     merchants = Merchant.objects.filter(status_id=1)
     for merchant in merchants:
         try:
-            merchant_schedule = merchant.schedules.get(schedule_name=today, status_id=1)
+            merchant_schedule = merchant.schedules.get(schedule_name=today, status_id=1, is_open=True)
             from_hour = str(merchant_schedule.from_hour)
             to_hour = str(merchant_schedule.to_hour)
             # Abrir comercio
