@@ -11,9 +11,11 @@ import conekta
 
 
 class QuestionSimpleSerializer(serializers.ModelSerializer):
+    group = serializers.StringRelatedField(read_only=True)
+
     class Meta:
         model = Question
-        fields = ('id', 'title', 'answer', 'status', 'created')
+        fields = ('id', 'title', 'answer', 'group', 'status', 'created')
         read_only_fields = fields
 
 
