@@ -97,20 +97,19 @@ def open_or_close_merchants():
     merchants = Merchant.objects.filter(status_id=1)
     for merchant in merchants:
         try:
-            merchant_schedule = merchant.schedules.get(schedule_name=today)
+            merchant_schedule = merchant.schedules.get(schedule_name=today, status_id=1)
             from_hour = str(merchant_schedule.from_hour)
             to_hour = str(merchant_schedule.to_hour)
             # Abrir comercio
             if from_hour <= current_hour <= to_hour:
-                print("ABRIO : {}".format(merchant.merchant_name))
                 merchant.is_open = True
                 merchants_to_update.append(merchant)
             elif to_hour <= current_hour >= from_hour:
                 merchant.is_open = False
                 merchants_to_update.append(merchant)
         except MerchantSchedule.DoesNotExist:
-            print("No existe horario")
-            pass
+            merchant.is_open = False
+            merchants_to_update.append(merchant)
     Merchant.objects.bulk_update(merchants_to_update, ['is_open'])
 
     # @periodic_task(name='reject_orders', run_every=timedelta(minutes=1))
