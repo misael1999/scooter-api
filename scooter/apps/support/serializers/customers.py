@@ -80,7 +80,7 @@ class CreateSupportModelSerializer(serializers.ModelSerializer):
                                               sound="new_message",
                                               android_channel_id="new_messages",
                                               data={"type": "NEW_MESSAGE_SUPPORT",
-                                                    "support_id": support.id,
+                                                    "order_id": support.id,
                                                     "message": "Pedido de nuevo",
                                                     'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                     })
@@ -138,7 +138,7 @@ class CreateMessageSupportSerializer(serializers.Serializer):
                                               sound="new_message",
                                               android_channel_id="new_messages",
                                               data={"type": "NEW_MESSAGE_SUPPORT",
-                                                    "support_id": support.id,
+                                                    "order_id": support.id,
                                                     "message": "Pedido de nuevo",
                                                     'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                     })
