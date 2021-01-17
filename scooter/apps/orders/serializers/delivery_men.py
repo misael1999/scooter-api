@@ -153,11 +153,11 @@ class ScanQrOrderSerializer(serializers.Serializer):
             order.save()
 
             # Recuperar el id del soporte
-            support = order.supports.first()
-            if support:
-                support.is_open = False
-                support.status_id = 2
-                support.save()
+            # support = order.supports.first()
+            # if support:
+            #     support.is_open = False
+            #     support.status_id = 2
+            #     support.save()
 
             delivery_status = DeliveryManStatus.objects.get(slug_name="available")
             delivery_man = order.delivery_man
