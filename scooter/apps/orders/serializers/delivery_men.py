@@ -183,15 +183,15 @@ class ScanQrOrderSerializer(serializers.Serializer):
                                                                 'click_action': 'FLUTTER_NOTIFICATION_CLICK'
                                                                 })
 
-                date_delivered = order.date_delivered_order
-                data_email = {'order': OrderWithDetailModelSerializer(order).data,
-                              'date_delivered_order': date_delivered.strftime(
-                                  "%m/%d/%Y, %H:%M:%S")
-                              }
-                send_email_task.delay(subject="Tu pedido en Los Pedidos",
-                                      to_user=order.user.username,
-                                      path_template='emails/users/invoice_order.html',
-                                      data=data_email)
+                # date_delivered = order.date_delivered_order
+                # data_email = {'order': OrderWithDetailModelSerializer(order).data,
+                #               'date_delivered_order': date_delivered.strftime(
+                #                   "%m/%d/%Y, %H:%M:%S")
+                #               }
+                # send_email_task.delay(subject="Tu pedido en Los Pedidos",
+                #                       to_user=order.user.username,
+                #                       path_template='emails/users/invoice_order.html',
+                #                       data=data_email)
 
             # Notification.objects.create(user_id=instance.user_id, title="Califica tu pedido",
             #                             type_notification_id=1,
@@ -200,7 +200,7 @@ class ScanQrOrderSerializer(serializers.Serializer):
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
         except Exception as ex:
-            print("Exception in reject order, please check it")
+            print("Exception in scan qr, please check it")
             print(ex.args.__str__())
             raise serializers.ValidationError({'detail': 'Error al escanear el código'})
 
