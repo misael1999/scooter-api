@@ -51,11 +51,11 @@ class MerchantStationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
     filter_fields = ('category', 'subcategory', 'area', 'zone', 'status', 'information_is_complete', 'reputation')
     station = None
 
-    def get_queryset(self):
-        if self.action == 'list':
-            merchants = Merchant.objects.filter(status=1, information_is_complete=True)
-            return merchants
-        return self.queryset
+    # def get_queryset(self):
+    #     if self.action == 'list':
+    #         merchants = Merchant.objects.filter(status=1, information_is_complete=True)
+    #         return merchants
+    #     return self.queryset
 
     def get_serializer_class(self):
         serializer_class = self.serializer_class
