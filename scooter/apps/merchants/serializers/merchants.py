@@ -220,7 +220,6 @@ class UpdateInfoMerchantSerializer(serializers.Serializer):
                     sta_schedule = merchant_schedule[0]
                     for field, value in schedule.items():
                         setattr(sta_schedule, field, value)
-                    print(sta_schedule.is_open)
                     schedules_to_update.append(sta_schedule)
                     continue
 
@@ -251,8 +250,6 @@ class UpdateInfoMerchantSerializer(serializers.Serializer):
 
         """ Save all data if everything goes well """
         try:
-            print("SCHDULE 1")
-            print(schedules_to_update[0].is_open)
             MerchantSchedule.objects.bulk_create(schedules_to_save)
             MerchantSchedule.objects.bulk_update(schedules_to_update, fields=["is_open", "from_hour", "to_hour"])
 
