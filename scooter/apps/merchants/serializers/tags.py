@@ -12,13 +12,20 @@ from scooter.utils.serializers.scooter import ScooterModelSerializer
 
 class TagModelSerializer(ScooterModelSerializer):
 
+    picture = Base64ImageField(allow_null=True, allow_empty_file=True, required=False)
+
     class Meta:
         model = Tag
         fields = '__all__'
 
+    def update(self, tag, data):
+        picture = data['picture']
+        if picture:
+            tag.picture.delete()
+        return super(TagModelSerializer, self).update(tag, data)
+
 
 class TagModelSimpleSerializer(ScooterModelSerializer):
-    picture = Base64ImageField(allow_null=True, allow_empty_file=True, required=False)
 
     class Meta:
         model = Tag
@@ -50,8 +57,3 @@ class MerchantTagModelSerializer(serializers.ModelSerializer):
             print(ex.args.__str__())
             raise serializers.ValidationError({'detail': 'Error registrar el metodo de pago en el comercio'})
 
-    def update(self, tag, data):
-        picture = data['picture']
-        if picture:
-            tag.picture.delete()
-        return super(MerchantTagModelSerializer, self).update(tag, data)
