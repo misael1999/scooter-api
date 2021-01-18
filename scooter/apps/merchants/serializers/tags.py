@@ -16,6 +16,19 @@ class TagModelSerializer(ScooterModelSerializer):
         fields = '__all__'
 
 
+class TagModelSimpleSerializer(ScooterModelSerializer):
+
+    class Meta:
+        model = Tag
+        fields = (
+            'id',
+            'name',
+            'picture',
+            'area'
+        )
+        read_only_fields = fields
+
+
 class MerchantTagModelSerializer(serializers.ModelSerializer):
 
     class Meta:

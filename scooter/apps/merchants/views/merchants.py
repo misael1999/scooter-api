@@ -13,7 +13,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from scooter.apps.common.models import CategoryMerchant, Area, Status
 from scooter.apps.common.serializers import AreaModelSerializer
-from scooter.apps.merchants.models import Merchant
+from scooter.apps.merchants.models import Merchant, Tag
 # Permissions
 from scooter.apps.merchants.permissions import IsAccountOwnerMerchant, IsSameMerchant
 # Utilities
@@ -23,7 +23,7 @@ from scooter.utils.viewsets import ScooterViewSet
 from scooter.apps.merchants.serializers import (MerchantSignUpSerializer,
                                                 MerchantWithAllInfoSerializer, UpdateInfoMerchantSerializer,
                                                 AvailabilityMerchantSerializer, ChangePasswordMerchantSerializer,
-                                                MerchantInfoSerializer)
+                                                MerchantInfoSerializer, TagModelSimpleSerializer)
 
 from scooter.apps.users.serializers.users import UserModelSimpleSerializer
 # Filters
@@ -183,7 +183,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             # Mejores calificados
             section_2 = self.get_section_order_by(area_id=area_id, category=category_model,
                                                   section_name="Top de Los Pedidos",
-                                                  section_description="Te presentamos los comercios con mejor raiting "
+                                                  section_description="Te presentamos los comercios con mejores calificaciones "
                                                                       "en nuestra plataforma.",
                                                   order_by="-reputation",
                                                   limit=settings.LIMIT_SECTIONS,
@@ -217,10 +217,12 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             sections.append(section_2)
             sections.append(section_3)
             sections.append(section_4)
+            tags = Tag.objects.filter(area_id=area_id)
 
             data = {
                 'more_merchants': False,
                 'secciones': sections,
+                'tags': TagModelSimpleSerializer(tags, many=True).data,
                 'orders': 0,
             }
 
