@@ -17,6 +17,7 @@ from scooter.apps.merchants.models import Merchant, Tag
 # Permissions
 from scooter.apps.merchants.permissions import IsAccountOwnerMerchant, IsSameMerchant
 # Utilities
+from scooter.apps.merchants.utils import MerchantTagFilter
 from scooter.utils.viewsets import ScooterViewSet
 # Models
 # Serializers
@@ -44,7 +45,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
     search_fields = ('merchant_name',)
     ordering_fields = ('is_open', 'reputation', 'created')
     ordering = ('-is_open', 'created')
-    filter_fields = ('category', 'subcategory', 'area', 'zone', 'status', 'information_is_complete', 'reputation')
+    filter_class = MerchantTagFilter
 
     def get_queryset(self):
         if self.action == 'list':

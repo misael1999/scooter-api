@@ -2350,6 +2350,11 @@ paths:
           required: false
           in: query
           type: integer
+        - name: tag
+          description: Ids de etiquetas separadas por comas
+          required: false
+          in: query
+          type: string
         - name: category
           description: Categoría
           required: false
@@ -2412,11 +2417,6 @@ paths:
           required: true
           in: query
           type: integer
-        - name: tags
-          description: Ids de etiquetas separadas por comas
-          required: false
-          in: query
-          type: string
         - name: lat
           description: Latitude
           in: query

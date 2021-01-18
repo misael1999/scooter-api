@@ -104,7 +104,7 @@ def open_or_close_merchants():
             if from_hour <= current_hour <= to_hour:
                 merchant.is_open = True
                 merchants_to_update.append(merchant)
-            elif to_hour <= current_hour >= from_hour:
+            elif to_hour >= current_hour < from_hour:
                 merchant.is_open = False
                 merchants_to_update.append(merchant)
         except MerchantSchedule.DoesNotExist:
