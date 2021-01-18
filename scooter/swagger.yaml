@@ -506,7 +506,7 @@ paths:
       tags:
         - Tags
   # MERCHANT TAGS
-  /api/v1/merchant/{merchant_id}/tags/:
+  /api/v1/merchants/{merchant_id}/tags/:
     parameters:
       - name: merchant_id
         in: path
@@ -514,8 +514,8 @@ paths:
         type: string
     post:
       operationId: register_merchant_tags
-      description: Agregar una o varias etiquetas de un comercio
-      summary: Agregar una nueva etiqueda
+      description: Agregar una o varias etiquetas a un comercio
+      summary: Agregar una o varias etiquetas a un comercio
       parameters:
         - name: body
           in: body
@@ -526,11 +526,11 @@ paths:
         '200':
           description: ''
       tags:
-        - Tags
+        - Tags merchant
     get:
       operationId: get_merchant_tags
       description: Obtener todas las etiquetas de un comercio
-      summary: Listado de etiquetas
+      summary: Obtener todas las etiquetas de un comercio
       parameters:
         - name: limit
           in: query
@@ -562,8 +562,8 @@ paths:
         '201':
           description: 'Listado de metodos de pago'
       tags:
-        - Tags
-  /api/v1/merchant/{merchant_id}/tags/{merchant_tag_id}/:
+        - Tags merchant
+  /api/v1/merchants/{merchant_id}/tags/{merchant_tag_id}/:
     parameters:
       - name: merchant_id
         in: path
@@ -573,30 +573,30 @@ paths:
         in: path
         required: true
         type: string
-    patch:
-      operationId: update_merchant_tag
-      description: Actualizar etiquetas de un comercio
-      summary: Actualizar una nueva etiqueta
-      parameters:
-        - name: body
-          in: body
-          description: Actualizar una etiqueta
-          schema:
-            $ref: '#/definitions/RegisterMerchantTag'
-      responses:
-        '200':
-          description: ''
-      tags:
-        - Tags
+#    patch:
+#      operationId: update_merchant_tag
+#      description: Actualizar etiquetas de un comercio
+#      summary: Actualizar etiquetas de un comercio
+#      parameters:
+#        - name: body
+#          in: body
+#          description: Actualizar una etiqueta
+#          schema:
+#            $ref: '#/definitions/RegisterMerchantTag'
+#      responses:
+#        '200':
+#          description: ''
+#      tags:
+#        - Tags merchant
     delete:
       operationId: delete_merchant_tag
       description: Borrar una etiqueta
-      summary: Borrar una etiqueta
+      summary: Borrar una etiqueta de un comercio
       responses:
         '200':
           description: ''
       tags:
-        - Tags
+        - Tags merchant
   # DEVICES
   /api/v1/devices/:
     post:
@@ -3453,9 +3453,12 @@ definitions:
   RegisterMerchantTag:
     type: object
     properties:
-      tag:
-        type: number
-        description: Etiqueta
+      tags:
+        type: array
+        description: Ids de etiquetas para asignar
+        items:
+          type: number
+          example: 1
   ContactUser:
     type: object
     properties:
