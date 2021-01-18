@@ -421,6 +421,90 @@ paths:
           description: 'Información de la pregunta'
       tags:
         - Support customers
+  # TAGS
+  /api/v1/tags/:
+    post:
+      operationId: register_tags
+      description: Agregar una nueva etiqueta
+      summary: Agregar una nueva etiqueda
+      parameters:
+        - name: body
+          in: body
+          description: Registrar una nueva etiqueta
+          schema:
+            $ref: '#/definitions/RegisterTag'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Tags
+    parameters: []
+    get:
+      operationId: get_tags
+      description: Obtener todas las etiquetas
+      summary: Listado de etiquetas
+      parameters:
+        - name: limit
+          in: query
+          description: Numero de resultados por pagina
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: El índice inicial desde el que devolver los resultados.
+          required: false
+          type: integer
+        - name: search
+          description: Buscar por (nombre)
+          in: query
+          required: false
+          type: string
+        - name: search
+          description: Buscar por (nombre)
+          in: query
+          required: false
+          type: string
+        - name: ordering
+          description: Order por
+          in: query
+          required: false
+          type: string
+          enum: ['name']
+      responses:
+        '201':
+          description: 'Listado de metodos de pago'
+      tags:
+        - Tags
+  /api/v1/tags/{tag_id}/:
+    parameters:
+      - name: tag_id
+        in: path
+        required: true
+        type: string
+    patch:
+      operationId: update_tag
+      description: Actualizar una nueva etiqueta
+      summary: Actualizar una nueva etiqueta
+      parameters:
+        - name: body
+          in: body
+          description: Actualizar una etiqueta
+          schema:
+            $ref: '#/definitions/RegisterTag'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Tags
+    delete:
+      operationId: delete_tag
+      description: Borrar una etiqueta
+      summary: Borrar una etiqueta
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Tags
   # DEVICES
   /api/v1/devices/:
     post:
@@ -3260,6 +3344,20 @@ definitions:
     required:
       - registration_id
       - type
+  RegisterTag:
+    type: object
+    properties:
+      name:
+        type: string
+        description: Nombre de la etiqueta
+      area:
+        type: number
+        example: 1
+        description: area de cobertura de la tag
+      picture:
+        type: string
+        example: base64;image
+        description: Imagen para la tag
   ContactUser:
     type: object
     properties:
