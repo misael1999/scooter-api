@@ -1,6 +1,6 @@
 from rest_framework import serializers
 # Serializers
-from scooter.apps.common.serializers import OrderStatusModelSerializer
+from scooter.apps.common.serializers import OrderStatusModelSerializer, ServiceModelSerializer
 from scooter.apps.common.serializers.common import Base64ImageField
 from scooter.apps.customers.serializers import CustomerAddressModelSerializer, CustomerSimpleOrderSerializer, \
     PointSerializer
@@ -77,8 +77,9 @@ class OrderWithDetailModelSerializer(ScooterModelSerializer):
     customer = CustomerSimpleOrderSerializer(read_only=True)
     from_address = CustomerAddressModelSerializer()
     to_address = CustomerAddressModelSerializer()
-    service = serializers.StringRelatedField(read_only=True, source="station_service")
     # order_status = serializers.StringRelatedField(read_only=True)
+    service = serializers.StringRelatedField(read_only=True, source="station_service")
+    service_obj = ServiceModelSerializer(read_only=True)
     details = DetailOrderSerializer(many=True)
     delivery_man = DeliveryManOrderSerializer(required=False)
     order_status = OrderStatusModelSerializer(read_only=True)
@@ -92,7 +93,7 @@ class OrderWithDetailModelSerializer(ScooterModelSerializer):
 
     class Meta:
         model = Order
-        fields = ("id", 'merchant', "service",
+        fields = ("id", 'merchant', "service", 'service_obj',
                   "from_address", "to_address", "service_price", "distance",
                   "indications", "approximate_price_order", 'reason_rejection', 'date_update_order',
                   "order_date", "date_delivered_order", "qr_code", "order_status",
