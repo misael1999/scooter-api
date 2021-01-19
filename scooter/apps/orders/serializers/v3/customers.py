@@ -128,7 +128,7 @@ class CreateOrderV3Serializer(serializers.ModelSerializer):
                                                        )
                 price = data_service['price_service']
                 data['distance'] = data_service['distance']
-            order_status = OrderStatus.objects.get(slug_name="await_confirmation_merchant")
+
             if is_order_to_merchant:
                 data['in_process'] = True
                 if merchant.is_open:
@@ -141,8 +141,8 @@ class CreateOrderV3Serializer(serializers.ModelSerializer):
                         data.pop('station', None)
                 else:
                     raise ValueError('{} ha cerrado'.format(merchant.merchant_name))
-            # else:
-            #     order_status = OrderStatus.objects.get(slug_name="await_delivery_man")
+            else:
+                order_status = OrderStatus.objects.get(slug_name="await_delivery_man")
 
             data['order_status'] = order_status
             data['qr_code'] = generate_qr_code()
@@ -180,7 +180,6 @@ class CreateOrderV3Serializer(serializers.ModelSerializer):
             #     # Send message by django channel
             #     async_to_sync(send_order_to_station_channel)(station.id, order.id)
             # else:
-
             if is_order_to_merchant:
                 # Verificar si el pago es con tarjeta:
                 payment_method = data.get('payment_method', 1)
