@@ -35,6 +35,7 @@ class MerchantWithAllInfoSerializer(serializers.ModelSerializer):
     subcategory = serializers.StringRelatedField(read_only=True)
     # user = UserModelSimpleSerializer()
     delivery_rules = MerchantDeliveryRuleSerializer(read_only=True)
+    tags = MerchantTagSimpleSerializer(many=True, read_only=True)
 
     class Meta:
         model = Merchant
@@ -44,7 +45,7 @@ class MerchantWithAllInfoSerializer(serializers.ModelSerializer):
                   'approximate_preparation_time', 'full_address', 'is_open', 'point', 'from_preparation_time',
                   'to_preparation_time', 'type_menu', 'zone', 'area', 'delivery_rules', 'merchant_level',
                   'operational_zones_activated', 'restricted_zones_activated', 'accept_payment_online',
-                  'has_rate_operating', 'increment_price_operating')
+                  'has_rate_operating', 'increment_price_operating', 'tags')
         read_only_fields = fields
 
 
