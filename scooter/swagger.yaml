@@ -3459,6 +3459,12 @@ definitions:
         items:
           type: number
           example: 1
+      delete_tags:
+        type: array
+        description: Ids de etiquetas para asignar
+        items:
+          type: number
+          example: 3
   ContactUser:
     type: object
     properties:
