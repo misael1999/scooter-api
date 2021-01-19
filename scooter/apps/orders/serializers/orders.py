@@ -57,7 +57,7 @@ class OrderCurrentStatusSerializer(serializers.ModelSerializer):
 # For requests we must put all the fields as read only
 class OrderModelSerializer(serializers.ModelSerializer):
     service = serializers.StringRelatedField(read_only=True, source="station_service")
-    service_obj = ServiceModelSerializer(read_only=True)
+    service_obj = ServiceModelSerializer(read_only=True, source="service")
 
     class Meta:
         model = Order

@@ -79,7 +79,7 @@ class OrderWithDetailModelSerializer(ScooterModelSerializer):
     to_address = CustomerAddressModelSerializer()
     # order_status = serializers.StringRelatedField(read_only=True)
     service = serializers.StringRelatedField(read_only=True, source="station_service")
-    service_obj = ServiceModelSerializer(read_only=True)
+    service_obj = ServiceModelSerializer(read_only=True, source="service")
     details = DetailOrderSerializer(many=True)
     delivery_man = DeliveryManOrderSerializer(required=False)
     order_status = OrderStatusModelSerializer(read_only=True)
