@@ -19,3 +19,7 @@ class MerchantTag(ScooterModel):
     tag = models.ForeignKey(Tag, on_delete=models.DO_NOTHING, related_name="merchants_tags")
     tag_name = models.CharField(max_length=50)
 
+    def __str__(self):
+        return self.tag_name
+
+

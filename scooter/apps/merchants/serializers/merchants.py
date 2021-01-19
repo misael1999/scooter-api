@@ -35,7 +35,7 @@ class MerchantWithAllInfoSerializer(serializers.ModelSerializer):
     subcategory = serializers.StringRelatedField(read_only=True)
     # user = UserModelSimpleSerializer()
     delivery_rules = MerchantDeliveryRuleSerializer(read_only=True)
-    tags = MerchantTagSimpleSerializer(many=True, read_only=True)
+    tags = serializers.StringRelatedField(many=True, read_only=True)
 
     class Meta:
         model = Merchant
