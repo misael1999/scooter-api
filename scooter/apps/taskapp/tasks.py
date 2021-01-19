@@ -87,7 +87,7 @@ def send_notification_delivery():
 
 
 # Period Task with crontab
-@periodic_task(name='close_or_open_merchants', run_every=crontab(minute=0, hour='8,9,12,13,14,15,16,17,18,19,20,21,22'))
+@periodic_task(name='close_or_open_merchants', run_every=crontab(minute=45, hour='8,9,12,13,14,15,16,17,18,19,20,21,22'))
 def open_or_close_merchants():
     today = timezone.localtime().strftime("%A").lower()
     now = timezone.localtime(timezone.now())
@@ -101,10 +101,10 @@ def open_or_close_merchants():
             from_hour = str(merchant_schedule.from_hour)
             to_hour = str(merchant_schedule.to_hour)
             # Abrir comercio
-            if from_hour <= current_hour <= to_hour:
+            if current_hour <= to_hour:
                 merchant.is_open = True
                 merchants_to_update.append(merchant)
-            elif to_hour >= current_hour < from_hour:
+            elif current_hour >= to_hour:
                 merchant.is_open = False
                 merchants_to_update.append(merchant)
         except MerchantSchedule.DoesNotExist:
