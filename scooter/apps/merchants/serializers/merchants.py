@@ -11,7 +11,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 # Models
 from scooter.apps.customers.serializers import PointSerializer
-from scooter.apps.merchants.serializers import MerchantTagSimpleSerializer
+from scooter.apps.merchants.serializers.tags import MerchantTagSimpleSerializer
 from scooter.apps.users.models import User
 from scooter.apps.merchants.models.merchants import Merchant, MerchantAddress, MerchantSchedule, TypeMenuMerchant, \
     MerchantDeliveryRule
