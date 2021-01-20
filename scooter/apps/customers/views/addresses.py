@@ -66,8 +66,6 @@ class CustomerAddressesViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cre
                                  message='Se ha registrado un nuevo direccion')
         return Response(data=data, status=status.HTTP_201_CREATED)
 
-    @method_decorator(cache_page(300))
-    @method_decorator(vary_on_cookie)
     def list(self, request, *args, **kwargs):
         return super(CustomerAddressesViewSet, self).list(request, *args, **kwargs)
 

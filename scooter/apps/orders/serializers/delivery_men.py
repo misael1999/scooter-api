@@ -13,6 +13,7 @@ from scooter.apps.orders.models.orders import HistoryRejectedOrders
 # Functions channels
 # Task Celery
 from scooter.apps.orders.serializers.v2 import OrderWithDetailModelSerializer
+from scooter.apps.support.models import Support
 from scooter.apps.taskapp.tasks import send_notification_push_task, send_email_task
 # Functions
 from scooter.apps.orders.serializers.orders import get_nearest_delivery_man
@@ -153,11 +154,16 @@ class ScanQrOrderSerializer(serializers.Serializer):
             order.save()
 
             # Recuperar el id del soporte
-            # support = order.supports.first()
-            # if support:
-            #     support.is_open = False
-            #     support.status_id = 2
-            #     support.save()
+            try:
+                support = order.supports.first()
+                if support:
+                    support.is_open = False
+                    support.status_id = 2
+                    support.save()
+            except Support.DoesNotExist:
+                pass
+            except Exception as ex:
+                pass
 
             delivery_status = DeliveryManStatus.objects.get(slug_name="available")
             delivery_man = order.delivery_man
