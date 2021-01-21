@@ -284,8 +284,8 @@ class UpdateOrderStatusSerializer(serializers.Serializer):
 def update_order_status(service, order_status, instance, data):
     try:
         # Validate that status
-        if instance.service.slug_name != service.slug_name:
-            raise ValueError('No es posible cambiar de estatus esta orden, no corresponde el tipo del servicio')
+        # if instance.service.slug_name != service.slug_name:
+        #     raise ValueError('No es posible cambiar de estatus esta orden, no corresponde el tipo del servicio')
 
         # Validate that status are not "order_status_slug"
         # if instance.order_status == order_status_slug:
