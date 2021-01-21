@@ -95,7 +95,7 @@ class RejectOrderMerchantSerializer(serializers.Serializer):
 
     def update(self, order, data):
         try:
-            type_notification = 'REJECT_ORDER_MERCHANT_NOT_WORKING'
+            type_notification = 'REJECT_ORDER_MERCHANT'
             if order.is_payment_online:
                 type_notification = 'REJECT_ORDER_MERCHANT_PAYMENT'
                 return_money_user(order)
@@ -129,7 +129,7 @@ class CancelOrderMerchantSerializer(serializers.Serializer):
 
     def update(self, order, data):
         try:
-            type_notification = 'REJECT_ORDER_MERCHANT_NOT_WORKING'
+            type_notification = 'REJECT_ORDER_MERCHANT'
             if order.is_payment_online:
                 type_notification = 'REJECT_ORDER_MERCHANT_PAYMENT'
                 return_money_user(order)
