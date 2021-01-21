@@ -29,13 +29,17 @@ class TagModelSerializer(ScooterModelSerializer):
 
 class TagModelSimpleSerializer(ScooterModelSerializer):
 
+    category = serializers.StringRelatedField(read_only=True)
+
     class Meta:
         model = Tag
         fields = (
             'id',
             'name',
             'picture',
-            'area'
+            'area',
+            'category',
+            'category_id'
         )
         read_only_fields = fields
 

@@ -12,6 +12,7 @@ class Tag(ScooterModel):
     picture = models.ImageField(upload_to='merchants/tags/', blank=True, null=True,
                                 validators=[FileExtensionValidator(['jpg', 'png', 'jpeg'])])
     area = models.ForeignKey('common.Area', on_delete=models.DO_NOTHING, default=1)
+    category = models.ForeignKey('common.CategoryMerchant', on_delete=models.DO_NOTHING, default=1)
 
 
 class MerchantTag(ScooterModel):
