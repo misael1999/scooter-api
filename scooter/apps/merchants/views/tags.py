@@ -61,7 +61,7 @@ class MerchantTagViewSet(ScooterViewSet, mixins.ListModelMixin,
 
 
 class TagViewSet(ScooterViewSet, mixins.ListModelMixin,
-                 mixins.RetrieveModelMixin, mixins.CreateModelMixin,
+                 mixins.UpdateModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin,
                  mixins.DestroyModelMixin):
 
     queryset = Tag.objects.all()
@@ -77,3 +77,13 @@ class TagViewSet(ScooterViewSet, mixins.ListModelMixin,
         if self.action == 'list':
             return TagModelSimpleSerializer
         return self.serializer_class
+
+    def perform_destroy(self, instance):
+        try:
+            sts = Status.objects.get(slug_name='inactive')
+            instance.status = sts
+            instance.save()
+        except Status.DoesNotExist:
+            error = self.set_error_response(status=False, field='status',
+                                            message='Ha ocurrido un error al borrar la etiqueta')
+            return Response(data=error, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
