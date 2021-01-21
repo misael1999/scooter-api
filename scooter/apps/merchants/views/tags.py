@@ -70,7 +70,7 @@ class TagViewSet(ScooterViewSet, mixins.ListModelMixin,
     filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
     search_fields = ('name',)
     ordering_fields = ('name',)
-    filter_fields = ('status',)
+    filter_fields = ('status', 'category')
     lookup_field = 'id'
 
     def get_serializer_class(self):
