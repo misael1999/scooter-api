@@ -111,6 +111,8 @@ class GeneralInfoMerchantSerializer(serializers.Serializer):
     to_preparation_time = serializers.FloatField()
     operational_zones_activated = serializers.BooleanField(required=False)
     restricted_zones_activated = serializers.BooleanField(required=False)
+    has_rate_operating = serializers.BooleanField(required=False)
+    increment_price_operating = serializers.FloatField(required=False)
 
 
 # Merchant Schedule
@@ -333,13 +335,13 @@ class MerchantSignUpSerializer(serializers.Serializer):
                 'password': password,
                 'url': settings.URL_SERVER_FRONTEND
             }
-            send_email = send_mail_verification(subject=subject,
-                                                to_user=user.username,
-                                                path_template="emails/merchants/welcome.html",
-                                                data=data)
-            if not send_email:
-                raise serializers.ValidationError({'detail': 'Ha ocurrido un error al enviar el correo'})
-            return user
+            # send_email = send_mail_verification(subject=subject,
+            #                                     to_user=user.username,
+            #                                     path_template="emails/merchants/welcome.html",
+            #                                     data=data)
+            # if not send_email:
+            #     raise serializers.ValidationError({'detail': 'Ha ocurrido un error al enviar el correo'})
 
+            return user
         except Exception as ex:
             return serializers.ValidationError({'detail': 'Ha ocurrido un problema al registrarse'})
