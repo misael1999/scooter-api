@@ -225,7 +225,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
                 'more_merchants': False,
                 'secciones': sections,
                 'tags': TagModelSimpleSerializer(tags, many=True).data,
-                'orders': 0,
+                'orders': 0
             }
 
             return Response(data=data, status=status.HTTP_200_OK)
