@@ -177,6 +177,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
                 data = {
                     'more_merchants': False,
                     'secciones': [],
+                    'tags': [],
                     'orders': 0,
                     'message': 'No hay comercios que mostrar'
                 }
@@ -218,7 +219,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             sections.append(section_2)
             sections.append(section_3)
             sections.append(section_4)
-            tags = Tag.objects.filter(area_id=area_id)
+            tags = Tag.objects.filter(area_id=area_id, category_id=category_model.id)
 
             data = {
                 'more_merchants': False,
