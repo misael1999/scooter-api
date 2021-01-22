@@ -91,7 +91,7 @@ def send_notification_delivery():
 def open_or_close_merchants():
     today = timezone.localtime().strftime("%A").lower()
     now = timezone.localtime(timezone.now())
-    offset = now - timedelta(minutes=2)
+    offset = now
     current_hour = offset.strftime('%H:%M:%S')
     merchants_to_update = []
     merchants = Merchant.objects.filter(status_id=1)
