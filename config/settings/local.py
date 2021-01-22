@@ -21,7 +21,9 @@ ALLOWED_HOSTS = [
     '192.168.0.6',
     'www.scooterdev.tech',
     'scooterdev.tech',
-    '100.25.196.247'
+    '100.25.196.247',
+    'api.lospedidos.site',
+    '34.68.85.45'
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True

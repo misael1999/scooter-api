@@ -91,7 +91,7 @@ def send_notification_delivery():
 def open_or_close_merchants():
     today = timezone.localtime().strftime("%A").lower()
     now = timezone.localtime(timezone.now())
-    offset = now + timedelta(minutes=15)
+    offset = now - timedelta(minutes=2)
     current_hour = offset.strftime('%H:%M:%S')
     merchants_to_update = []
     merchants = Merchant.objects.filter(status_id=1)
@@ -101,10 +101,10 @@ def open_or_close_merchants():
             from_hour = str(merchant_schedule.from_hour)
             to_hour = str(merchant_schedule.to_hour)
             # Abrir comercio
-            if from_hour <= current_hour <= to_hour:
+            if current_hour <= to_hour and from_hour >= current_hour:
                 merchant.is_open = True
                 merchants_to_update.append(merchant)
-            elif to_hour <= current_hour >= from_hour:
+            elif current_hour >= to_hour:
                 merchant.is_open = False
                 merchants_to_update.append(merchant)
         except MerchantSchedule.DoesNotExist:
