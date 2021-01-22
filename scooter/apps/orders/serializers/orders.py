@@ -57,10 +57,11 @@ class OrderCurrentStatusSerializer(serializers.ModelSerializer):
 # For requests we must put all the fields as read only
 class OrderModelSerializer(serializers.ModelSerializer):
     service = serializers.StringRelatedField(read_only=True, source="station_service")
+    service_obj = ServiceModelSerializer(read_only=True, source="service")
 
     class Meta:
         model = Order
-        fields = ("id", "delivery_man", "station", "service", "distance",
+        fields = ("id", "delivery_man", "station", "service", "service_obj", "distance",
                   "from_address_id", "to_address_id", "service_price",
                   "indications", "approximate_price_order", 'maximum_response_time',
                   "date_delivered_order", "qr_code", "order_status", "order_date", 'validate_qr',

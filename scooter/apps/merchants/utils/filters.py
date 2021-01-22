@@ -15,6 +15,19 @@ class MerchantFilter(FilterSet):
         return queryset.filter(order_status_id__in=order_status_ids)
 
 
+class MerchantTagFilter(FilterSet):
+
+    tag = CharFilter(method='filter_by_tag')
+
+    class Meta:
+        model = Merchant
+        fields = ('category', 'subcategory', 'area', 'zone', 'status', 'information_is_complete', 'reputation', 'tag')
+
+    def filter_by_tag(self, queryset, name, value):
+        tag_id = value
+        return queryset.filter(tags__tag_id__in=tag_id)
+
+
 class MerchantDeliveryManFilter(FilterSet):
     status = CharFilter(method='filter_by_status_ids')
 

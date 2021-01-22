@@ -13,17 +13,18 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from scooter.apps.common.models import CategoryMerchant, Area, Status
 from scooter.apps.common.serializers import AreaModelSerializer
-from scooter.apps.merchants.models import Merchant
+from scooter.apps.merchants.models import Merchant, Tag
 # Permissions
 from scooter.apps.merchants.permissions import IsAccountOwnerMerchant, IsSameMerchant
 # Utilities
+from scooter.apps.merchants.utils import MerchantTagFilter
 from scooter.utils.viewsets import ScooterViewSet
 # Models
 # Serializers
 from scooter.apps.merchants.serializers import (MerchantSignUpSerializer,
                                                 MerchantWithAllInfoSerializer, UpdateInfoMerchantSerializer,
                                                 AvailabilityMerchantSerializer, ChangePasswordMerchantSerializer,
-                                                MerchantInfoSerializer)
+                                                MerchantInfoSerializer, TagModelSimpleSerializer)
 
 from scooter.apps.users.serializers.users import UserModelSimpleSerializer
 # Filters
@@ -44,7 +45,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
     search_fields = ('merchant_name',)
     ordering_fields = ('is_open', 'reputation', 'created')
     ordering = ('-is_open', 'created')
-    filter_fields = ('category', 'subcategory', 'area', 'zone', 'status', 'information_is_complete', 'reputation')
+    filter_class = MerchantTagFilter
 
     def get_queryset(self):
         if self.action == 'list':
@@ -176,6 +177,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
                 data = {
                     'more_merchants': False,
                     'secciones': [],
+                    'tags': [],
                     'orders': 0,
                     'message': 'No hay comercios que mostrar'
                 }
@@ -183,7 +185,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             # Mejores calificados
             section_2 = self.get_section_order_by(area_id=area_id, category=category_model,
                                                   section_name="Top de Los Pedidos",
-                                                  section_description="Te presentamos los comercios con mejor raiting "
+                                                  section_description="Te presentamos los comercios con mejores calificaciones "
                                                                       "en nuestra plataforma.",
                                                   order_by="-reputation",
                                                   limit=settings.LIMIT_SECTIONS,
@@ -217,11 +219,13 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             sections.append(section_2)
             sections.append(section_3)
             sections.append(section_4)
+            tags = Tag.objects.filter(area_id=area_id, category_id=category_model.id)
 
             data = {
                 'more_merchants': False,
                 'secciones': sections,
-                'orders': 0,
+                'tags': TagModelSimpleSerializer(tags, many=True).data,
+                'orders': 0
             }
 
             return Response(data=data, status=status.HTTP_200_OK)

@@ -18,6 +18,7 @@ from scooter.apps.merchants.models import Merchant
 # Permissions
 from scooter.apps.merchants.permissions import IsAccountOwnerMerchant, IsSameMerchant
 # Utilities
+from scooter.apps.stations.serializers import UpdateMerchantStationSerializer
 from scooter.utils.viewsets import ScooterViewSet
 # Models
 # Serializers
@@ -61,6 +62,8 @@ class MerchantStationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         serializer_class = self.serializer_class
         if self.action == 'create':
             serializer_class = MerchantSignUpSerializer
+        if self.action in ['update', 'partial_update']:
+            serializer_class = UpdateMerchantStationSerializer
         if self.action == 'retrieve':
             serializer_class = MerchantInfoSerializer
         if self.action in ['list']:
@@ -91,7 +94,7 @@ class MerchantStationViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         return Response(data, status=status.HTTP_201_CREATED)
 
     # Cache requested url for each user for 2 hours
-    @method_decorator(cache_page(60 * 10))
+    @method_decorator(cache_page(60 * 2))
     @method_decorator(vary_on_cookie)
     def retrieve(self, request, *args, **kwargs):
         return super(MerchantStationViewSet, self).retrieve(request, *args, **kwargs)

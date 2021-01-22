@@ -41,7 +41,10 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
             #     'type': 0,
             #     'zone': {},
             #     'area_id': area_id,
-            #     'message': 'No estaremos disponibles el día 31 de diciembre y 01 de enero\nLos Pedidos les desea un feliz año nuevo, nos vemos pronto.'
+            #     'station_phone_number': station.phone_number,
+            #     'station_id': station.id,
+            #     'message': 'No estaremos disponibles el día 31 de diciembre y
+            #     01 de enero\nLos Pedidos les desea un feliz año nuevo, nos vemos pronto.'
             # }, status=status.HTTP_200_OK)
 
             lat = request.query_params.get('lat', 18.462938)
@@ -59,6 +62,7 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
                     'zone': {},
                     'area': area_id,
                     'station_id': station.id,
+                    'station_phone_number': station.phone_number,
                     'message': 'En tu zona no hay servicios de restaurantes o supermercados'
                 }, status=status.HTTP_200_OK)
             area_id = areas.last().id
@@ -74,6 +78,7 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
                     'type': 2,
                     'area': area_id,
                     'station_id': station.id,
+                    'station_phone_number': station.phone_number,
                     'message': message
                 }, status=status.HTTP_200_OK)
 
@@ -95,6 +100,7 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
                                 'type': 2,
                                 'area_id': area_id,
                                 'station_id': station.id,
+                                'station_phone_number': station.phone_number,
                                 'message': message
                             }, status=status.HTTP_200_OK)
                     else:
@@ -108,6 +114,7 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
                             'type': 2,
                             'area_id': area_id,
                             'station_id': station.id,
+                            'station_phone_number': station.phone_number,
                             'message': message
                         }, status=status.HTTP_200_OK)
 
@@ -116,6 +123,7 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
                 'type': 0,
                 'area_id': area_id,
                 'station_id': station.id,
+                'station_phone_number': station.phone_number,
                 'message': 'Si hay cobertura'
             }, status=status.HTTP_200_OK)
         except ValueError as e:

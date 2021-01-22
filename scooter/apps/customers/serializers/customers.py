@@ -138,12 +138,12 @@ class CustomerSignUpSerializer(serializers.Serializer):
             'token': code,
             'url': settings.URL_SERVER_FRONTEND
         }
-        send_email = send_mail_verification(subject=subject,
-                                            to_user=user.username,
-                                            path_template="emails/users/account_verification.html",
-                                            data=data)
-        if not send_email:
-            raise serializers.ValidationError({'detail': 'Ha ocurrido un error al enviar el correo'})
+        # send_email = send_mail_verification(subject=subject,
+        #                                     to_user=user.username,
+        #                                     path_template="emails/users/account_verification.html",
+        #                                     data=data)
+        # if not send_email:
+        #     raise serializers.ValidationError({'detail': 'Ha ocurrido un error al enviar el correo'})
 
         refresh = RefreshToken.for_user(user)
         response = dict()

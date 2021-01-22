@@ -8,14 +8,11 @@ from scooter.apps.common.models import DeliveryManStatus
 from scooter.apps.common.serializers import Base64ImageField
 from scooter.apps.delivery_men.models.delivery_men import DeliveryMan
 # Utilities
-from scooter.apps.stations.serializers import VehicleModelSerializer
 from scooter.utils.serializers.scooter import ScooterModelSerializer
 # Serializers
 from scooter.apps.users.serializers.users import UserModelSimpleSerializer
 # Utilities
-from scooter.apps.delivery_men.utils import send_notify_change_location
 # Django channels
-from asgiref.sync import async_to_sync
 
 
 class DeliveryManModelSerializer(ScooterModelSerializer):

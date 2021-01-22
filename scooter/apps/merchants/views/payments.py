@@ -19,8 +19,8 @@ from scooter.utils.viewsets import ScooterViewSet
 
 
 class MerchantPaymentMethodViewSet(ScooterViewSet, mixins.ListModelMixin,
-                    mixins.RetrieveModelMixin, mixins.CreateModelMixin,
-                    mixins.UpdateModelMixin, mixins.DestroyModelMixin):
+                                   mixins.RetrieveModelMixin, mixins.CreateModelMixin,
+                                   mixins.UpdateModelMixin, mixins.DestroyModelMixin):
     """ Handle add payment methods """
     queryset = MerchantPaymentMethod.objects.all()
     serializer_class = MerchantPaymentMethodModelSerializer
@@ -53,4 +53,3 @@ class MerchantPaymentMethodViewSet(ScooterViewSet, mixins.ListModelMixin,
             error = self.set_error_response(status=False, field='status',
                                             message='Ha ocurrido un error al borrar la categoria')
             return Response(data=error, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-

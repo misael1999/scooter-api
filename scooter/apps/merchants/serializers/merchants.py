@@ -11,6 +11,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 # Models
 from scooter.apps.customers.serializers import PointSerializer
+from scooter.apps.merchants.serializers.tags import MerchantTagSimpleSerializer
 from scooter.apps.users.models import User
 from scooter.apps.merchants.models.merchants import Merchant, MerchantAddress, MerchantSchedule, TypeMenuMerchant, \
     MerchantDeliveryRule
@@ -34,6 +35,7 @@ class MerchantWithAllInfoSerializer(serializers.ModelSerializer):
     subcategory = serializers.StringRelatedField(read_only=True)
     # user = UserModelSimpleSerializer()
     delivery_rules = MerchantDeliveryRuleSerializer(read_only=True)
+    tags = serializers.StringRelatedField(many=True, read_only=True)
 
     class Meta:
         model = Merchant
@@ -43,7 +45,7 @@ class MerchantWithAllInfoSerializer(serializers.ModelSerializer):
                   'approximate_preparation_time', 'full_address', 'is_open', 'point', 'from_preparation_time',
                   'to_preparation_time', 'type_menu', 'zone', 'area', 'delivery_rules', 'merchant_level',
                   'operational_zones_activated', 'restricted_zones_activated', 'accept_payment_online',
-                  'has_rate_operating', 'increment_price_operating')
+                  'has_rate_operating', 'increment_price_operating', 'tags')
         read_only_fields = fields
 
 
@@ -109,6 +111,8 @@ class GeneralInfoMerchantSerializer(serializers.Serializer):
     to_preparation_time = serializers.FloatField()
     operational_zones_activated = serializers.BooleanField(required=False)
     restricted_zones_activated = serializers.BooleanField(required=False)
+    has_rate_operating = serializers.BooleanField(required=False)
+    increment_price_operating = serializers.FloatField(required=False)
 
 
 # Merchant Schedule
@@ -134,6 +138,7 @@ class MerchantInfoSerializer(serializers.ModelSerializer):
     schedules = MerchantScheduleSerializer(many=True)
     user = UserModelSimpleSerializer()
     delivery_rules = MerchantDeliveryRuleSerializer(read_only=True)
+    tags = MerchantTagSimpleSerializer(many=True, read_only=True)
 
     class Meta:
         model = Merchant
@@ -143,7 +148,7 @@ class MerchantInfoSerializer(serializers.ModelSerializer):
                   'approximate_preparation_time', 'is_open', 'point', 'from_preparation_time',
                   'to_preparation_time', 'schedules', 'full_address', 'zone', 'area', 'delivery_rules',
                   'merchant_level', 'operational_zones_activated', 'restricted_zones_activated',
-                  'accept_payment_online','has_rate_operating', 'increment_price_operating')
+                  'accept_payment_online','has_rate_operating', 'increment_price_operating', "tags")
         read_only_fields = fields
 
 
@@ -330,13 +335,13 @@ class MerchantSignUpSerializer(serializers.Serializer):
                 'password': password,
                 'url': settings.URL_SERVER_FRONTEND
             }
-            send_email = send_mail_verification(subject=subject,
-                                                to_user=user.username,
-                                                path_template="emails/merchants/welcome.html",
-                                                data=data)
-            if not send_email:
-                raise serializers.ValidationError({'detail': 'Ha ocurrido un error al enviar el correo'})
-            return user
+            # send_email = send_mail_verification(subject=subject,
+            #                                     to_user=user.username,
+            #                                     path_template="emails/merchants/welcome.html",
+            #                                     data=data)
+            # if not send_email:
+            #     raise serializers.ValidationError({'detail': 'Ha ocurrido un error al enviar el correo'})
 
+            return user
         except Exception as ex:
             return serializers.ValidationError({'detail': 'Ha ocurrido un problema al registrarse'})

@@ -129,8 +129,8 @@ class CreateOrderV3Serializer(serializers.ModelSerializer):
                 price = data_service['price_service']
                 data['distance'] = data_service['distance']
 
+            data['in_process'] = True
             if is_order_to_merchant:
-                data['in_process'] = True
                 if merchant.is_open:
                     # if not self.valid_stock(details):
                     #     raise ValueError('Un producto no cuenta con suficiente stock')
@@ -180,7 +180,6 @@ class CreateOrderV3Serializer(serializers.ModelSerializer):
             #     # Send message by django channel
             #     async_to_sync(send_order_to_station_channel)(station.id, order.id)
             # else:
-
             if is_order_to_merchant:
                 # Verificar si el pago es con tarjeta:
                 payment_method = data.get('payment_method', 1)

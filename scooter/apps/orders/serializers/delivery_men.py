@@ -13,6 +13,7 @@ from scooter.apps.orders.models.orders import HistoryRejectedOrders
 # Functions channels
 # Task Celery
 from scooter.apps.orders.serializers.v2 import OrderWithDetailModelSerializer
+from scooter.apps.support.models import Support
 from scooter.apps.taskapp.tasks import send_notification_push_task, send_email_task
 # Functions
 from scooter.apps.orders.serializers.orders import get_nearest_delivery_man
@@ -153,11 +154,16 @@ class ScanQrOrderSerializer(serializers.Serializer):
             order.save()
 
             # Recuperar el id del soporte
-            # support = order.supports.first()
-            # if support:
-            #     support.is_open = False
-            #     support.status_id = 2
-            #     support.save()
+            try:
+                support = order.supports.first()
+                if support:
+                    support.is_open = False
+                    support.status_id = 2
+                    support.save()
+            except Support.DoesNotExist:
+                pass
+            except Exception as ex:
+                pass
 
             delivery_status = DeliveryManStatus.objects.get(slug_name="available")
             delivery_man = order.delivery_man
@@ -278,8 +284,8 @@ class UpdateOrderStatusSerializer(serializers.Serializer):
 def update_order_status(service, order_status, instance, data):
     try:
         # Validate that status
-        if instance.service.slug_name != service.slug_name:
-            raise ValueError('No es posible cambiar de estatus esta orden, no corresponde el tipo del servicio')
+        # if instance.service.slug_name != service.slug_name:
+        #     raise ValueError('No es posible cambiar de estatus esta orden, no corresponde el tipo del servicio')
 
         # Validate that status are not "order_status_slug"
         # if instance.order_status == order_status_slug:
@@ -422,7 +428,7 @@ def accept_order_devivery(order, delivery_man):
     order.in_process = True
     order.save()
     # Send notification push to customer
-    type_notification = "ACCEPTED_ORDER"
+    type_notification = "ACCEPTED_ORDER_NOT_WORK"
     if order.is_order_to_merchant:
         type_notification = "ACCEPT_ORDER_DELIVERY"
         send_notification_push_task.delay(user_id=order.merchant.user_id,

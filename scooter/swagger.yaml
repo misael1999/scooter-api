@@ -421,6 +421,182 @@ paths:
           description: 'Información de la pregunta'
       tags:
         - Support customers
+  # TAGS
+  /api/v1/tags/:
+    post:
+      operationId: register_tags
+      description: Agregar una nueva etiqueta
+      summary: Agregar una nueva etiqueda
+      parameters:
+        - name: body
+          in: body
+          description: Registrar una nueva etiqueta
+          schema:
+            $ref: '#/definitions/RegisterTag'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Tags
+    parameters: []
+    get:
+      operationId: get_tags
+      description: Obtener todas las etiquetas
+      summary: Listado de etiquetas
+      parameters:
+        - name: limit
+          in: query
+          description: Numero de resultados por pagina
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: El índice inicial desde el que devolver los resultados.
+          required: false
+          type: integer
+        - name: search
+          description: Buscar por (nombre)
+          in: query
+          required: false
+          type: string
+        - name: search
+          description: Buscar por (nombre)
+          in: query
+          required: false
+          type: string
+        - name: ordering
+          description: Order por
+          in: query
+          required: false
+          type: string
+          enum: ['name']
+      responses:
+        '201':
+          description: 'Listado de metodos de pago'
+      tags:
+        - Tags
+  /api/v1/tags/{tag_id}/:
+    parameters:
+      - name: tag_id
+        in: path
+        required: true
+        type: string
+    patch:
+      operationId: update_tag
+      description: Actualizar una nueva etiqueta
+      summary: Actualizar una nueva etiqueta
+      parameters:
+        - name: body
+          in: body
+          description: Actualizar una etiqueta
+          schema:
+            $ref: '#/definitions/RegisterTag'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Tags
+    delete:
+      operationId: delete_tag
+      description: Borrar una etiqueta
+      summary: Borrar una etiqueta
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Tags
+  # MERCHANT TAGS
+  /api/v1/merchants/{merchant_id}/tags/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+    post:
+      operationId: register_merchant_tags
+      description: Agregar una o varias etiquetas a un comercio
+      summary: Agregar una o varias etiquetas a un comercio
+      parameters:
+        - name: body
+          in: body
+          description: Registrar una nueva etiqueta
+          schema:
+            $ref: '#/definitions/RegisterMerchantTag'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Tags merchant
+    get:
+      operationId: get_merchant_tags
+      description: Obtener todas las etiquetas de un comercio
+      summary: Obtener todas las etiquetas de un comercio
+      parameters:
+        - name: limit
+          in: query
+          description: Numero de resultados por pagina
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: El índice inicial desde el que devolver los resultados.
+          required: false
+          type: integer
+        - name: search
+          description: Buscar por (nombre)
+          in: query
+          required: false
+          type: string
+        - name: search
+          description: Buscar por (nombre)
+          in: query
+          required: false
+          type: string
+        - name: ordering
+          description: Order por
+          in: query
+          required: false
+          type: string
+          enum: ['name']
+      responses:
+        '201':
+          description: 'Listado de metodos de pago'
+      tags:
+        - Tags merchant
+  /api/v1/merchants/{merchant_id}/tags/{merchant_tag_id}/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+      - name: merchant_tag_id
+        in: path
+        required: true
+        type: string
+#    patch:
+#      operationId: update_merchant_tag
+#      description: Actualizar etiquetas de un comercio
+#      summary: Actualizar etiquetas de un comercio
+#      parameters:
+#        - name: body
+#          in: body
+#          description: Actualizar una etiqueta
+#          schema:
+#            $ref: '#/definitions/RegisterMerchantTag'
+#      responses:
+#        '200':
+#          description: ''
+#      tags:
+#        - Tags merchant
+    delete:
+      operationId: delete_merchant_tag
+      description: Borrar una etiqueta
+      summary: Borrar una etiqueta de un comercio
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Tags merchant
   # DEVICES
   /api/v1/devices/:
     post:
@@ -2350,6 +2526,11 @@ paths:
           required: false
           in: query
           type: integer
+        - name: tag
+          description: Ids de etiquetas separadas por comas
+          required: false
+          in: query
+          type: string
         - name: category
           description: Categoría
           required: false
@@ -2412,11 +2593,6 @@ paths:
           required: true
           in: query
           type: integer
-        - name: tags
-          description: Ids de etiquetas separadas por comas
-          required: false
-          in: query
-          type: string
         - name: lat
           description: Latitude
           in: query
@@ -3260,6 +3436,35 @@ definitions:
     required:
       - registration_id
       - type
+  RegisterTag:
+    type: object
+    properties:
+      name:
+        type: string
+        description: Nombre de la etiqueta
+      area:
+        type: number
+        example: 1
+        description: area de cobertura de la tag
+      picture:
+        type: string
+        example: base64;image
+        description: Imagen para la tag
+  RegisterMerchantTag:
+    type: object
+    properties:
+      tags:
+        type: array
+        description: Ids de etiquetas para asignar
+        items:
+          type: number
+          example: 1
+      delete_tags:
+        type: array
+        description: Ids de etiquetas para asignar
+        items:
+          type: number
+          example: 3
   ContactUser:
     type: object
     properties:

@@ -25,6 +25,10 @@ router.register(r'api/v1/merchants/(?P<merchant_id>[a-zA-Z0-9_-]+)/zones',
                 views.MerchantZoneViewSet, basename='zones-merchants')
 router.register(r'api/v1/merchants/(?P<merchant_id>[a-zA-Z0-9_-]+)/payment_methods',
                 views.MerchantPaymentMethodViewSet, basename='payment-methods-merchants')
+router.register(r'api/v1/tags',
+                views.TagViewSet, basename='tags')
+router.register(r'api/v1/merchants/(?P<merchant_id>[a-zA-Z0-9_-]+)/tags',
+                views.MerchantTagViewSet, basename='merchant-tags')
 
 urlpatterns = [
     # Views
