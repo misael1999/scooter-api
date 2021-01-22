@@ -428,7 +428,7 @@ def accept_order_devivery(order, delivery_man):
     order.in_process = True
     order.save()
     # Send notification push to customer
-    type_notification = "ACCEPTED_ORDER_NOT_WORK"
+    type_notification = "ACCEPTED_ORDER"
     if order.is_order_to_merchant:
         type_notification = "ACCEPT_ORDER_DELIVERY"
         send_notification_push_task.delay(user_id=order.merchant.user_id,
