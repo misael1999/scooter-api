@@ -101,10 +101,10 @@ def open_or_close_merchants():
             from_hour = str(merchant_schedule.from_hour)
             to_hour = str(merchant_schedule.to_hour)
             # Abrir comercio
-            if from_hour >= current_hour:
+            if current_hour >= from_hour and current_hour < to_hour:
                 merchant.is_open = True
                 merchants_to_update.append(merchant)
-            elif current_hour >= to_hour:
+            else:
                 merchant.is_open = False
                 merchants_to_update.append(merchant)
         except MerchantSchedule.DoesNotExist:
