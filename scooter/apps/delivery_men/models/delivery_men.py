@@ -30,6 +30,11 @@ class DeliveryMan(ScooterModel):
     vehicle_color = models.CharField(max_length=15, null=True, blank=True)
     vehicle_type = models.ForeignKey('common.TypeVehicle', on_delete=models.DO_NOTHING, default=1)
 
+    device_name = models.CharField(max_length=80, null=True, blank=True)
+    version_code = models.CharField(max_length=50, null=True, blank=True)
+    device_version = models.CharField(max_length=50, null=True, blank=True)
+    is_android = models.BooleanField(default=True)
+
     from_merchant = models.BooleanField(default=False)
     objects = DeliveryManManager()
 

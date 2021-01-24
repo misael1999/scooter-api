@@ -3992,6 +3992,18 @@ definitions:
       picture:
         type: string
         description: Imagen del repartidor
+      device_name:
+        type: string
+        description: Nombre del dispositivo (LG, CHAYOMI)
+      version_code:
+        type: string
+        description: Versión de la app
+      device_version:
+        type: string
+        description: Version de android o ios
+      is_android:
+        type: boolean
+        description: Si es android
   # VEHICLE'S STATION
   RegisterVehicle:
     type: object

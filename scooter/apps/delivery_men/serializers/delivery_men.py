@@ -23,11 +23,25 @@ class DeliveryManModelSerializer(ScooterModelSerializer):
         geo_field = 'location'
         fields = '__all__'
         read_only_fields = (
-            'user', 'station', 'name', 'last_name',
-            'phone_number', 'reputation', 'location',
-            'delivery_status', 'vehicle_plate', 'vehicle_model',
-            'vehicle_year', 'vehicle_color', 'vehicle_type',
-            'last_time_update_location', 'from_merchant'
+            'user',
+            'station',
+            'name',
+            'last_name',
+            'phone_number',
+            'reputation',
+            'location',
+            'delivery_status',
+            'vehicle_plate',
+            'vehicle_model',
+            'vehicle_year',
+            'vehicle_color',
+            'vehicle_type',
+            'last_time_update_location',
+            'from_merchant',
+            'device_name',
+            'version_code',
+            'device_version',
+            'is_android'
         )
 
     def update(self, instance, data):
