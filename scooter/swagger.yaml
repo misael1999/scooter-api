@@ -120,12 +120,12 @@ paths:
           in: query
           description: Latitude
           required: true
-          type: double
+          type: string
         - name: lng
           in: query
           description: Longitude
           required: true
-          type: double
+          type: string
       responses:
         '200':
           description: 'Zona'
