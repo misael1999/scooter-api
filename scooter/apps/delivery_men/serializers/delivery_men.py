@@ -37,11 +37,7 @@ class DeliveryManModelSerializer(ScooterModelSerializer):
             'vehicle_color',
             'vehicle_type',
             'last_time_update_location',
-            'from_merchant',
-            'device_name',
-            'version_code',
-            'device_version',
-            'is_android'
+            'from_merchant'
         )
 
     def update(self, instance, data):

@@ -87,7 +87,8 @@ def send_notification_delivery():
 
 
 # Period Task with crontab
-@periodic_task(name='close_or_open_merchants', run_every=crontab(minute=2, hour='8,9,12,13,14,15,16,17,18,19,20,21,22'))
+@periodic_task(name='close_or_open_merchants',
+               run_every=crontab(minute=2, hour='8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23'))
 def open_or_close_merchants():
     today = timezone.localtime().strftime("%A").lower()
     now = timezone.localtime(timezone.now())
@@ -113,6 +114,8 @@ def open_or_close_merchants():
     Merchant.objects.bulk_update(merchants_to_update, ['is_open'])
 
     # @periodic_task(name='reject_orders', run_every=timedelta(minutes=1))
+
+
 # def reject_orders():
 #     """ Verify orders and reject when nobody responds """
 #     now = timezone.localtime(timezone.now())
