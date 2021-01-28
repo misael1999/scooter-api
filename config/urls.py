@@ -38,6 +38,8 @@ urlpatterns = [
     # Payments
     path('', include('scooter.apps.payments.urls')),
     # Support
-    path('', include('scooter.apps.support.urls'))
+    path('', include('scooter.apps.support.urls')),
+    # Promotions
+    path('', include('scooter.apps.promotions.urls'))
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

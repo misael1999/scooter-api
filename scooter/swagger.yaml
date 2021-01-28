@@ -2817,6 +2817,7 @@ paths:
     patch:
       operationId: update_vehicle_unlock
       description: Activar categoría
+      summary: Activar categoría
       parameters:
         - name: body
           in: body
@@ -2841,11 +2842,12 @@ paths:
     get:
       operationId: get_products_category
       description: Obtener productos por categoria
+      summary: Obtener productos por categoria
       responses:
         '200':
           description: 'Información de la categoría'
       tags:
-        - Comercios
+        - Comercios Productos Categorías
   /api/v1/merchants/{merchant_id}/categories/{category_id}/subcategories/products/:
     parameters:
       - name: merchant_id
@@ -2859,11 +2861,12 @@ paths:
     get:
       operationId: get_products_subcategories_products
       description: Obtener productos agrupadas por subcategorias
+      summary: Obtener productos agrupadas por subcategorias
       responses:
         '200':
           description: 'Información de la categoría agrupado las subcategorias'
       tags:
-        - Comercios
+        - Comercios Productos Categorías
   /api/v1/merchants/{merchant_id}/categories/products/:
     parameters:
       - name: merchant_id
@@ -2873,6 +2876,7 @@ paths:
     get:
       operationId: get_categories_products_merchant
       description: Obtener los productos agrupado por categorias
+      summary: Obtener los productos agrupado por categorias
       parameters:
         - name: limit
           in: query
@@ -2904,7 +2908,7 @@ paths:
         '201':
           description: 'Obtener los productos agrupado por categorias'
       tags:
-        - Comercios
+        - Comercios Productos Categorías
   /api/v1/merchants/{merchant_id}/statistics/summary/:
     parameters:
       - name: merchant_id
@@ -2934,6 +2938,7 @@ paths:
     get:
       operationId: get_subcategories_products_merchant_search
       description: Obtener los productos agrupado por subcategorias
+      summary: Obtener los productos agrupado por subcategorias
       parameters:
         - name: search
           description: Buscar por (nombre)
@@ -2945,7 +2950,7 @@ paths:
           description: 'Obtener los productos agrupado por subcategorias,
            filtrando unicamente los productos que coincidan con la busqueda'
       tags:
-        - Comercios
+        - Comercios Productos Categorías
   /api/v1/merchants/{merchant_id}/subcategories/{subcategory_id}/products/:
     parameters:
       - name: merchant_id
@@ -2959,6 +2964,7 @@ paths:
     get:
       operationId: get_subcategories_products_merchant
       description: Obtener los productos de una subcategoria
+      summary: Obtener los productos de una subcategoria
       parameters:
         - name: limit
           in: query
@@ -2990,7 +2996,7 @@ paths:
         '201':
           description: 'Obtener los productos agrupado por categorias'
       tags:
-        - Comercios
+        - Comercios Productos Categorías
   /api/v1/merchants/{merchant_id}/subcategories/{subcategory_id}/products/sections/:
     parameters:
       - name: merchant_id
@@ -3004,6 +3010,7 @@ paths:
     get:
       operationId: get_subcategories_products_sections_merchant
       description: Obtener los productos de una subcategoria con sus secciones
+      summary: Obtener los productos de una subcategoria con sus secciones
       parameters:
         - name: limit
           in: query
@@ -3035,7 +3042,7 @@ paths:
         '200':
           description: 'Obtener los productos agrupado por secciones'
       tags:
-        - Comercios
+        - Comercios Productos Categorías
   /api/v1/merchants/{merchant_id}/categories/level_two/:
     parameters:
       - name: merchant_id
@@ -3045,6 +3052,7 @@ paths:
     get:
       operationId: get_categories_two_merchant
       description: Obtener unicamente las categorias
+      summary: Obtener unicamente las categorias
       parameters:
         - name: limit
           in: query
@@ -3076,7 +3084,7 @@ paths:
         '201':
           description: 'Obtener los productos agrupado por categorias'
       tags:
-        - Comercios
+        - Comercios Categorías
   /api/v1/merchants/{merchant_id}/categories/level_three/:
     parameters:
       - name: merchant_id
@@ -3086,6 +3094,7 @@ paths:
     get:
       operationId: get_categories_level_three_merchant
       description: Obtener las categorias con las subcategorias
+      summary: Obtener las categorias con las subcategorias
       parameters:
         - name: limit
           in: query
@@ -3117,7 +3126,7 @@ paths:
         '201':
           description: 'Obtener los productos agrupado por categorias'
       tags:
-        - Comercios
+        - Comercios Productos Categorías
 # PRODUCTS
   /api/v1/merchants/{merchant_id}/products/:
     parameters:
@@ -3129,6 +3138,7 @@ paths:
     post:
       operationId: register_product
       description: Registro de productos
+      summary: Registro de productos
       parameters:
         - name: body
           in: body
@@ -3139,10 +3149,11 @@ paths:
         '201':
           description: 'Información del producto'
       tags:
-        - Comercios
+        - Comercios Productos
     get:
       operationId: get_products_merchant
       description: Obtener productos de un comercio
+      summary: Obtener productos de un comercio
       parameters:
         - name: limit
           in: query
@@ -3174,7 +3185,7 @@ paths:
         '201':
           description: 'Listado de categorías por comercio'
       tags:
-        - Comercios
+        - Comercios Productos
   /api/v1/merchants/{merchant_id}/products/{product_id}/:
     parameters:
       - name: merchant_id
@@ -3199,7 +3210,7 @@ paths:
         '201':
           description: 'Información del producto'
       tags:
-        - Comercios
+        - Comercios Productos Categorías
     # GET INFO CATEGORY BY MERCHANT
     get:
       operationId: get_product
@@ -3216,7 +3227,32 @@ paths:
         '201':
           description: 'Información de la categoria'
       tags:
-        - Comercios
+        - Comercios Productos
+  /api/v1/products/{product_id}/menu_categories/{menu_category_id}/:
+    parameters:
+      - name: menu_category_id
+        in: path
+        required: true
+        type: string
+      - name: product_id
+        in: path
+        required: true
+        type: string
+  # UPDATE PRODUCT BY MERCHANT
+    patch:
+      operationId: update_menu_category_product
+      description: Actualizar datos del producto
+      parameters:
+        - name: body
+          in: body
+          description: Actualizar datos del producto
+          schema:
+            $ref: '#/definitions/UpdateMerchantProductCategory'
+      responses:
+        '201':
+          description: 'Información del producto'
+      tags:
+        - Comercios Productos
   /api/v1/merchants/{merchant_id}/products/{product_id}/unlock/:
     parameters:
       - name: merchant_id
@@ -4533,6 +4569,42 @@ definitions:
       - stock
       - price
       - category_id
+  UpdateMerchantProductCategory:
+    type: object
+    properties:
+       name:
+         type: string
+         description: Nombre de la categoría
+       is_obligatory:
+         type: string
+         description: Es necesario
+       min_options_choose:
+         type: number
+         example: 1
+         description: Minimo de opciones a elegir
+       max_options_choose:
+         type: number
+         example: 1
+         description: Máximo de opciones a elegir
+       options_to_update:
+         type: array
+         items:
+           type: object
+           properties:
+             name:
+               type: string
+               description: Nombre de la opción
+             type_id:
+               type: number
+               description: Tipo de opción
+             price:
+               type: number
+               description: Precio del producto
+       options_to_delete:
+         type: array
+         items:
+           type: number
+           example: 1
   UpdateProduct:
     type: object
     properties:

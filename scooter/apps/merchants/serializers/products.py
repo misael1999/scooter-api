@@ -39,6 +39,10 @@ class ProductMenuCategorySerializer(serializers.ModelSerializer):
         read_only_fields = ('status', 'id')
 
 
+class UpdateProductMenuOption():
+    pass
+
+
 class ProductsModelSerializer(ScooterModelSerializer):
     name = serializers.CharField(max_length=70,
                                  validators=
