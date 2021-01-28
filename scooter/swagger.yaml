@@ -2928,7 +2928,7 @@ paths:
         '201':
           description: 'Obtener los productos agrupado por categorias'
       tags:
-        - Comercios
+        - Comercios Estadisticas
   /api/v1/merchants/{merchant_id}/categories/products/search/:
     parameters:
       - name: merchant_id
@@ -3084,7 +3084,7 @@ paths:
         '201':
           description: 'Obtener los productos agrupado por categorias'
       tags:
-        - Comercios Categorías
+        - Comercios Productos Categorías
   /api/v1/merchants/{merchant_id}/categories/level_three/:
     parameters:
       - name: merchant_id
@@ -4591,15 +4591,18 @@ definitions:
          items:
            type: object
            properties:
+             id:
+               type: number
+               description: Id de la opcion
              name:
                type: string
                description: Nombre de la opción
-             type_id:
-               type: number
-               description: Tipo de opción
              price:
                type: number
                description: Precio del producto
+              is_available:
+                type: boolean
+                description: Si esta agotado o no
        options_to_delete:
          type: array
          items:
