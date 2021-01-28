@@ -4600,14 +4600,9 @@ definitions:
              price:
                type: number
                description: Precio del producto
-              is_available:
-                type: boolean
-                description: Si esta agotado o no
-       options_to_delete:
-         type: array
-         items:
-           type: number
-           example: 1
+             is_available:
+               type: boolean
+               description: Si esta agotado o no
   UpdateProduct:
     type: object
     properties:
