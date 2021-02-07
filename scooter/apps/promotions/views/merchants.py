@@ -39,7 +39,7 @@ class MerchantPromotionViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cre
     def get_queryset(self):
         """ Personalized query when the action is a list so that it only returns active categories """
         if self.action == 'list':
-            return self.merchant.merchantpromotion_set.all()
+            return self.merchant.promotions.all()
         return self.queryset
 
     def create(self, request, *args, **kwargs):

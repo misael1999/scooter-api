@@ -69,6 +69,7 @@ class CreateOrderV3Serializer(serializers.ModelSerializer):
     card_id = CustomerFilteredPrimaryKeyRelatedField(required=False, queryset=Card.objects,
                                                      source="card", allow_null=True,
                                                      allow_empty=True)
+    has_promotion = serializers.BooleanField(default=False, required=False)
 
     class Meta:
         model = Order
@@ -101,6 +102,7 @@ class CreateOrderV3Serializer(serializers.ModelSerializer):
             station = data.get('station', None)
             merchant = data.get('merchant', None)
             customer_promotion = data.get('promotion', None)
+            has_promotion = data.get('has_promotion', False)
             price_promotion = None
             maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=settings.TIME_RESPONSE)
             if customer_promotion:
@@ -258,6 +260,11 @@ class CreateOrderV3Serializer(serializers.ModelSerializer):
             print(ex.__cause__)
             print(ex)
             raise serializers.ValidationError({'detail': 'Error al crear la orden'})
+
+    def check_merchant_promotions(self, merchant):
+
+
+        pass
 
     def valid_stock(self, details):
         is_valid = True
