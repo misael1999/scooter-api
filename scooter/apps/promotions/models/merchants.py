@@ -25,7 +25,7 @@ class MerchantPromotion(ScooterModel):
     promotion_type = models.ForeignKey(MerchantPromotionType, on_delete=models.DO_NOTHING)
     station = models.ForeignKey('stations.Station', on_delete=models.DO_NOTHING)
     coupon_code = models.CharField(max_length=15, null=True, blank=True)
-    merchant = models.ForeignKey('merchants.Merchant', on_delete=models.DO_NOTHING)
+    merchant = models.ForeignKey('merchants.Merchant', on_delete=models.DO_NOTHING, related_name="promotions")
     reason_not_available = models.CharField(max_length=150, null=True, blank=True)
     is_approved = models.BooleanField(default=False)
     objects = MerchantPromotionManager()
