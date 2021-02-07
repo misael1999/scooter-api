@@ -6,4 +6,7 @@ class MerchantManager(Manager):
     def get_queryset(self):
         return super(MerchantManager, self).get_queryset().select_related(
             'delivery_rules',
+        ).prefetch_related(
+            'tags',
+            'promotions'
         )

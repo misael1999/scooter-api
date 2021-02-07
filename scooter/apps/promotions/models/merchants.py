@@ -1,4 +1,6 @@
 from django.db import models
+
+from scooter.apps.promotions.managers.merchants import MerchantPromotionManager, MerchantPromotionTimeIntervalManager
 from scooter.utils.models import ScooterModel
 
 
@@ -26,6 +28,7 @@ class MerchantPromotion(ScooterModel):
     merchant = models.ForeignKey('merchants.Merchant', on_delete=models.DO_NOTHING)
     reason_not_available = models.CharField(max_length=150, null=True, blank=True)
     is_approved = models.BooleanField(default=False)
+    objects = MerchantPromotionManager()
 
     def __str__(self):
         return self.name
@@ -88,6 +91,7 @@ class MerchantPromotionTimeInterval(ScooterModel):
     promotion = models.ForeignKey(MerchantPromotion, on_delete=models.DO_NOTHING, related_name="time_intervals")
     from_time = models.TimeField(null=True)
     to_time = models.TimeField(null=True)
+    objects = MerchantPromotionTimeIntervalManager()
 
     def __str__(self):
         return "De: {} a: {}".format(self.from_time, self.to_time)
