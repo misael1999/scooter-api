@@ -123,8 +123,8 @@ class ProductsMenuCategoryViewSet(ScooterViewSet, mixins.ListModelMixin,
     def update(self, request, *args, **kwargs):
         menu = self.get_object()
         # Send instance of product for validate of name not exist
-        serializer = self.get_serializer(menu, data=request.data, partial=True,
-                                         context=self.get_serializer_context())
+        serializer = UpdateProductMenuCategorySerializer(menu, data=request.data, partial=True,
+                                                         context=self.get_serializer_context())
         serializer.is_valid(raise_exception=True)
         menu = serializer.save()
         # menu_updated = UpdateProductMenuCategorySerializer(menu).data

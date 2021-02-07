@@ -31,7 +31,12 @@ class ProductMenuCategorySerializer(serializers.ModelSerializer):
 
 # Serializers
 class ProductSimpleModelSerializer(ScooterModelSerializer):
-    menu_categories = ProductMenuCategorySerializer(many=True, required=False)
+    # menu_categories = ProductMenuCategorySerializer(many=True, required=False)
+    menu_categories = serializers.SerializerMethodField('get_menu_categories', read_only=True)
+
+    def get_menu_categories(self, product):
+        qs = product.menu_categories.filter(status_id=1, product=product)
+        return ProductMenuCategorySerializer(instance=qs, many=True, read_only=True).data
 
     class Meta:
         model = Product
