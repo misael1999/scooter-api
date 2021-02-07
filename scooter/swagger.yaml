@@ -597,6 +597,113 @@ paths:
           description: ''
       tags:
         - Tags merchant
+  # MERCHANT PROMOTIONS
+  /api/v1/merchants/{merchant_id}/promotions/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+    post:
+      operationId: register_merchant_promotions
+      description: Agregar promociones por comercio
+      summary: Agregar promociones por comercio
+      parameters:
+        - name: body
+          in: body
+          description: Agregar promociones por comercio
+          schema:
+            $ref: '#/definitions/RegisterMerchantPromotion'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Promotions merchant
+    get:
+      operationId: get_merchant_promotions
+      description: Obtener todas las promociones de un comercio
+      summary: Obtener todas las promociones de un comercio
+      parameters:
+        - name: limit
+          in: query
+          description: Numero de resultados por pagina
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: El índice inicial desde el que devolver los resultados.
+          required: false
+          type: integer
+        - name: search
+          description: Buscar por (nombre)
+          in: query
+          required: false
+          type: string
+        - name: ordering
+          description: Order por nombre, presupuesto
+          in: query
+          required: false
+          type: string
+          enum: ['name', 'budget']
+        - name: from_date
+          in: query
+          description: Desde la fecha YYYY-MM-DD
+          required: false
+          type: date
+        - name: to_date
+          in: query
+          description: Hasta la fecha YYYY-MM-DD
+          required: false
+          type: date
+        - name: is_approved
+          description: Si esta aprobada
+          in: query
+          required: false
+          type: boolean
+        - name: is_available
+          description: Si esta aprobada
+          in: query
+          required: false
+          type: boolean
+      responses:
+        '201':
+          description: 'Listado de promociones'
+      tags:
+        - Promotions merchant
+  /api/v1/merchants/{merchant_id}/promotions/{merchant_promotion_id}/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+      - name: merchant_promotion_id
+        in: path
+        required: true
+        type: string
+    patch:
+      operationId: update_merchant_promotion
+      description: Actualizar promocion de un comercio
+      summary: Actualizar promocion de un comercio
+      parameters:
+        - name: body
+          in: body
+          description: Actualizar promocion de un comercio
+          schema:
+            $ref: '#/definitions/RegisterMerchantPromotion'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Promotions merchant
+    delete:
+      operationId: delete_merchant_promotion
+      description: Desactivar una promoción
+      summary: Desactivar una promoción
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Promotions merchant
   # DEVICES
   /api/v1/devices/:
     post:
@@ -3253,6 +3360,19 @@ paths:
           description: 'Información del producto'
       tags:
         - Comercios Productos
+  # DESACTIVAR PRODUCT BY MERCHANT
+    delete:
+      operationId: delete_menu_category_product
+      description: Desactivar menu
+      parameters:
+        - name: body
+          in: body
+          description: Desactivar datos del producto
+      responses:
+        '201':
+          description: 'Información del producto'
+      tags:
+        - Comercios Productos
   /api/v1/merchants/{merchant_id}/products/{product_id}/unlock/:
     parameters:
       - name: merchant_id
@@ -3486,6 +3606,87 @@ definitions:
         type: string
         example: base64;image
         description: Imagen para la tag
+  RegisterMerchantPromotion:
+    type: object
+    properties:
+      name:
+        type: string
+        description: Nombre de la promoción en caso de que sea personalizada
+        example: "Entrega con descuentos en el costo de envio o envio gratuito"
+      description:
+        type: string
+        description: Descripción de la promoción para tenerla como referencía
+        example: "Descripción de referencia"
+      from_date:
+        type: string
+        description: A partir de que fecha va estar disponible en caso de que no sea periodico
+        example: "2021-01-01 10:22"
+      to_date:
+        type: string
+        description: Hasta que fecha va estar disponible en caso de que no sea periodico
+        example: "2021-01-25 17:00"
+      promotion_type:
+        type: number
+        description: Tipo de promoción
+        enum: ['delivery_discount', 'products_discount']
+      promotion_rule:
+        type: object
+        properties:
+          is_periodic:
+            type: boolean
+            example: true
+            description: Es periodico
+          has_limit_usage:
+            type: boolean
+            example: false
+            description: Tiene limite de uso o tiene presupuesto
+          is_discount_percentage:
+            type: boolean
+            example: false
+            description: Si el descuento es con porcentaje
+          is_coupon_code:
+            type: boolean
+            example: false
+            description: Si el comercio desea que sea un cupon o sea para el publico general
+          minimum_order_price:
+            type: boolean
+            example: true
+            description: Precio mínimo de orden para que se aplicable la promoción
+          discount_amount:
+            type: number
+            example: 20
+            description: De cuanto sera el descuento
+          usage_limit:
+            type: number
+            example: 1
+            description: Limite de uso si se coloco que no tiene presupuesto
+          budget:
+            type: number
+            example: 100
+            description: Presupuesto para la promoción en caso de no sea periodico
+      time_intervals:
+        type: array
+        description: Ids de etiquetas para asignar
+        items:
+          type: object
+          properties:
+            from_time:
+              type: string
+              example: "15:00"
+              description: Desde la hora
+            to_time:
+              type: string
+              example: "22:00"
+              description: Hasta la hora
+            schedule_ids:
+              type: array
+              descriptions: Días a aplicar la promoción en un cierto tiempo
+              items:
+                type: number
+                example: 2
+                description: ID del día que se aplicara ese intervalo de tiempo
+
+
   RegisterMerchantTag:
     type: object
     properties:

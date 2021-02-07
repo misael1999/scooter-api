@@ -39,8 +39,35 @@ class ProductMenuCategorySerializer(serializers.ModelSerializer):
         read_only_fields = ('status', 'id')
 
 
-class UpdateProductMenuOption():
-    pass
+class UpdateProductMenuCategorySerializer(serializers.Serializer):
+    name = serializers.CharField()
+    is_obligatory = serializers.BooleanField()
+    min_options_choose = serializers.IntegerField()
+    max_options_choose = serializers.IntegerField()
+    options_to_update = ProductMenuOptionSerializer(many=True)
+
+    def create(self, validated_data):
+        return validated_data
+
+    def update(self, menu_category, data):
+        try:
+            options = data.pop('options_to_update', [])
+            # Actualizar menu
+            for field, value in data.items():
+                setattr(menu_category, field, value)
+            menu_category.save()
+            for option in options:
+                option_id = option.pop('id', None)
+                if not option_id:
+                    raise ValueError('No has ingresado el ID de la opción')
+                ProductMenuOption.objects.filter(pk=option_id).update(**option)
+            return data
+        except ValueError as e:
+            raise serializers.ValidationError({'detail': e})
+        except Exception as ex:
+            print("Exception save product, please check it")
+            print(ex.args.__str__())
+            raise serializers.ValidationError({'detail': 'Error al guardar la información'})
 
 
 class ProductsModelSerializer(ScooterModelSerializer):

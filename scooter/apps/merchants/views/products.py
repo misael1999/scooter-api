@@ -5,15 +5,15 @@ from rest_framework.response import Response
 # Models
 from scooter.apps.common.models.status import Status
 # Serializers
-from scooter.apps.merchants.serializers import ProductsModelSerializer
+from scooter.apps.merchants.serializers import ProductsModelSerializer, UpdateProductMenuCategorySerializer
 # Viewset
-from scooter.apps.merchants.models import Product
+from scooter.apps.merchants.models import Product, ProductMenuCategory
 from scooter.utils.viewsets.scooter import ScooterViewSet
 # Mixins
-from scooter.apps.common.mixins import AddMerchantMixin
+from scooter.apps.common.mixins import AddMerchantMixin, AddProductMixin
 # Permissions
 from rest_framework.permissions import IsAuthenticated
-from scooter.apps.merchants.permissions import IsAccountOwnerMerchant
+from scooter.apps.merchants.permissions import IsAccountOwnerMerchant, IsProductOwner
 # Filters
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
@@ -82,7 +82,6 @@ class ProductsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.CreateModelM
                                             message='Ha ocurrido un error al borrar el producto')
             return Response(data=error, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
     @action(detail=True, methods=['PATCH'])
     def unlock(self, request, *args, **kwargs):
         product = self.get_object()
@@ -91,4 +90,63 @@ class ProductsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.CreateModelM
         product.status = sts
         product.save()
         data = self.set_response(status=True, data={}, message="Producto activado correctamente")
+        return Response(data=data, status=status.HTTP_200_OK)
+
+
+class ProductsMenuCategoryViewSet(ScooterViewSet, mixins.ListModelMixin,
+                                  mixins.UpdateModelMixin, mixins.RetrieveModelMixin,
+                                  mixins.DestroyModelMixin, AddProductMixin):
+    """ View set for the merchants can update product menu """
+    serializer_class = UpdateProductMenuCategorySerializer
+    queryset = ProductMenuCategory.objects.all()
+    permission_classes = (IsAuthenticated, IsProductOwner)
+    # Affect the default order
+    """ Method dispatch in AddMerchantMixin """
+    product = None
+
+    def get_queryset(self):
+        """ Personalized query when the action is a list so that it only returns active categories """
+        if self.action == 'list':
+            return self.product.menu_categories.all()
+        return self.queryset
+
+    # def create(self, request, *args, **kwargs):
+    #     """ To return a custom response """
+    #     serializer = self.get_serializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     obj = serializer.save()
+    #     data = self.set_response(status=True,
+    #                              data=ProductsModelSerializer(obj).data,
+    #                              message='Se ha registrado un nuevo producto')
+    #     return Response(data=data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, *args, **kwargs):
+        menu = self.get_object()
+        # Send instance of product for validate of name not exist
+        serializer = self.get_serializer(menu, data=request.data, partial=True,
+                                         context=self.get_serializer_context())
+        serializer.is_valid(raise_exception=True)
+        menu = serializer.save()
+        # menu_updated = UpdateProductMenuCategorySerializer(menu).data
+        data = self.set_response(status=True, data=menu, message="menu actualizado correctamente")
+        return Response(data=data, status=status.HTTP_201_CREATED)
+
+    def perform_destroy(self, instance):
+        try:
+            sts = Status.objects.get(slug_name='inactive')
+            instance.status = sts
+            instance.save()
+        except Status.DoesNotExist:
+            error = self.set_error_response(status=False, field='status',
+                                            message='Ha ocurrido un error al desactivar el menu')
+            return Response(data=error, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=True, methods=['PATCH'])
+    def unlock(self, request, *args, **kwargs):
+        menu = self.get_object()
+        sts = Status.objects.get(slug_name='active')
+        # Send instance of product for validate of name not exist
+        menu.status = sts
+        menu.save()
+        data = self.set_response(status=True, data={}, message="Menu activado correctamente")
         return Response(data=data, status=status.HTTP_200_OK)

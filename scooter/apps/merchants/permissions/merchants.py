@@ -16,6 +16,16 @@ class IsAccountOwnerMerchant(BasePermission):
         return user.id == view.merchant.user_id
 
 
+class IsProductOwner(BasePermission):
+
+    def has_permission(self, request, view):
+        """Verify user have a merchant."""
+        user = request.user
+
+        # Station
+        return user.id == view.product.user_id
+
+
 class IsSameMerchant(BasePermission):
 
     def has_permission(self, request, view):
