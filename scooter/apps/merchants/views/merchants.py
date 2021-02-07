@@ -1,36 +1,33 @@
 # Cache methods
 from django.conf import settings
+from django.contrib.gis.db.models.functions import Distance
+# Django rest
+from django.contrib.gis.geos import Point
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.views.decorators.vary import vary_on_cookie
-# Django rest
-from django.contrib.gis.geos import Point
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, mixins
 from rest_framework.decorators import action
-from rest_framework.response import Response
+# Filters
+from rest_framework.filters import SearchFilter, OrderingFilter
 # Permissions
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
 
 from scooter.apps.common.models import CategoryMerchant, Area, Status
 from scooter.apps.common.serializers import AreaModelSerializer
 from scooter.apps.merchants.models import Merchant, Tag
 # Permissions
-from scooter.apps.merchants.permissions import IsAccountOwnerMerchant, IsSameMerchant
+from scooter.apps.merchants.permissions import IsSameMerchant
+# Models
+# Serializers
+from scooter.apps.merchants.serializers import (MerchantWithAllInfoSerializer, UpdateInfoMerchantSerializer,
+                                                AvailabilityMerchantSerializer, ChangePasswordMerchantSerializer,
+                                                MerchantInfoSerializer, TagModelSimpleSerializer)
 # Utilities
 from scooter.apps.merchants.utils import MerchantTagFilter
 from scooter.utils.viewsets import ScooterViewSet
-# Models
-# Serializers
-from scooter.apps.merchants.serializers import (MerchantSignUpSerializer,
-                                                MerchantWithAllInfoSerializer, UpdateInfoMerchantSerializer,
-                                                AvailabilityMerchantSerializer, ChangePasswordMerchantSerializer,
-                                                MerchantInfoSerializer, TagModelSimpleSerializer)
-
-from scooter.apps.users.serializers.users import UserModelSimpleSerializer
-# Filters
-from rest_framework.filters import SearchFilter, OrderingFilter
-from django_filters.rest_framework import DjangoFilterBackend
-from django.contrib.gis.db.models.functions import Distance
 
 
 class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,

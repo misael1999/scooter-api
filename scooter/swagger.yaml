@@ -3628,7 +3628,7 @@ definitions:
       promotion_type:
         type: number
         description: Tipo de promoción
-        enum: ['delivery_discount', 'products_discount']
+        example: 1
       promotion_rule:
         type: object
         properties:
@@ -3637,6 +3637,10 @@ definitions:
             example: true
             description: Es periodico
           has_limit_usage:
+            type: boolean
+            example: false
+            description: Tiene limite de uso o tiene presupuesto
+          has_limit_discount_amount:
             type: boolean
             example: false
             description: Tiene limite de uso o tiene presupuesto
@@ -3649,13 +3653,17 @@ definitions:
             example: false
             description: Si el comercio desea que sea un cupon o sea para el publico general
           minimum_order_price:
-            type: boolean
-            example: true
+            type: number
+            example: 130
             description: Precio mínimo de orden para que se aplicable la promoción
           discount_amount:
             type: number
             example: 20
             description: De cuanto sera el descuento
+          limit_discount_amount:
+            type: number
+            example: 20
+            description: Limite de descuento
           usage_limit:
             type: number
             example: 1
