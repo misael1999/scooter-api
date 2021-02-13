@@ -77,7 +77,7 @@ class CustomerPromotion(ScooterModel):
 
     name = models.CharField(max_length=70, null=True, blank=True)
     description = models.CharField(max_length=150, null=True, blank=True)
-    history = models.ForeignKey(HistoryCustomerInvitation, on_delete=models.DO_NOTHING)
+    history = models.ForeignKey(HistoryCustomerInvitation, on_delete=models.DO_NOTHING, null=True)
     customer = models.ForeignKey('customers.Customer', on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField()
     expiration_date = models.DateTimeField()

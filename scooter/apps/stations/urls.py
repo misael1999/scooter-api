@@ -9,6 +9,9 @@ from scooter.apps.stations import views
 router = DefaultRouter()
 router.register(r'api/v1/stations', views.StationViewSet, basename='stations')
 
+router.register(r'api/v1/stations/(?P<station_id>[a-zA-Z0-9_-]+)/customer_promotions',
+                views.StationCustomerPromotionViewSet, basename='customer-promotions-station')
+
 router.register(r'api/v1/stations/(?P<station_id>[a-zA-Z0-9_-]+)/vehicles',
                 views.VehiclesViewSet, basename='vehicles-station')
 

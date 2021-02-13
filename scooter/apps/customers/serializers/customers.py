@@ -250,11 +250,13 @@ class HistoryCustomerModelSerializer(serializers.ModelSerializer):
 
 
 class CustomerPromotionModelSerializer(serializers.ModelSerializer):
-    history = HistoryCustomerModelSerializer()
+    history = HistoryCustomerModelSerializer(read_only=True)
+    customer = CustomerInvitationSimpleSerializer(read_only=True)
 
     class Meta:
         model = CustomerPromotion
         fields = ('id', 'name', 'description', 'history', 'customer', 'created_at',
                   'expiration_date', 'used', 'used_at')
+        read_only_fields = fields
 
 

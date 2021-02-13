@@ -5,3 +5,4 @@ from .customers import *
 from .notifications import *
 from .zones import *
 from .merchants import *
+from .promotions import *

@@ -1677,6 +1677,100 @@ paths:
           description: 'Información del vehiculo'
       tags:
         - Centrales
+  /api/v1/stations/{station_id}/customer_promotions/:
+    parameters:
+      - name: station_id
+        in: path
+        required: true
+        type: string
+    # CREATE CUSTOMER PROMOTION BY STATION
+    post:
+      operationId: register_customer_promotion
+      description: Registro de promociones
+      parameters:
+        - name: body
+          in: body
+          description: Registro de promociones
+          schema:
+            $ref: '#/definitions/RegisterStationCustomerPromotion'
+      responses:
+        '201':
+          description: 'Promoción creada'
+      tags:
+        - Centrales - Promociones
+    get:
+      operationId: get_customer_promotion_station
+      description: Obtener datos de las promociones de los clientes
+      parameters:
+        - name: limit
+          in: query
+          description: Numero de resultados por pagina
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: El índice inicial desde el que devolver los resultados.
+          required: false
+          type: integer
+        - name: status
+          description: ID Status
+          required: false
+          in: query
+          type: string
+        - name: search
+          description: Buscar por (nombre del cliente, teléfono)
+          in: query
+          required: false
+          type: string
+        - name: used
+          description: Filtrar si la promoción ya fue usada
+          in: query
+          required: false
+          type: boolean
+        - name: ordering
+          description: Ordenar por
+          in: query
+          required: false
+          type: string
+          enum: ['expiration_date', 'created_at', 'customer__total_orders', 'used', 'used_at']
+      responses:
+        '201':
+          description: 'Listado de vehiculos por central'
+      tags:
+        - Centrales - Promociones
+  /api/v1/stations/{station_id}/customer_promotions/{promotion_id}/:
+    parameters:
+      - name: station_id
+        in: path
+        required: true
+        type: string
+      - name: promotion_id
+        in: path
+        required: true
+        type: string
+  # UPDATE CUSTOMER PROMOTION BY STATION
+    patch:
+      operationId: update_customer_promotion
+      description: Actualizar datos de la promoción
+      parameters:
+        - name: body
+          in: body
+          description: Actualizar datos del vehiculo
+          schema:
+            $ref: '#/definitions/RegisterStationCustomerPromotion'
+      responses:
+        '201':
+          description: 'Información del vehiculo'
+      tags:
+        - Centrales - Promociones
+    delete:
+      operationId: delete_customer_promotion
+      description: Borra Promoción de cliente
+      responses:
+        '201':
+          description: 'Información de la promoción'
+      tags:
+        - Centrales - Promociones
   /api/v1/stations/{station_id}/vehicles/{vehicle_id}/unlock/:
     parameters:
       - name: station_id
@@ -3606,6 +3700,18 @@ definitions:
         type: string
         example: base64;image
         description: Imagen para la tag
+  RegisterStationCustomerPromotion:
+    type: object
+    properties:
+      customer_ids:
+        type: array
+        items:
+          type: number
+          example: 1
+      quantity_days_validity:
+        type: number
+        example: 3
+        description: Días que estara disponible la promoción
   RegisterMerchantPromotion:
     type: object
     properties:
