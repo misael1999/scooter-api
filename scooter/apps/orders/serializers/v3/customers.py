@@ -69,11 +69,11 @@ class CreateOrderV3Serializer(serializers.ModelSerializer):
     card_id = CustomerFilteredPrimaryKeyRelatedField(required=False, queryset=Card.objects,
                                                      source="card", allow_null=True,
                                                      allow_empty=True)
-    has_promotion = serializers.BooleanField(default=False, required=False)
+    # has_promotion = serializers.BooleanField(default=False, required=False)
 
     class Meta:
         model = Order
-        fields = ('user', 'details', "has_promotion", 'station_id', 'service_id', 'from_address_id', 'to_address_id',
+        fields = ('user', 'details', 'station_id', 'service_id', 'from_address_id', 'to_address_id',
                   'indications', 'approximate_price_order', 'phone_number', 'validate_qr', 'merchant_id',
                   'is_order_to_merchant', 'promotion', 'payment_method', 'card_id')
 
@@ -102,7 +102,7 @@ class CreateOrderV3Serializer(serializers.ModelSerializer):
             station = data.get('station', None)
             merchant = data.get('merchant', None)
             customer_promotion = data.get('promotion', None)
-            has_promotion = data.get('has_promotion', False)
+            # has_promotion = data.get('has_promotion', False)
             price_promotion = None
             maximum_response_time = timezone.localtime(timezone.now()) + timedelta(minutes=settings.TIME_RESPONSE)
             if customer_promotion:
