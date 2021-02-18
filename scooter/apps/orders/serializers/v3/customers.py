@@ -73,7 +73,7 @@ class CreateOrderV3Serializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ('user', 'details', 'station_id', 'service_id', 'from_address_id', 'to_address_id',
+        fields = ('user', 'details', "has_promotion", 'station_id', 'service_id', 'from_address_id', 'to_address_id',
                   'indications', 'approximate_price_order', 'phone_number', 'validate_qr', 'merchant_id',
                   'is_order_to_merchant', 'promotion', 'payment_method', 'card_id')
 
