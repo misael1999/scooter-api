@@ -369,13 +369,13 @@ class CreateOrderSerializer(serializers.ModelSerializer):
                                                                          detail_menu=detail_menu))
 
                 # El precio extra son las opciones que tienen un costo
-                details_to_conekta.append({
-                    "name": product.name,
-                    "unit_price": round((product.price + extra_price) * 100),
-                    "quantity": detail['quantity']
-                })
                 detail_menu.price = menu_price
                 detail_menu.save()
+            details_to_conekta.append({
+                "name": product.name,
+                "unit_price": round((product.price + extra_price) * 100),
+                "quantity": detail['quantity']
+            })
             # El precio extra son las opciones que tienen un costo
             price_order = price_order + ((detail['product'].price + extra_price) * detail['quantity'])
             OrderDetailMenuOption.objects.bulk_create(details_options_to_save)
