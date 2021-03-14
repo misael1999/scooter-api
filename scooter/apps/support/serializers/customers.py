@@ -38,6 +38,8 @@ class CreateSupportModelSerializer(serializers.ModelSerializer):
         if self.context['is_customer']:
             customer = self.context['customer']
             data['customer'] = customer
+        else:
+            customer = data['order'].customer
         # Verify if the customer has not support open
         support = Support.objects.filter(station=data['station'], customer=data['customer'], support_status_id=3,
                                          is_open=True)

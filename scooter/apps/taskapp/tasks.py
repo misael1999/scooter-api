@@ -1,25 +1,23 @@
+
 # Django
 from datetime import timedelta
 
-from django.db.models import Q
-from django.utils import timezone
-# Functions
-from scooter.apps.common.models import OrderStatus
-from scooter.apps.delivery_men.models import DeliveryMan
-from scooter.apps.merchants.models import Merchant, MerchantSchedule
-from scooter.utils.functions import send_mail_verification, send_order_delivery, return_money_user, \
-    send_notification_push_order_with_sound
+from celery.schedules import crontab
 # Celery
 from celery.task import task, periodic_task
-from celery.schedules import crontab
-
-# FCM
+from django.utils import timezone
+# FCMØØ
 from fcm_django.models import FCMDevice
+
+# Functions
+from scooter.apps.common.models import OrderStatus
+from scooter.apps.merchants.models import Merchant, MerchantSchedule
 # Models
 from scooter.apps.orders.models import Order
+from scooter.utils.functions import send_mail_verification, send_order_delivery, return_money_user
+from scooter.utils.functions import send_notice_order_delivery_fn
 # Functions
 from scooter.utils.functions import send_notification_push_order
-from scooter.utils.functions import send_notice_order_delivery_fn
 
 
 @task(name='send_email_task', max_retries=3)
@@ -101,6 +99,7 @@ def open_or_close_merchants():
     merchants_to_update = []
     merchants = Merchant.objects.filter(status_id=1)
     for merchant in merchants:
+        print(merchant)
         try:
             merchant_schedule = merchant.schedules.get(schedule_name=today, status_id=1, is_open=True)
             from_hour = str(merchant_schedule.from_hour)
@@ -113,6 +112,7 @@ def open_or_close_merchants():
                 merchant.is_open = False
                 merchants_to_update.append(merchant)
         except MerchantSchedule.DoesNotExist:
+            print("NO EXISTE HORARIO")
             merchant.is_open = False
             merchants_to_update.append(merchant)
     Merchant.objects.bulk_update(merchants_to_update, ['is_open'])

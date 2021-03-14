@@ -17,7 +17,7 @@ from scooter.apps.orders.models.orders import (OrderDetail, HistoryRejectedOrder
 from scooter.apps.payments.models import Card
 from scooter.apps.stations.models import Station, StationService, MemberStation
 from scooter.apps.common.models import Service, OrderStatus, Notification
-from scooter.apps.customers.models import CustomerAddress, CustomerPromotion
+from scooter.apps.customers.models import CustomerAddress, CustomerPromotion, Customer
 from scooter.apps.orders.models.orders import Order
 # Functions channels
 from scooter.apps.orders.utils.orders import notify_merchants, notify_delivery_men, send_order_to_station_channel
@@ -297,6 +297,38 @@ class CreateOrderSerializer(serializers.ModelSerializer):
             "extra_price": extra_price
         }
 
+    # def create_charge(self):
+    #     items = list()
+    #     customer = Customer.objects.get(pk=314)
+    #
+    #     items.append(
+    #         {
+    #             "name": 'Hamburguesa Beef',
+    #             "unit_price": round(115 * 100),
+    #             "quantity": 1
+    #         }
+    #     )
+    #     items.append(
+    #         {
+    #             "name": 'Hamburguesa tradicional',
+    #             "unit_price": round(68 * 100),
+    #             "quantity": 1
+    #         }
+    #     )
+    #     conekta.Order.create({
+    #         "currency": "MXN",
+    #         "customer_info": {
+    #             "customer_id": customer.cards.last().conekta_id
+    #         },
+    #         "line_items": items,
+    #         "charges": [{
+    #             "payment_method": {
+    #                 "type": "card",
+    #                 "payment_source_id": customer.cards.last().source_id,
+    #             }
+    #         }]
+    #     })
+
     def create_order_conekta(self, card, order, items):
         # Agregamos el precio del envío como item
         items.append(
@@ -307,6 +339,21 @@ class CreateOrderSerializer(serializers.ModelSerializer):
             }
         )
         try:
+            order_conekta = conekta.Order.create({
+                "currency": "MXN",
+                "pre_authorize": True,
+                "customer_info": {
+                    "customer_id": card.conekta_id
+                },
+                "line_items": items,
+                "charges": [{
+                    "payment_method": {
+                        "type": "card",
+                        "payment_source_id": card.source_id,
+                    }
+                }]
+
+            })
             order_conekta = conekta.Order.create({
                 "currency": "MXN",
                 "pre_authorize": True,
