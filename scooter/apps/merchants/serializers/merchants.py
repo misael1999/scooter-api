@@ -12,6 +12,7 @@ from rest_framework.validators import UniqueValidator
 # Models
 from scooter.apps.customers.serializers import PointSerializer
 from scooter.apps.merchants.serializers.tags import MerchantTagSimpleSerializer
+from scooter.apps.promotions.serializers import MerchantPromotionSimpleSerializer
 from scooter.apps.users.models import User
 from scooter.apps.merchants.models.merchants import Merchant, MerchantAddress, MerchantSchedule, TypeMenuMerchant, \
     MerchantDeliveryRule
@@ -36,6 +37,11 @@ class MerchantWithAllInfoSerializer(serializers.ModelSerializer):
     # user = UserModelSimpleSerializer()
     delivery_rules = MerchantDeliveryRuleSerializer(read_only=True)
     tags = serializers.StringRelatedField(many=True, read_only=True)
+    promotions = serializers.SerializerMethodField('get_promotions', read_only=True)
+
+    def get_promotions(self, merchant):
+        qs = merchant.promotions.all()
+        return MerchantPromotionSimpleSerializer(qs, many=True).data
 
     class Meta:
         model = Merchant
@@ -45,7 +51,7 @@ class MerchantWithAllInfoSerializer(serializers.ModelSerializer):
                   'approximate_preparation_time', 'full_address', 'is_open', 'point', 'from_preparation_time',
                   'to_preparation_time', 'type_menu', 'zone', 'area', 'delivery_rules', 'merchant_level',
                   'operational_zones_activated', 'restricted_zones_activated', 'accept_payment_online',
-                  'has_rate_operating', 'increment_price_operating', 'tags')
+                  'has_rate_operating', 'increment_price_operating', 'tags', 'promotions')
         read_only_fields = fields
 
 
