@@ -73,10 +73,10 @@ def send_notification_delivery():
         for order in orders:
             station = order.station
             if station.assign_delivery_manually:
-                message = '¡AVISO!!!! Un comercio no ha respondido un pedido!' if (order.order_status.slug_name == "await_confirmation_merchant") else 'Aún no haz asignado un pedirepartidor ¡IMPORTANTE!'
+                # message = '¡AVISO!!!! Un comercio no ha respondido un pedido!' if (order.order_status.slug_name == "await_confirmation_merchant") else 'Aún no haz asignado un pedirepartidor ¡IMPORTANTE!'
                 send_notification_push_order(user_id=station.user_id,
                                              title='¡¡¡¡¡ Pedido SIN responder !!!!!!!',
-                                             body=message,
+                                             body="AVISO DE PRUEBA",
                                              sound="alarms.mp3",
                                              android_channel_id="alarms",
                                              data={"type": "NEW_ORDER",
