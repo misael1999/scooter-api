@@ -61,7 +61,8 @@ def send_notification_delivery():
     # offset = now - timedelta(seconds=90)
     # orders = Order.objects.filter(order_ready_date__lte=offset,
     #                               order_status__slug_name__in=["await_delivery_man"])
-    orders = Order.objects.filter(order_status__slug_name__in=["await_delivery_man"])
+    orders = Order.objects.filter(order_status__slug_name__in=["await_delivery_man",
+                                                               "await_confirmation_merchant"])
     # orders = Order.objects.filter(Q(order_ready_date__lte=offset,
     #                                 order_status__slug_name__in=["await_delivery_man"]
     #                                 ) | Q(order_status__slug_name__in=["await_delivery_man"],
@@ -72,9 +73,10 @@ def send_notification_delivery():
         for order in orders:
             station = order.station
             if station.assign_delivery_manually:
+                message = '¡AVISO!!!! Un comercio no ha respondido un pedido!' if order.order_status.slug_name == "await_confirmation_merchant" else 'Aún no haz asignado un pedirepartidor ¡IMPORTANTE!'
                 send_notification_push_order(user_id=station.user_id,
                                              title='¡¡¡¡¡ Pedido SIN responder !!!!!!!',
-                                             body='Tienes un pedido sin responder',
+                                             body=message,
                                              sound="alarms.mp3",
                                              android_channel_id="alarms",
                                              data={"type": "NEW_ORDER",
@@ -99,7 +101,6 @@ def open_or_close_merchants():
     merchants_to_update = []
     merchants = Merchant.objects.filter(status_id=1)
     for merchant in merchants:
-        print(merchant)
         try:
             merchant_schedule = merchant.schedules.get(schedule_name=today, status_id=1, is_open=True)
             from_hour = str(merchant_schedule.from_hour)
@@ -112,7 +113,6 @@ def open_or_close_merchants():
                 merchant.is_open = False
                 merchants_to_update.append(merchant)
         except MerchantSchedule.DoesNotExist:
-            print("NO EXISTE HORARIO")
             merchant.is_open = False
             merchants_to_update.append(merchant)
     Merchant.objects.bulk_update(merchants_to_update, ['is_open'])

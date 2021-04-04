@@ -189,11 +189,13 @@ def return_money_user(order):
     if not order.order_conekta_id:
         return
     try:
-        order_conekta = conekta.Order.find(order.order_conekta_id)
-        order_conekta.void({
-            "reason": "requested_by_client"
 
-        })
+        order_conekta = conekta.Order.find(order.order_conekta_id)
+        # Regresar el dinero manualmente
+        # order_conekta.void({
+        #     "reason": "requested_by_client"
+        #
+        # })
     except conekta.ConektaError as e:
         # Mandar correo al soporte y al usuario
         print(e.code)
