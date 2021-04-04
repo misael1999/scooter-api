@@ -1,4 +1,3 @@
-
 # Django
 from datetime import timedelta
 
@@ -72,11 +71,14 @@ def send_notification_delivery():
     if orders:
         for order in orders:
             station = order.station
+            merchant = order.merchant
             if station.assign_delivery_manually:
-                # message = '¡AVISO!!!! Un comercio no ha respondido un pedido!' if (order.order_status.slug_name == "await_confirmation_merchant") else 'Aún no haz asignado un pedirepartidor ¡IMPORTANTE!'
+                message = '¡AVISO!!!! {merchant_name} no ha respondido un pedido!'.format(
+                    merchant_name=merchant.merchant_name) if (
+                            order.order_status.slug_name == "await_confirmation_merchant") else 'Aún no haz asignado un pedirepartidor ¡IMPORTANTE!'
                 send_notification_push_order(user_id=station.user_id,
                                              title='¡¡¡¡¡ Pedido SIN responder !!!!!!!',
-                                             body="AVISO DE PRUEBA",
+                                             body=message,
                                              sound="alarms.mp3",
                                              android_channel_id="alarms",
                                              data={"type": "NEW_ORDER",
@@ -143,7 +145,7 @@ def open_or_close_merchants():
 #                       reason_rejection="Pedido ignorado por el central")
 
 
-@periodic_task(name='ignore_orders', run_every=timedelta(minutes=5))
+@periodic_task(name='ignore_orders', run_every=timedelta(minutes=6))
 def ignore_orders():
     """ Verify orders and reject when nobody responds """
     now = timezone.localtime(timezone.now())
