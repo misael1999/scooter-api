@@ -73,7 +73,7 @@ def send_notification_delivery():
         for order in orders:
             station = order.station
             if station.assign_delivery_manually:
-                message = '¡AVISO!!!! Un comercio no ha respondido un pedido!' if order.order_status.slug_name == "await_confirmation_merchant" else 'Aún no haz asignado un pedirepartidor ¡IMPORTANTE!'
+                message = '¡AVISO!!!! Un comercio no ha respondido un pedido!' if (order.order_status.slug_name == "await_confirmation_merchant") else 'Aún no haz asignado un pedirepartidor ¡IMPORTANTE!'
                 send_notification_push_order(user_id=station.user_id,
                                              title='¡¡¡¡¡ Pedido SIN responder !!!!!!!',
                                              body=message,
@@ -143,7 +143,7 @@ def open_or_close_merchants():
 #                       reason_rejection="Pedido ignorado por el central")
 
 
-@periodic_task(name='ignore_orders', run_every=timedelta(minutes=1))
+@periodic_task(name='ignore_orders', run_every=timedelta(minutes=5))
 def ignore_orders():
     """ Verify orders and reject when nobody responds """
     now = timezone.localtime(timezone.now())
