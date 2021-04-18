@@ -2265,6 +2265,30 @@ paths:
           description: 'Promoción revisada'
       tags:
         - Pedidos clientes
+  /api/v1/stations/{station_id}/orders/{order_id}/return_money/:
+    parameters:
+      - name: station_id
+        in: path
+        required: true
+        type: string
+      - name: order_id
+        in: path
+        required: true
+        type: string
+    patch:
+      operationId: return_money_manually
+      description: Devolver el dinero manualmente
+      parameters:
+        - name: body
+          in: body
+          description: Devolver el dinero manualmente
+          schema:
+            $ref: '#/definitions/ReturnMoneyManually'
+      responses:
+        '200':
+          description: 'Dinero devuelto'
+      tags:
+        - Pedidos centrales
   /api/v1/stations/{station_id}/orders/:
     parameters:
       - name: station_id

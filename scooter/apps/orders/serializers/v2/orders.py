@@ -15,6 +15,7 @@ from scooter.apps.orders.serializers import RatingOrderSerializer
 from scooter.apps.payments.serializers import CardModelSerializer
 from scooter.apps.stations.serializers import StationSimpleOrderSerializer
 from scooter.apps.orders.models import OrderDetailMenu, OrderDetailMenuOption, OrderDetail
+from scooter.utils.functions import return_money_user_manually
 from scooter.utils.serializers.scooter import ScooterModelSerializer
 
 
@@ -104,5 +105,19 @@ class OrderWithDetailModelSerializer(ScooterModelSerializer):
                   )
         read_only_fields = fields
 
+
+class ReturnOrderMoneySerializer(serializers.Serializer):
+    def update(self, order, data):
+        try:
+            return_money_user_manually(order)
+            return order
+        except ValueError as e:
+            raise serializers.ValidationError({'detail': str(e)})
+        except Exception as ex:
+            print("Exception in return order money, please check it")
+            print(ex.args.__str__())
+            print(ex.__cause__)
+            print(ex)
+            raise serializers.ValidationError({'detail': 'Error al devolver el dinero de la orden'})
 
 

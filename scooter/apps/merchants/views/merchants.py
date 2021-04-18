@@ -1,4 +1,6 @@
 # Cache methods
+import random
+
 from django.conf import settings
 from django.contrib.gis.db.models.functions import Distance
 # Django rest
@@ -7,6 +9,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.views.decorators.vary import vary_on_cookie
 from django_filters.rest_framework import DjangoFilterBackend
+from ipython_genutils.py3compat import xrange
 from rest_framework import status, mixins
 from rest_framework.decorators import action
 # Filters
@@ -206,7 +209,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
                                                   section_name=category_model.name,
                                                   section_description="",
                                                   order_by="created",
-                                                  limit=30,
+                                                  limit=40,
                                                   orientation="V",
                                                   filters=filters_shared,
                                                   picture=""
@@ -262,7 +265,8 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             return {
                 'has_data': False
             }
-
+        if orientation == "V":
+            merchants = self.iter_sample_fast(merchants, len(list(merchants)))
         return {
             'has_data': True,
             'section_name': section_name,
@@ -285,3 +289,19 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
     def get_list_merchant_by_category(self, area_id, category_id, limit):
 
         pass
+
+    def iter_sample_fast(self, iterable_list, samplesize):
+        results = []
+        iterator = iter(iterable_list)
+        # Fill in the first samplesize elements:
+        try:
+            for _ in xrange(samplesize):
+                results.append(iterator.__next__())
+        except StopIteration:
+            raise ValueError("Sample larger than population.")
+        random.shuffle(results)  # Randomize their positions
+        for i, v in enumerate(iterator, samplesize):
+            r = random.randint(0, i)
+            if r < samplesize:
+                results[r] = v  # at a decreasing rate, replace random items
+        return results

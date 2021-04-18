@@ -14,7 +14,7 @@ from scooter.apps.customers.permissions.customers import IsAccountOwnerCustomer
 from scooter.apps.orders.serializers import (OrderModelSerializer,
                                              CalculateServicePriceSerializer)
 from scooter.apps.orders.serializers.v3 import (CreateOrderV3Serializer,)
-from scooter.apps.orders.serializers.v2 import (OrderWithDetailModelSerializer,)
+from scooter.apps.orders.serializers.v2 import (OrderWithDetailModelSerializer, ReturnOrderMoneySerializer)
 # Models
 from scooter.apps.orders.models.orders import Order
 # Mixin
