@@ -16,6 +16,7 @@ from scooter.apps.common.models.status import Status
 from scooter.apps.merchants.models import Product
 from scooter.apps.merchants.permissions import IsAccountOwnerMerchant
 # Serializers
+from scooter.apps.promotions.models import MerchantPromotion
 from scooter.apps.promotions.serializers import MerchantPromotionSimpleSerializer, CreateMerchantPromotion
 from scooter.utils.viewsets.scooter import ScooterViewSet
 
@@ -25,7 +26,7 @@ class MerchantPromotionViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cre
                                mixins.DestroyModelMixin, AddMerchantMixin):
 
     serializer_class = MerchantPromotionSimpleSerializer
-    queryset = Product.objects.all()
+    queryset = MerchantPromotion.objects.all()
     permission_classes = (IsAuthenticated, IsAccountOwnerMerchant)
     filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
     search_fields = ('name', 'description')
@@ -35,6 +36,7 @@ class MerchantPromotionViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cre
     filter_fields = ('status', 'promotion_type')
     """ Method dispatch in AddMerchantMixin """
     merchant = None
+    lookup_field = "id"
 
     def get_queryset(self):
         """ Personalized query when the action is a list so that it only returns active categories """

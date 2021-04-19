@@ -680,6 +680,15 @@ paths:
         in: path
         required: true
         type: string
+    get:
+      operationId: get_one_merchant_promotion
+      description: Obtener todas las promociones de un comercio
+      summary: Obtener todas las promociones de un comercio
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Promotions merchant
     patch:
       operationId: update_merchant_promotion
       description: Actualizar promocion de un comercio
