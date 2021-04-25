@@ -131,6 +131,21 @@ paths:
           description: 'Zona'
       tags:
         - Común
+  /api/v1/commons/zones/test_polygon/:
+    post:
+      operationId: test_polygon
+      description: Prueba de polígono.
+      parameters:
+        - name: body
+          in: body
+          description: Prueba de poligono
+          schema:
+            $ref: '#/definitions/TestPolygon'
+      responses:
+        '201':
+          description: 'Información de la zona'
+      tags:
+        - Común
   /api/v1/commons/type_addresses/:
     get:
       operationId: type_addresses_get
@@ -4833,7 +4848,12 @@ definitions:
       - name
   UnlockCategory:
     type: object
-
+  TestPolygon:
+    type: object
+    properties:
+      kml_data:
+        type: string
+        description: Data en texto plano con formato de una kml
 # PRODUCT'S MERCHANT
   RegisterProduct:
     type: object

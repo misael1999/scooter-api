@@ -7,6 +7,7 @@ from rest_framework.response import Response
 # Models
 from scooter.apps.common.models import Area
 # Viewset
+from scooter.apps.common.serializers import TestPolygonSerializer
 from scooter.apps.stations.models import StationZone, Station
 from scooter.apps.stations.serializers import StationZoneSerializer, StationZoneSimpleSerializer
 from scooter.utils.viewsets.scooter import ScooterViewSet
@@ -22,13 +23,12 @@ class ZonesViewSet(ScooterViewSet, mixins.ListModelMixin,
     queryset = StationZone.objects.all()
     permission_classes = (AllowAny,)
 
-    # Filters
-    # filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
-    # search_fields = ('alias', 'full_address', 'category')
-    # # ordering_fields = ('created',)
-    # # Affect the default order
-    # ordering = ('-created', '-alias', '-category')
-    # filter_fields = ('category',)
+    @action(detail=False, methods=['POST'])
+    def test_polygon(self, request, *args, **kwargs):
+        serializer = TestPolygonSerializer(data=request.data, context=self.get_serializer_context())
+        serializer.is_valid(raise_exception=True)
+        obj = serializer.save()
+        return Response(data=obj, status=status.HTTP_201_CREATED)
 
     @action(detail=False, methods=['GET'])
     def check_location(self, request, *args, **kwargs):
