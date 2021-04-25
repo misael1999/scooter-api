@@ -208,7 +208,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             section_4 = self.get_section_order_by(area_id, category=category_model,
                                                   section_name=category_model.name,
                                                   section_description="",
-                                                  order_by="created",
+                                                  order_by="?",
                                                   limit=40,
                                                   orientation="V",
                                                   filters=filters_shared,
@@ -265,8 +265,8 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             return {
                 'has_data': False
             }
-        if orientation == "V":
-            merchants = self.iter_sample_fast(merchants, len(list(merchants)))
+        # if orientation == "V":
+        #     merchants = self.iter_sample_fast(merchants, len(list(merchants)))
         return {
             'has_data': True,
             'section_name': section_name,
