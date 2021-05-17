@@ -27,7 +27,7 @@ class MerchantPromotionViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cre
 
     serializer_class = MerchantPromotionSimpleSerializer
     queryset = MerchantPromotion.objects.all()
-    permission_classes = (IsAuthenticated, IsAccountOwnerMerchant)
+    permission_classes = (IsAuthenticated,)
     filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
     search_fields = ('name', 'description')
     ordering_fields = ('created', 'name', 'description')
