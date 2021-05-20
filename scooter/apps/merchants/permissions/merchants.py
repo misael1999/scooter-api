@@ -5,6 +5,17 @@ from rest_framework.permissions import BasePermission
 from scooter.apps.merchants.models import Merchant
 
 
+class IsAccountOwnerMerchantOrStationAdmin(BasePermission):
+    """Verify requesting user is the merchant."""
+
+    def has_permission(self, request, view):
+        """Verify user have a merchant."""
+        user = request.user
+
+        # Station
+        return user.is_station() or user.id == view.merchant.user_id
+
+
 class IsAccountOwnerMerchant(BasePermission):
     """Verify requesting user is the merchant."""
 
