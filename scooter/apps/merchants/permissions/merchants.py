@@ -16,6 +16,19 @@ class IsAccountOwnerMerchantOrStationAdmin(BasePermission):
         return user.is_station() or user.id == view.merchant.user_id
 
 
+class IsSameMerchantOrStationAdmin(BasePermission):
+
+    def has_permission(self, request, view):
+        """Let object permission grant access."""
+        obj = view.get_object()
+        return self.has_object_permission(request, view, obj)
+
+    def has_object_permission(self, request, view, obj):
+        """ Verify delivery man is the same that in the obj """
+        user = request.user
+        return user.is_station() or user.id == obj.user_id
+
+
 class IsAccountOwnerMerchant(BasePermission):
     """Verify requesting user is the merchant."""
 

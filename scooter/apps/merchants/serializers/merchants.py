@@ -12,6 +12,7 @@ from rest_framework.validators import UniqueValidator
 # Models
 from scooter.apps.customers.serializers import PointSerializer
 from scooter.apps.merchants.serializers.tags import MerchantTagSimpleSerializer
+from scooter.apps.orders.models.ratings import RatingOrder
 from scooter.apps.promotions.serializers import MerchantPromotionSimpleSerializer
 from scooter.apps.users.models import User
 from scooter.apps.merchants.models.merchants import Merchant, MerchantAddress, MerchantSchedule, TypeMenuMerchant, \
@@ -155,6 +156,21 @@ class MerchantInfoSerializer(serializers.ModelSerializer):
                   'to_preparation_time', 'schedules', 'full_address', 'zone', 'area', 'delivery_rules',
                   'merchant_level', 'operational_zones_activated', 'restricted_zones_activated',
                   'accept_payment_online','has_rate_operating', 'increment_price_operating', "tags")
+        read_only_fields = fields
+
+
+class MerchantRatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RatingOrder
+        fields = ('id',
+                  'order',
+                  'delivery_man',
+                  'rating_customer',
+                  'comments',
+                  'rating',
+                  'rating_merchant'
+                  )
+        depth = 1
         read_only_fields = fields
 
 

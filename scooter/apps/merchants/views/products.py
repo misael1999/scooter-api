@@ -13,7 +13,8 @@ from scooter.utils.viewsets.scooter import ScooterViewSet
 from scooter.apps.common.mixins import AddMerchantMixin, AddProductMixin
 # Permissions
 from rest_framework.permissions import IsAuthenticated
-from scooter.apps.merchants.permissions import IsAccountOwnerMerchant, IsProductOwner
+from scooter.apps.merchants.permissions import IsAccountOwnerMerchant, IsProductOwner, \
+    IsAccountOwnerMerchantOrStationAdmin, IsSameMerchantOrStationAdmin
 # Filters
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
@@ -26,7 +27,7 @@ class ProductsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.CreateModelM
 
     serializer_class = ProductsModelSerializer
     queryset = Product.objects.all()
-    permission_classes = (IsAuthenticated, IsAccountOwnerMerchant)
+    permission_classes = (IsAuthenticated, IsSameMerchantOrStationAdmin)
     filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
     search_fields = ('name', 'category__name', 'description')
     ordering_fields = ('created', 'name', 'description')

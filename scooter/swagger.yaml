@@ -520,6 +520,22 @@ paths:
           description: ''
       tags:
         - Tags
+# MERCHANT TAGS
+  /api/v1/merchants/{merchant_id}/ratings/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+    get:
+      operationId: get_merchant_ratings
+      description: Obtener las evaluaciones a los comercios
+      summary: Obtener las evaluaciones a los comercios
+      responses:
+        '201':
+          description: 'Listado de metodos de pago'
+      tags:
+        - Ratings merchant
   # MERCHANT TAGS
   /api/v1/merchants/{merchant_id}/tags/:
     parameters:

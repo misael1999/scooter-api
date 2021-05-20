@@ -27,7 +27,8 @@ from scooter.apps.merchants.permissions import IsSameMerchant
 # Serializers
 from scooter.apps.merchants.serializers import (MerchantWithAllInfoSerializer, UpdateInfoMerchantSerializer,
                                                 AvailabilityMerchantSerializer, ChangePasswordMerchantSerializer,
-                                                MerchantInfoSerializer, TagModelSimpleSerializer)
+                                                MerchantInfoSerializer, TagModelSimpleSerializer,
+                                                MerchantRatingSerializer)
 # Utilities
 from scooter.apps.merchants.utils import MerchantTagFilter
 from scooter.utils.viewsets import ScooterViewSet
@@ -132,6 +133,13 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
             return Response(
                 self.set_error_response(status=False, field='Detail',
                                         message='Error al consultar el area en comercios'))
+
+    @action(detail=True, methods=['GET'])
+    def ratings(self, request, *args, **kwargs):
+        merchant = self.get_object()
+        ratings = merchant.ratingorder_set.all()
+        data = MerchantRatingSerializer(ratings, many=True).data
+        return Response(data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=('PATCH', 'PUT'))
     def update_availability(self, request, *args, **kwargs):
