@@ -121,3 +121,16 @@ class ReturnOrderMoneySerializer(serializers.Serializer):
             raise serializers.ValidationError({'detail': 'Error al devolver el dinero de la orden'})
 
 
+class ConfirmOrderMoneySerializer(serializers.Serializer):
+    def update(self, order, data):
+        try:
+            return_money_user_manually(order)
+            return order
+        except ValueError as e:
+            raise serializers.ValidationError({'detail': str(e)})
+        except Exception as ex:
+            print("Exception in return order money, please check it")
+            print(ex.args.__str__())
+            print(ex.__cause__)
+            print(ex)
+            raise serializers.ValidationError({'detail': 'Error al devolver el dinero de la orden'})
