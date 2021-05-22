@@ -13,8 +13,7 @@ from scooter.utils.viewsets.scooter import ScooterViewSet
 from scooter.apps.common.mixins import AddMerchantMixin, AddProductMixin
 # Permissions
 from rest_framework.permissions import IsAuthenticated
-from scooter.apps.merchants.permissions import IsAccountOwnerMerchant, IsProductOwner, \
-    IsAccountOwnerMerchantOrStationAdmin, IsSameMerchantOrStationAdmin
+from scooter.apps.merchants.permissions import IsProductOwner, IsAccountOwnerMerchantOrStationAdmin
 # Filters
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
@@ -27,7 +26,7 @@ class ProductsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.CreateModelM
 
     serializer_class = ProductsModelSerializer
     queryset = Product.objects.all()
-    permission_classes = (IsAuthenticated, IsSameMerchantOrStationAdmin)
+    permission_classes = (IsAuthenticated, IsAccountOwnerMerchantOrStationAdmin)
     filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
     search_fields = ('name', 'category__name', 'description')
     ordering_fields = ('created', 'name', 'description')
@@ -37,6 +36,7 @@ class ProductsViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.CreateModelM
     """ Method dispatch in AddMerchantMixin """
     merchant = None
     product_instance = None
+    lookup_field = "pk"
 
     def get_queryset(self):
         """ Personalized query when the action is a list so that it only returns active categories """

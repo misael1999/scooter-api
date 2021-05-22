@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 # Utilities
-from scooter.apps.orders.serializers.v2 import ReturnOrderMoneySerializer
+from scooter.apps.orders.serializers.v2 import ReturnOrderMoneySerializer, ConfirmOrderMoneySerializer
 from scooter.apps.orders.utils.filters import OrderFilter
 from scooter.utils.viewsets.scooter import ScooterViewSet
 # Permissions
@@ -214,6 +214,18 @@ class StationOrderViewSet(ScooterViewSet, AddStationMixin,
         """ Calculate price of the servive before request the service """
         order = self.get_object()
         serializer = ReturnOrderMoneySerializer(order, data=request.data, context=self.get_serializer_context())
+        serializer.is_valid(raise_exception=True)
+        obj = serializer.save()
+        data = self.set_response(status=True,
+                                 data={},
+                                 message='Dinero devuelto correctamente')
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    @action(methods=['PATCH'], detail=True)
+    def confirm_money(self, request, *args, **kwargs):
+        """ Calculate price of the servive before request the service """
+        order = self.get_object()
+        serializer = ConfirmOrderMoneySerializer(order, data=request.data, context=self.get_serializer_context())
         serializer.is_valid(raise_exception=True)
         obj = serializer.save()
         data = self.set_response(status=True,

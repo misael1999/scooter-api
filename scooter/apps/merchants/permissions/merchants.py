@@ -47,7 +47,7 @@ class IsProductOwner(BasePermission):
         user = request.user
 
         # Station
-        return user.id == view.product.user_id
+        return user.is_station() or user.id == view.product.user_id
 
 
 class IsSameMerchant(BasePermission):

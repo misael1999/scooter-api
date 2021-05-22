@@ -22,7 +22,7 @@ from scooter.apps.common.models import CategoryMerchant, Area, Status
 from scooter.apps.common.serializers import AreaModelSerializer
 from scooter.apps.merchants.models import Merchant, Tag
 # Permissions
-from scooter.apps.merchants.permissions import IsSameMerchant
+from scooter.apps.merchants.permissions import IsSameMerchantOrStationAdmin
 # Models
 # Serializers
 from scooter.apps.merchants.serializers import (MerchantWithAllInfoSerializer, UpdateInfoMerchantSerializer,
@@ -79,7 +79,7 @@ class MerchantViewSet(ScooterViewSet, mixins.RetrieveModelMixin,
         if self.action in ['list', 'retrieve', 'home']:
             permission_classes = [AllowAny]
         elif self.action in ['partial_update', 'update', 'update_info']:
-            permission_classes = [IsAuthenticated, IsSameMerchant]
+            permission_classes = [IsAuthenticated, IsSameMerchantOrStationAdmin]
         else:
             permission_classes = [IsAuthenticated]
 
