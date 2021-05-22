@@ -30,7 +30,8 @@ class CustomerAddressesViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cre
 
     serializer_class = CustomerAddressModelSerializer
     queryset = CustomerAddress.objects.all()
-    permission_classes = (IsAuthenticated, IsAccountOwnerCustomer)
+    # TODO agregar permisos
+    permission_classes = (IsAuthenticated,)
     # Filters
     filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
     search_fields = ('alias', 'full_address')
