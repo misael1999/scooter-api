@@ -230,5 +230,5 @@ class StationOrderViewSet(ScooterViewSet, AddStationMixin,
         obj = serializer.save()
         data = self.set_response(status=True,
                                  data={},
-                                 message='Dinero devuelto correctamente')
+                                 message='Pago Confirmado correctamente')
         return Response(data=data, status=status.HTTP_200_OK)

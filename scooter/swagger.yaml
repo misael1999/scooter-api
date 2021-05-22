@@ -2329,6 +2329,31 @@ paths:
           description: 'Dinero devuelto'
       tags:
         - Pedidos centrales
+  /api/v1/stations/{station_id}/orders/{order_id}/confirm_money/:
+    parameters:
+      - name: station_id
+        in: path
+        required: true
+        type: string
+      - name: order_id
+        in: path
+        required: true
+        type: string
+    patch:
+      operationId: confirm_money_manually
+      description: Confirmar el dinero manualmente
+      summary: Confirmar el dinero manualmente
+      parameters:
+        - name: body
+          in: body
+          description: Confirmar el dinero manualmente
+          schema:
+            $ref: '#/definitions/ReturnMoneyManually'
+      responses:
+        '200':
+          description: 'Dinero devuelto'
+      tags:
+        - Pedidos centrales
   /api/v1/stations/{station_id}/orders/:
     parameters:
       - name: station_id

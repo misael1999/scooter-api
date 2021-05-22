@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework import serializers
 # Serializers
 from scooter.apps.common.serializers import OrderStatusModelSerializer, ServiceModelSerializer
@@ -17,6 +18,9 @@ from scooter.apps.stations.serializers import StationSimpleOrderSerializer
 from scooter.apps.orders.models import OrderDetailMenu, OrderDetailMenuOption, OrderDetail
 from scooter.utils.functions import return_money_user_manually
 from scooter.utils.serializers.scooter import ScooterModelSerializer
+import conekta
+conekta.api_key = settings.CONEKTA_API_KEY
+conekta.api_version = settings.CONEKTA_API_KEY
 
 
 class DetailMenuOptionSerializer(serializers.ModelSerializer):
@@ -124,13 +128,14 @@ class ReturnOrderMoneySerializer(serializers.Serializer):
 class ConfirmOrderMoneySerializer(serializers.Serializer):
     def update(self, order, data):
         try:
-            return_money_user_manually(order)
+            order_conekta = conekta.Order.find(order.order_conekta_id)
+            order_captured = order_conekta.capture()
             return order
         except ValueError as e:
             raise serializers.ValidationError({'detail': str(e)})
         except Exception as ex:
-            print("Exception in return order money, please check it")
+            print("Exception in confirm order money, please check it")
             print(ex.args.__str__())
             print(ex.__cause__)
             print(ex)
-            raise serializers.ValidationError({'detail': 'Error al devolver el dinero de la orden'})
+            raise serializers.ValidationError({'detail': 'Error al confirmar el dinero de la orden'})
