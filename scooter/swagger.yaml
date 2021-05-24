@@ -520,6 +520,22 @@ paths:
           description: ''
       tags:
         - Tags
+# MERCHANT TAGS
+  /api/v1/merchants/{merchant_id}/ratings/:
+    parameters:
+      - name: merchant_id
+        in: path
+        required: true
+        type: string
+    get:
+      operationId: get_merchant_ratings
+      description: Obtener las evaluaciones a los comercios
+      summary: Obtener las evaluaciones a los comercios
+      responses:
+        '201':
+          description: 'Listado de metodos de pago'
+      tags:
+        - Ratings merchant
   # MERCHANT TAGS
   /api/v1/merchants/{merchant_id}/tags/:
     parameters:
@@ -2306,6 +2322,31 @@ paths:
         - name: body
           in: body
           description: Devolver el dinero manualmente
+          schema:
+            $ref: '#/definitions/ReturnMoneyManually'
+      responses:
+        '200':
+          description: 'Dinero devuelto'
+      tags:
+        - Pedidos centrales
+  /api/v1/stations/{station_id}/orders/{order_id}/confirm_money/:
+    parameters:
+      - name: station_id
+        in: path
+        required: true
+        type: string
+      - name: order_id
+        in: path
+        required: true
+        type: string
+    patch:
+      operationId: confirm_money_manually
+      description: Confirmar el dinero manualmente
+      summary: Confirmar el dinero manualmente
+      parameters:
+        - name: body
+          in: body
+          description: Confirmar el dinero manualmente
           schema:
             $ref: '#/definitions/ReturnMoneyManually'
       responses:

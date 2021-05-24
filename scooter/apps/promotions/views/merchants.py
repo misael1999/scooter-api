@@ -14,7 +14,7 @@ from scooter.apps.common.mixins import AddMerchantMixin
 from scooter.apps.common.models.status import Status
 # Viewset
 from scooter.apps.merchants.models import Product
-from scooter.apps.merchants.permissions import IsAccountOwnerMerchant
+from scooter.apps.merchants.permissions import IsAccountOwnerMerchant, IsAccountOwnerMerchantOrStationAdmin
 # Serializers
 from scooter.apps.promotions.models import MerchantPromotion
 from scooter.apps.promotions.serializers import MerchantPromotionSimpleSerializer, CreateMerchantPromotion
@@ -27,7 +27,7 @@ class MerchantPromotionViewSet(ScooterViewSet, mixins.ListModelMixin, mixins.Cre
 
     serializer_class = MerchantPromotionSimpleSerializer
     queryset = MerchantPromotion.objects.all()
-    permission_classes = (IsAuthenticated, IsAccountOwnerMerchant)
+    permission_classes = (IsAuthenticated, IsAccountOwnerMerchantOrStationAdmin)
     filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
     search_fields = ('name', 'description')
     ordering_fields = ('created', 'name', 'description')
