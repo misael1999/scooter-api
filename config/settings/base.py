@@ -211,18 +211,6 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 30
 }
 
-FCM_DJANGO_SETTINGS = {
-    "APP_VERBOSE_NAME": "Scooter",
-    # default: _('FCM Django')
-    "FCM_SERVER_KEY": "AAAAg9bmMBM:APA91bHJiRLZfMs9U5Nm-9ovjIy1iEyI7ewEb_b9MBAe--6L3ZqvOg8tpCp3hUmAtUoCf2SpkT55iXAjEXbZ8ZWpa6NIdIAG9JcgFfXMiQk1FGK_u5g4PRsk6LzA6blsYa5t8Fl0W2QM",
-    # true if you want to have only one active device per registered user at a time
-    # default: False
-    "ONE_DEVICE_PER_USER": False,
-    # devices to which notifications cannot be sent,
-    # are deleted upon receiving error response from FCM
-    # default: False
-    "DELETE_INACTIVE_DEVICES": False,
-}
 
 # STORAGE GOOGLE CLOUD
 DEFAULT_FILE_STORAGE = 'gcloud.GoogleCloudMediaFileStorage'
@@ -246,37 +234,3 @@ UPLOAD_ROOT = 'media/uploads/'
 DOWNLOAD_ROOT = os.path.join(ROOT_DIR, "static/media/downloads")
 DOWNLOAD_URL = STATIC_URL + "media/downloads"
 
-GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
-    "scooter-e52b9e8a6f26.json"
-)
-# END STORAGE
-
-# Conekta prod
-CONEKTA_API_KEY = "key_JZxwiecZxNrqHo3YNyxTQQ"
-# dev
-# CONEKTA_API_KEY = "key_2jx7uHTnz8ydRyKkXrNCcQ"
-CONEKTA_API_VERSION = "2.0"
-
-# Swagger
-SWAGGER_YAML_FILE = str(APPS_DIR.path('swagger.yaml'))  # os.path.join(BASE_DIR, 'swagger.yaml')
-FACEBOOK_APP_ID = '690189338433902'
-FACEBOOK_APP_SECRET = '4c55431b063952e631df380e0e73a10a'
-
-URL_SERVER_BACKEND = os.environ.get('URL_SERVER_BACKEND', 'http://localhost:8000')
-URL_SERVER_FRONTEND = os.environ.get('URL_SERVER_FRONTEND', 'http://localhost:4200')
-LIMIT_SECTIONS = os.environ.get('LIMIT_SECTIONS', 5)
-
-# Apple Auth
-
-AUTH_APPLE_ID_CLIENT = 'com.devopsti.scooter.app'  # Your client_id com.application.your, aka "Service ID"
-AUTH_APPLE_ID_TEAM = 'P66H875VKX'  # Your Team ID, ie K2232113
-AUTH_APPLE_ID_KEY = '7AU8KB9MHL'  # Your Key ID, ie Y2P99J3N81K
-AUTH_APPLE_ID_SECRET = """
------BEGIN PRIVATE KEY-----
-MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQg0FB339AAWL0IF/gU
-H0YFDgqR2XPw6jq3u+t/jm+iOwWgCgYIKoZIzj0DAQehRANCAAQIE/U9Daj4cMn9
-d+P1cTSS2YlDGJrEdLAP8u2y7Qgxd87S9eet5YimIKnBfa2VT+bKFSwbyBd+afTt
-6CjJuIdk
------END PRIVATE KEY-----"""
-AUTH_APPLE_ID_SCOPE = ['email', 'name']
-AUTH_APPLE_ID_EMAIL_AS_USERNAME = False  # If you want to use email as username
